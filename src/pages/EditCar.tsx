@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,12 +14,13 @@ import {
   ArrowLeft,
   ImagePlus
 } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import { useToast } from "@/hooks/use-toast";
 
-export default function AddCar() {
-  const { addCar } = useData();
+export default function EditCar() {
+  const { id } = useParams();
+  const { cars, updateCar } = useData();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [images, setImages] = useState<string[]>([]);
@@ -37,6 +38,36 @@ export default function AddCar() {
     status: "available",
     description: ""
   });
+
+  // Находим машину по ID
+  const car = cars.find(c => c.id === Number(id));
+
+  // Загружаем данные машины при загрузке компонента
+  useEffect(() => {
+    if (car) {
+      setFormData({
+        name: car.name,
+        model: car.model,
+        year: car.year,
+        category: car.category,
+        fuelType: car.fuelType,
+        transmission: car.transmission,
+        dailyPrice: car.pricePerDay.toString(),
+        weeklyPrice: car.weeklyPrice?.toString() || "",
+        monthlyPrice: car.monthlyPrice?.toString() || "",
+        mileage: car.mileage.toString(),
+        status: car.status,
+        description: car.description || ""
+      });
+      
+      // Загружаем изображения
+      if (car.images && car.images.length > 0) {
+        setImages(car.images);
+      } else if (car.image) {
+        setImages([car.image]);
+      }
+    }
+  }, [car]);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -61,7 +92,7 @@ export default function AddCar() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSaveCar = () => {
+  const handleUpdateCar = () => {
     if (!formData.name || !formData.model || !formData.category || !formData.dailyPrice) {
       toast({
         title: "Ошибка",
@@ -71,7 +102,17 @@ export default function AddCar() {
       return;
     }
 
-    const carData = {
+    if (!car) {
+      toast({
+        title: "Ошибка",
+        description: "Машина не найдена",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const updatedCarData = {
+      ...car,
       name: formData.name,
       model: formData.model,
       year: formData.year,
@@ -85,18 +126,50 @@ export default function AddCar() {
       status: formData.status as 'available' | 'rented' | 'maintenance' | 'unavailable',
       description: formData.description,
       image: images[0] || "/placeholder.svg",
-      images: images.length > 0 ? images : undefined
+      images: images.length > 0 ? images : undefined,
+      updatedAt: new Date().toISOString()
     };
 
-    addCar(carData);
+    updateCar(car.id, updatedCarData);
     
     toast({
       title: "Успешно",
-      description: "Автомобиль добавлен в автопарк"
+      description: "Информация об автомобиле обновлена"
     });
 
     navigate("/cars");
   };
+
+  // Если машина не найдена, показываем сообщение
+  if (!car) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center gap-4">
+          <Link to="/cars">
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold text-black">Редактировать машину</h1>
+            <p className="text-black">Машина не найдена</p>
+          </div>
+        </div>
+        <Card className="shadow-card">
+          <CardContent className="p-8 text-center">
+            <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+            <h3 className="text-lg font-semibold mb-2">Машина не найдена</h3>
+            <p className="text-muted-foreground mb-4">
+              Запрашиваемая машина не существует или была удалена
+            </p>
+            <Link to="/cars">
+              <Button>Вернуться к списку машин</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -107,10 +180,10 @@ export default function AddCar() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Добавить машину
+          <h1 className="text-3xl font-bold text-black">
+            Редактировать машину
           </h1>
-          <p className="text-muted-foreground">Заполните информацию о новом автомобиле</p>
+          <p className="text-black">Обновите информацию об автомобиле</p>
         </div>
       </div>
 
@@ -178,10 +251,10 @@ export default function AddCar() {
                       <SelectValue placeholder="Выберите категорию" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="economy">Эконом</SelectItem>
-                      <SelectItem value="business">Бизнес</SelectItem>
-                      <SelectItem value="premium">Премиум</SelectItem>
-                      <SelectItem value="suv">Джип</SelectItem>
+                      <SelectItem value="Эконом">Эконом</SelectItem>
+                      <SelectItem value="Бизнес">Бизнес</SelectItem>
+                      <SelectItem value="Премиум">Премиум</SelectItem>
+                      <SelectItem value="Джип">Джип</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -192,10 +265,10 @@ export default function AddCar() {
                       <SelectValue placeholder="Тип топлива" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="petrol">Бензин</SelectItem>
-                      <SelectItem value="diesel">Дизель</SelectItem>
-                      <SelectItem value="hybrid">Гибрид</SelectItem>
-                      <SelectItem value="electric">Электрическая</SelectItem>
+                      <SelectItem value="Бензин">Бензин</SelectItem>
+                      <SelectItem value="Дизель">Дизель</SelectItem>
+                      <SelectItem value="Гибрид">Гибрид</SelectItem>
+                      <SelectItem value="Электрическая">Электрическая</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -206,8 +279,8 @@ export default function AddCar() {
                       <SelectValue placeholder="КПП" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="automatic">Автомат</SelectItem>
-                      <SelectItem value="manual">Механика</SelectItem>
+                      <SelectItem value="Автомат">Автомат</SelectItem>
+                      <SelectItem value="Механика">Механика</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -337,6 +410,7 @@ export default function AddCar() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="available">Доступна</SelectItem>
+                  <SelectItem value="rented">Занята</SelectItem>
                   <SelectItem value="maintenance">На ремонте</SelectItem>
                   <SelectItem value="unavailable">Недоступна</SelectItem>
                 </SelectContent>
@@ -366,10 +440,10 @@ export default function AddCar() {
             <CardContent className="pt-6 space-y-3">
               <Button 
                 className="w-full bg-gradient-primary hover:bg-primary-hover"
-                onClick={handleSaveCar}
+                onClick={handleUpdateCar}
               >
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить машину
+                Обновить машину
               </Button>
               <Button variant="outline" className="w-full">
                 Сохранить как черновик
@@ -380,4 +454,4 @@ export default function AddCar() {
       </div>
     </div>
   );
-}
+} 

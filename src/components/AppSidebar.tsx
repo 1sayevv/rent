@@ -6,7 +6,8 @@ import {
   DollarSign, 
   Settings,
   Plus,
-  BookOpen
+  BookOpen,
+  Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
 
@@ -30,6 +31,7 @@ const mainItems = [
   { title: "Клиенты", url: "/clients", icon: Users },
   { title: "Финансы", url: "/finances", icon: DollarSign },
   { title: "Настройки", url: "/settings", icon: Settings },
+  { title: "Данные", url: "/data", icon: Database },
 ];
 
 const quickActions = [
@@ -118,6 +120,8 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+
+
       </SidebarContent>
     </Sidebar>
   );

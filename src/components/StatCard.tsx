@@ -34,15 +34,15 @@ export function StatCard({
   };
 
   const changeClasses = {
-    positive: "text-success",
-    negative: "text-destructive",
-    neutral: "text-muted-foreground"
+    positive: "text-black",
+    negative: "text-black",
+    neutral: "text-black"
   };
 
   return (
     <Card className={cn("shadow-card hover:shadow-elevated transition-smooth", variantClasses[variant])}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">
+        <CardTitle className="text-sm font-medium text-black">
           {title}
         </CardTitle>
         <div className={cn(
@@ -53,7 +53,7 @@ export function StatCard({
         </div>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold text-card-foreground">{value}</div>
+        <div className="text-2xl font-bold text-black">{value}</div>
         {change && (
           <p className={cn("text-xs", changeClasses[changeType])}>
             {changeType === "positive" && "↗"} 

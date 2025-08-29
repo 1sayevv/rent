@@ -16,85 +16,20 @@ import {
   UserPlus
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useData } from "@/context/DataContext";
+import { ClientDetailsModal } from "@/components/ClientDetailsModal";
+import { Client } from "@/types";
+import { useNavigate } from "react-router-dom";
 
-const clients = [
-  {
-    id: 1,
-    name: "Али Алиев",
-    email: "ali.aliev@email.com",
-    phone: "+994 55 123 45 67",
-    totalBookings: 12,
-    totalSpent: 2340,
-    status: "vip",
-    joinDate: "2023-03-15",
-    lastBooking: "2024-06-10",
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: 2,
-    name: "Лейла Мамедова",
-    email: "leyla.mamedova@email.com", 
-    phone: "+994 50 987 65 43",
-    totalBookings: 8,
-    totalSpent: 1250,
-    status: "regular",
-    joinDate: "2023-07-22",
-    lastBooking: "2024-06-14",
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: 3,
-    name: "Расим Гасанов",
-    email: "rasim.gasanov@email.com",
-    phone: "+994 77 555 33 22", 
-    totalBookings: 15,
-    totalSpent: 3890,
-    status: "vip",
-    joinDate: "2022-11-08",
-    lastBooking: "2024-06-08",
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: 4,
-    name: "Нигяр Исмайылова",
-    email: "nigar.ismayilova@email.com",
-    phone: "+994 51 444 77 88",
-    totalBookings: 5,
-    totalSpent: 680,
-    status: "regular",
-    joinDate: "2024-01-12",
-    lastBooking: "2024-06-13",
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: 5,
-    name: "Эльчин Керимов",
-    email: "elchin.kerimov@email.com",
-    phone: "+994 70 111 22 33",
-    totalBookings: 3,
-    totalSpent: 420,
-    status: "new",
-    joinDate: "2024-05-18",
-    lastBooking: "2024-06-15",
-    avatar: "/placeholder.svg"
-  },
-  {
-    id: 6,
-    name: "Сабина Ахмедова",
-    email: "sabina.ahmadova@email.com",
-    phone: "+994 55 777 88 99",
-    totalBookings: 20,
-    totalSpent: 5200,
-    status: "vip",
-    joinDate: "2022-05-03",
-    lastBooking: "2024-06-12",
-    avatar: "/placeholder.svg"
-  }
-];
+
 
 export default function Clients() {
+  const { clients, deleteClient, bookings, cars } = useData();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -127,6 +62,26 @@ export default function Clients() {
   const newClients = clients.filter(c => c.status === "new").length;
   const totalRevenue = clients.reduce((sum, client) => sum + client.totalSpent, 0);
 
+  // Функции для работы с модальным окном
+  const handleViewClient = (client: Client) => {
+    setSelectedClient(client);
+    setIsModalOpen(true);
+  };
+
+  const handleEditClient = (client: Client) => {
+    // Переход на страницу редактирования клиента
+    navigate(`/clients/edit/${client.id}`);
+  };
+
+  const handleDeleteClient = (clientId: number) => {
+    deleteClient(clientId);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedClient(null);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -136,7 +91,10 @@ export default function Clients() {
           </h1>
           <p className="text-muted-foreground">Управление клиентской базой</p>
         </div>
-        <Button className="bg-gradient-primary hover:bg-primary-hover">
+        <Button 
+          className="bg-gradient-primary hover:bg-primary-hover"
+          onClick={() => navigate("/clients/add")}
+        >
           <UserPlus className="h-4 w-4 mr-2" />
           Добавить клиента
         </Button>
@@ -276,11 +234,21 @@ export default function Clients() {
               </div>
 
               <div className="flex gap-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleViewClient(client)}
+                >
                   <Eye className="h-4 w-4 mr-1" />
                   Просмотр
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleEditClient(client)}
+                >
                   <Edit className="h-4 w-4 mr-1" />
                   Изменить
                 </Button>
@@ -305,6 +273,17 @@ export default function Clients() {
           </p>
         </div>
       )}
+
+      {/* Модальное окно с деталями клиента */}
+      <ClientDetailsModal
+        client={selectedClient}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onEdit={handleEditClient}
+        onDelete={handleDeleteClient}
+        bookings={bookings}
+        cars={cars}
+      />
     </div>
   );
 }

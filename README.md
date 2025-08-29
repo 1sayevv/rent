@@ -1,73 +1,124 @@
-# Welcome to your Lovable project
+# Auto Manage Suite
 
-## Project info
+Система управления автопрокатом с сохранением всех данных в localStorage браузера.
 
-**URL**: https://lovable.dev/projects/f571cfeb-f6fd-4a9b-982b-efb8af810c27
+## Особенности
 
-## How can I edit this code?
+- **Система авторизации**: Защищенный вход для администратора с отдельной страницей логина
+- **Полное сохранение в localStorage**: Все данные (автомобили, клиенты, бронирования, финансы, настройки) автоматически сохраняются в localStorage браузера
+- **Экспорт/Импорт данных**: Возможность экспорта всех данных в JSON файл и импорта из резервной копии
+- **Управление автомобилями**: Добавление, редактирование, удаление автомобилей
+- **Управление клиентами**: База данных клиентов с историей бронирований
+- **Система бронирований**: Создание и управление бронированиями с различными статусами
+- **Финансовый учет**: Отслеживание доходов и расходов
+- **Настройки системы**: Конфигурация компании и системных параметров
 
-There are several ways of editing your application.
+## Структура данных
 
-**Use Lovable**
+### Автомобили (Cars)
+- Основная информация (название, модель, год)
+- Технические характеристики (топливо, КПП, пробег)
+- Ценообразование (дневная, недельная, месячная ставки)
+- Статус (доступен, занят, на ремонте)
+- Изображения
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f571cfeb-f6fd-4a9b-982b-efb8af810c27) and start prompting.
+### Клиенты (Clients)
+- Контактная информация (имя, email, телефон)
+- Статистика (количество бронирований, общая сумма)
+- Статус (VIP, постоянный, новый)
+- История активности
 
-Changes made via Lovable will be committed automatically to this repo.
+### Бронирования (Bookings)
+- Связь с клиентом и автомобилем
+- Даты аренды (начало и конец)
+- Локации получения и возврата
+- Статус (подтвержден, ожидает, активен, завершен, отменен)
+- Общая стоимость
 
-**Use your preferred IDE**
+### Финансовые записи (Financial Records)
+- Тип (доход/расход)
+- Категория
+- Сумма
+- Описание
+- Дата
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Настройки (Settings)
+- Информация о компании
+- Валюта и часовой пояс
+- Язык интерфейса
+- Настройки уведомлений
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Функции localStorage
 
-Follow these steps:
+### Автоматическое сохранение
+Все изменения в данных автоматически сохраняются в localStorage браузера:
+- `cars` - данные автомобилей
+- `clients` - данные клиентов  
+- `bookings` - данные бронирований
+- `financialRecords` - финансовые записи
+- `settings` - настройки системы
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+### Экспорт данных
+- Скачивание всех данных в JSON файл
+- Включает метаданные (дата экспорта, версия)
+- Используется для резервного копирования
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### Импорт данных
+- Загрузка данных из JSON файла
+- Полная замена существующих данных
+- Восстановление из резервной копии
 
-# Step 3: Install the necessary dependencies.
-npm i
+### Очистка данных
+- Удаление всех данных из localStorage
+- Подтверждение действия для предотвращения случайной потери
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+## Установка и запуск
+
+```bash
+# Установка зависимостей
+npm install
+
+# Запуск в режиме разработки
 npm run dev
+
+# Сборка для продакшена
+npm run build
 ```
 
-**Edit a file directly in GitHub**
+## Использование
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+1. **Вход в систему**: Перейдите на `/login` и введите данные администратора
+2. **Добавление автомобиля**: Перейдите в раздел "Машины" → "Добавить машину"
+3. **Управление клиентами**: Раздел "Клиенты" для работы с клиентской базой
+4. **Создание бронирования**: Раздел "Бронирования" для управления заказами
+5. **Настройки**: Раздел "Настройки" для конфигурации системы
+6. **Управление данными**: Раздел "Данные" для экспорта/импорта
 
-**Use GitHub Codespaces**
+## Данные для входа
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **Email**: admin@mail.com
+- **Пароль**: 1234
 
-## What technologies are used for this project?
+## Технические детали
 
-This project is built with:
+- **React 18** с TypeScript
+- **Vite** для сборки
+- **Tailwind CSS** для стилизации
+- **React Router** для навигации
+- **Context API** для управления состоянием
+- **localStorage API** для хранения данных
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Безопасность
 
-## How can I deploy this project?
+⚠️ **Важно**: Данные хранятся локально в браузере пользователя. При очистке кэша или смене браузера данные могут быть потеряны. Рекомендуется регулярно экспортировать данные для резервного копирования.
 
-Simply open [Lovable](https://lovable.dev/projects/f571cfeb-f6fd-4a9b-982b-efb8af810c27) and click on Share -> Publish.
+## Поддержка браузеров
 
-## Can I connect a custom domain to my Lovable project?
+Система работает во всех современных браузерах, поддерживающих:
+- localStorage API
+- ES6+ синтаксис
+- CSS Grid и Flexbox
 
-Yes, you can!
+## Лицензия
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+MIT License

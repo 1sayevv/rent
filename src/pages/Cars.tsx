@@ -16,87 +16,29 @@ import {
   Settings,
   Calendar
 } from "lucide-react";
-import { Link } from "react-router-dom";
-
-const cars = [
-  {
-    id: 1,
-    name: "Toyota Camry",
-    model: "2023",
-    category: "Бизнес",
-    pricePerDay: 45,
-    mileage: 12500,
-    fuelType: "Бензин",
-    transmission: "Автомат",
-    status: "available",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 2,
-    name: "BMW X5",
-    model: "2022",
-    category: "Премиум",
-    pricePerDay: 85,
-    mileage: 8500,
-    fuelType: "Бензин",
-    transmission: "Автомат", 
-    status: "rented",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 3,
-    name: "Mercedes C-Class",
-    model: "2023",
-    category: "Премиум",
-    pricePerDay: 75,
-    mileage: 5200,
-    fuelType: "Бензин",
-    transmission: "Автомат",
-    status: "available",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 4,
-    name: "Hyundai Sonata",
-    model: "2022",
-    category: "Эконом",
-    pricePerDay: 35,
-    mileage: 18000,
-    fuelType: "Бензин",
-    transmission: "Автомат",
-    status: "maintenance",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 5,
-    name: "Audi Q7",
-    model: "2023",
-    category: "Премиум",
-    pricePerDay: 95,
-    mileage: 3200,
-    fuelType: "Бензин",
-    transmission: "Автомат",
-    status: "available",
-    image: "/placeholder.svg"
-  },
-  {
-    id: 6,
-    name: "Kia Rio",
-    model: "2021",
-    category: "Эконом", 
-    pricePerDay: 25,
-    mileage: 32000,
-    fuelType: "Бензин",
-    transmission: "Механика",
-    status: "rented",
-    image: "/placeholder.svg"
-  }
-];
+import { Link, useNavigate } from "react-router-dom";
+import { useData } from "@/context/DataContext";
+import { CarDetailsModal } from "@/components/CarDetailsModal";
+import { Car as CarType } from "@/types";
 
 export default function Cars() {
+  const { cars, deleteCar } = useData();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedCar, setSelectedCar] = useState<CarType | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleViewCar = (car: CarType) => {
+    setSelectedCar(car);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedCar(null);
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -143,10 +85,10 @@ export default function Cars() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-black">
             Автопарк
           </h1>
-          <p className="text-muted-foreground">Управление автомобилями</p>
+          <p className="text-black">Управление автомобилями</p>
         </div>
         <Link to="/cars/add">
           <Button className="bg-gradient-primary hover:bg-primary-hover">
@@ -299,16 +241,31 @@ export default function Cars() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 pt-2">
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Eye className="h-4 w-4 mr-1" />
-                    Просмотр
+                <div className="flex gap-2 pt-2 overflow-hidden">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 min-w-0"
+                    onClick={() => handleViewCar(car)}
+                  >
+                    <Eye className="h-4 w-4 mr-1 flex-shrink-0" />
+                    <span className="truncate">Просмотр</span>
                   </Button>
-                  <Button variant="outline" size="sm" className="flex-1">
-                    <Edit className="h-4 w-4 mr-1" />
-                    Изменить
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="flex-1 min-w-0"
+                    onClick={() => navigate(`/cars/edit/${car.id}`)}
+                  >
+                    <Edit className="h-4 w-4 mr-1 flex-shrink-0" />
+                    <span className="truncate">Изменить</span>
                   </Button>
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => deleteCar(car.id)}
+                    className="text-destructive hover:bg-destructive/10 flex-shrink-0 w-9 h-9 p-0"
+                  >
                     <Trash2 className="h-4 w-4" />
                   </Button>
                 </div>
@@ -331,6 +288,13 @@ export default function Cars() {
           </Button>
         </div>
       )}
+
+      {/* Модальное окно с деталями машины */}
+      <CarDetailsModal
+        car={selectedCar}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 }

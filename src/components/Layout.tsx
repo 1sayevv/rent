@@ -1,8 +1,9 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search, User } from "lucide-react";
+import { Bell, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ProfileMenu from "./ProfileMenu";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -35,9 +36,7 @@ export function Layout({ children }: LayoutProps) {
                   3
                 </span>
               </Button>
-              <Button variant="ghost" size="icon">
-                <User className="h-5 w-5" />
-              </Button>
+              <ProfileMenu />
             </div>
           </header>
 

@@ -85,10 +85,10 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-3xl font-bold text-black">
             Dashboard
           </h1>
-          <p className="text-muted-foreground">Обзор вашего автопарка</p>
+          <p className="text-black">Обзор вашего автопарка</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Сегодня</p>
@@ -135,7 +135,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-black">
               <Calendar className="h-5 w-5 text-primary" />
               Бронирования по дням недели
             </CardTitle>
@@ -155,7 +155,7 @@ export default function Dashboard() {
 
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-black">
               <TrendingUp className="h-5 w-5 text-revenue" />
               Доход по месяцам
             </CardTitle>
@@ -185,7 +185,7 @@ export default function Dashboard() {
         {/* Recent Bookings */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-black">
               <CheckCircle className="h-5 w-5 text-success" />
               Новые бронирования
             </CardTitle>
@@ -206,7 +206,7 @@ export default function Dashboard() {
         {/* Today's Schedule */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-black">
               <Clock className="h-5 w-5 text-primary" />
               Расписание на сегодня
             </CardTitle>
@@ -232,7 +232,7 @@ export default function Dashboard() {
         {/* Top Cars */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
+            <CardTitle className="flex items-center gap-2 text-black">
               <Car className="h-5 w-5 text-primary" />
               ТОП-5 популярных машин
             </CardTitle>

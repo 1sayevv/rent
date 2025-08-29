@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +13,9 @@ import {
   Eye,
   AlertTriangle
 } from "lucide-react";
+import { ExportModal } from "@/components/ExportModal";
+import { prepareFinancialData } from "@/utils/exportUtils";
+import { useData } from "@/context/DataContext";
 import {
   LineChart,
   Line,
@@ -111,6 +115,12 @@ const debts = [
 ];
 
 export default function Finances() {
+  const { financialRecords, bookings, cars, clients } = useData();
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Подготовка данных для экспорта
+  const financialReport = prepareFinancialData(financialRecords, bookings, cars, clients);
+
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
@@ -138,7 +148,10 @@ export default function Finances() {
           </h1>
           <p className="text-muted-foreground">Анализ доходов и расходов</p>
         </div>
-        <Button className="bg-gradient-primary hover:bg-primary-hover">
+        <Button 
+          className="bg-gradient-primary hover:bg-primary-hover"
+          onClick={() => setIsExportModalOpen(true)}
+        >
           <Download className="h-4 w-4 mr-2" />
           Экспорт отчета
         </Button>
@@ -442,6 +455,13 @@ export default function Finances() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Модальное окно экспорта */}
+      <ExportModal
+        isOpen={isExportModalOpen}
+        onClose={() => setIsExportModalOpen(false)}
+        report={financialReport}
+      />
     </div>
   );
 }

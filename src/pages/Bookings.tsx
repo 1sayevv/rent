@@ -18,93 +18,21 @@ import {
   MapPin,
   Clock
 } from "lucide-react";
+import { useData } from "@/context/DataContext";
+import { BookingCalendar } from "@/components/BookingCalendar";
+import { BookingDetailsModal } from "@/components/BookingDetailsModal";
+import { useNavigate } from "react-router-dom";
+import { Booking } from "@/types";
 
-const bookings = [
-  {
-    id: 1,
-    client: {
-      name: "Али Алиев",
-      phone: "+994 55 123 45 67",
-      email: "ali.aliev@email.com"
-    },
-    car: "BMW X5 (2022)",
-    startDate: "2024-06-15",
-    endDate: "2024-06-20",
-    pickupLocation: "Аэропорт Гейдар Алиев",
-    returnLocation: "Центральный офис",
-    totalPrice: 425,
-    status: "confirmed",
-    createdAt: "2024-06-10"
-  },
-  {
-    id: 2,
-    client: {
-      name: "Лейла Мамедова",
-      phone: "+994 50 987 65 43",
-      email: "leyla.mamedova@email.com"
-    },
-    car: "Mercedes C-Class (2023)",
-    startDate: "2024-06-16",
-    endDate: "2024-06-18",
-    pickupLocation: "Отель Four Seasons",
-    returnLocation: "Отель Four Seasons",
-    totalPrice: 150,
-    status: "pending",
-    createdAt: "2024-06-14"
-  },
-  {
-    id: 3,
-    client: {
-      name: "Расим Гасанов",
-      phone: "+994 77 555 33 22",
-      email: "rasim.gasanov@email.com"
-    },
-    car: "Toyota Camry (2023)",
-    startDate: "2024-06-12",
-    endDate: "2024-06-16",
-    pickupLocation: "Центральный офис",
-    returnLocation: "Аэропорт Гейдар Алиев",
-    totalPrice: 180,
-    status: "active",
-    createdAt: "2024-06-08"
-  },
-  {
-    id: 4,
-    client: {
-      name: "Нигяр Исмайылова",
-      phone: "+994 51 444 77 88",
-      email: "nigar.ismayilova@email.com"
-    },
-    car: "Hyundai Tucson (2022)",
-    startDate: "2024-06-18",
-    endDate: "2024-06-25",
-    pickupLocation: "Торговый центр Park Bulvar",
-    returnLocation: "Центральный офис",
-    totalPrice: 280,
-    status: "confirmed",
-    createdAt: "2024-06-13"
-  },
-  {
-    id: 5,
-    client: {
-      name: "Эльчин Керимов",
-      phone: "+994 70 111 22 33",
-      email: "elchin.kerimov@email.com"
-    },
-    car: "Audi Q7 (2023)",
-    startDate: "2024-06-20",
-    endDate: "2024-06-27",
-    pickupLocation: "Аэропорт Гейдар Алиев",
-    returnLocation: "Аэропорт Гейдар Алиев",
-    totalPrice: 665,
-    status: "pending",
-    createdAt: "2024-06-15"
-  }
-];
+
 
 export default function Bookings() {
+  const { bookings, updateBooking, deleteBooking, cars, clients } = useData();
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -134,6 +62,38 @@ export default function Bookings() {
   const confirmedBookings = bookings.filter(b => b.status === "confirmed").length;
   const pendingBookings = bookings.filter(b => b.status === "pending").length;
   const activeBookings = bookings.filter(b => b.status === "active").length;
+
+  // Функции для работы с календарем
+  const handleViewBooking = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsBookingModalOpen(true);
+  };
+
+  const handleEditBooking = (booking: Booking) => {
+    // Здесь можно добавить переход на страницу редактирования
+    console.log('Edit booking:', booking);
+  };
+
+  const handleDeleteBooking = (bookingId: number) => {
+    // Удаление бронирования
+    if (confirm('Вы уверены, что хотите удалить это бронирование?')) {
+      deleteBooking(bookingId);
+    }
+  };
+
+  const handleStatusChange = (bookingId: number, status: string) => {
+    updateBooking(bookingId, { status: status as any });
+  };
+
+  const handleAddBooking = () => {
+    // Здесь можно добавить переход на страницу добавления бронирования
+    console.log('Add booking');
+  };
+
+  const handleCloseBookingModal = () => {
+    setIsBookingModalOpen(false);
+    setSelectedBooking(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -322,24 +282,41 @@ export default function Bookings() {
                 </div>
 
                 <div className="flex gap-2 pt-4 border-t">
-                  <Button variant="outline" size="sm">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleViewBooking(booking)}
+                  >
                     <Eye className="h-4 w-4 mr-1" />
                     Просмотр
                   </Button>
                   {booking.status === "pending" && (
                     <>
-                      <Button size="sm" className="bg-success hover:bg-success/90">
+                      <Button 
+                        size="sm" 
+                        className="bg-success hover:bg-success/90"
+                        onClick={() => updateBooking(booking.id, { status: 'confirmed' })}
+                      >
                         <Check className="h-4 w-4 mr-1" />
                         Подтвердить
                       </Button>
-                      <Button variant="outline" size="sm" className="text-destructive hover:bg-destructive/10">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        className="text-destructive hover:bg-destructive/10"
+                        onClick={() => updateBooking(booking.id, { status: 'cancelled' })}
+                      >
                         <X className="h-4 w-4 mr-1" />
                         Отклонить
                       </Button>
                     </>
                   )}
                   {booking.status === "active" && (
-                    <Button size="sm" className="bg-warning hover:bg-warning/90">
+                    <Button 
+                      size="sm" 
+                      className="bg-warning hover:bg-warning/90"
+                      onClick={() => updateBooking(booking.id, { status: 'completed' })}
+                    >
                       <Check className="h-4 w-4 mr-1" />
                       Завершить
                     </Button>
@@ -351,23 +328,14 @@ export default function Bookings() {
         </TabsContent>
 
         <TabsContent value="calendar">
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Calendar className="h-5 w-5 text-primary" />
-                Календарь бронирований
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="h-96 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Календарь бронирований будет реализован</p>
-                  <p className="text-sm">с интеграцией с библиотекой календаря</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BookingCalendar
+            bookings={bookings}
+            cars={cars}
+            onViewBooking={handleViewBooking}
+            onEditBooking={handleEditBooking}
+            onDeleteBooking={handleDeleteBooking}
+            onAddBooking={handleAddBooking}
+          />
         </TabsContent>
       </Tabs>
 
@@ -380,6 +348,18 @@ export default function Bookings() {
           </p>
         </div>
       )}
+
+      {/* Модальное окно с деталями бронирования */}
+      <BookingDetailsModal
+        booking={selectedBooking}
+        isOpen={isBookingModalOpen}
+        onClose={handleCloseBookingModal}
+        onEdit={handleEditBooking}
+        onDelete={handleDeleteBooking}
+        onStatusChange={handleStatusChange}
+        car={selectedBooking ? cars.find(c => c.name === selectedBooking.car) : undefined}
+        client={selectedBooking ? clients.find(c => c.id === selectedBooking.clientId) : undefined}
+      />
     </div>
   );
 }
