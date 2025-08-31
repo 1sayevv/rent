@@ -66,8 +66,8 @@ export default function DraggableImageGallery({
       
       if (availableSlots <= 0) {
         toast({
-          title: "Ошибка",
-          description: `Максимальное количество изображений: ${maxImages}`,
+          title: "Error",
+          description: `Maximum number of images: ${maxImages}`,
           variant: "destructive"
         });
         return;
@@ -76,20 +76,20 @@ export default function DraggableImageGallery({
       Array.from(files).forEach((file, index) => {
         // Проверяем, не превышаем ли лимит
         if (index >= availableSlots) {
-          errors.push(`Достигнут лимит изображений (${maxImages})`);
+          errors.push(`Image limit reached (${maxImages})`);
           return;
         }
 
         // Проверяем тип файла
         if (!file.type.startsWith('image/')) {
-          errors.push(`${file.name} - не является изображением`);
+          errors.push(`${file.name} - is not an image`);
           return;
         }
 
         // Проверяем размер файла (10MB)
         const maxSize = 10 * 1024 * 1024; // 10MB
         if (file.size > maxSize) {
-          errors.push(`${file.name} - размер превышает 10MB`);
+          errors.push(`${file.name} - size exceeds 10MB`);
           return;
         }
 
@@ -100,7 +100,7 @@ export default function DraggableImageGallery({
       if (errors.length > 0) {
         errors.forEach(error => {
           toast({
-            title: "Ошибка загрузки",
+            title: "Upload Error",
             description: error,
             variant: "destructive"
           });
@@ -127,25 +127,25 @@ export default function DraggableImageGallery({
         onImagesChange([...legacyImages, ...results]);
       } else {
         // Новый режим - используем ImageFile объекты
-    const newImages: ImageFile[] = [];
+        const newImages: ImageFile[] = [];
         validFiles.forEach((file, index) => {
-        const id = `image-${Date.now()}-${index}`;
-        const preview = URL.createObjectURL(file);
-        newImages.push({ id, file, preview });
+          const id = `image-${Date.now()}-${index}`;
+          const preview = URL.createObjectURL(file);
+          newImages.push({ id, file, preview });
         });
         onImagesChange([...modernImages, ...newImages]);
       }
 
       if (validFiles.length > 0) {
         toast({
-          title: "Успешно",
-          description: `Загружено ${validFiles.length} изображений`,
+          title: "Success",
+          description: `Uploaded ${validFiles.length} images`,
         });
       }
     } catch (error) {
       toast({
-        title: "Ошибка",
-        description: "Произошла ошибка при загрузке файлов",
+        title: "Error",
+        description: "An error occurred while uploading files",
         variant: "destructive"
       });
     } finally {
@@ -249,14 +249,14 @@ export default function DraggableImageGallery({
             isDragOver ? "text-primary" : "text-foreground"
           )}>
             {isUploading 
-              ? "Загрузка..." 
+              ? "Uploading..." 
               : isDragOver 
-                ? "Отпустите файлы для загрузки" 
-                : "Загрузить изображения"
+                ? "Drop files to upload" 
+                : "Upload Images"
             }
           </p>
           <p className="text-sm text-muted-foreground">
-            Drag & Drop поддерживается • {isLegacyMode ? legacyImages.length : modernImages.length}/{maxImages}
+            Drag & Drop supported • {isLegacyMode ? legacyImages.length : modernImages.length}/{maxImages}
           </p>
         </div>
       )}
@@ -265,9 +265,9 @@ export default function DraggableImageGallery({
       {(isLegacyMode ? legacyImages.length >= maxImages : modernImages.length >= maxImages) && (
         <div className="border border-muted rounded-lg p-4 text-center">
           <p className="text-sm text-muted-foreground">
-            Достигнут лимит изображений ({maxImages})
+            Image limit reached ({maxImages})
           </p>
-      </div>
+        </div>
       )}
 
       {/* Images Grid */}
@@ -276,10 +276,10 @@ export default function DraggableImageGallery({
           {/* Header with drag instruction and photo count */}
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-medium text-foreground">
-              Перетащите изображения для изменения порядка
+              Drag images to change order
             </h3>
             <span className="text-sm text-muted-foreground">
-              {isLegacyMode ? legacyImages.length : modernImages.length} фото
+              {isLegacyMode ? legacyImages.length : modernImages.length} photos
             </span>
           </div>
 

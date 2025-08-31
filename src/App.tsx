@@ -21,51 +21,61 @@ import Finances from "./pages/Finances";
 import Settings from "./pages/Settings";
 import DataManager from "./components/DataManager";
 import NotFound from "./pages/NotFound";
+import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <DataProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Публичный маршрут для входа */}
-            <Route path="/login" element={<Login />} />
-            
-            {/* Защищенные маршруты */}
-            <Route path="/*" element={
-              <ProtectedRoute>
-                <Layout>
-                  <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/cars" element={<Cars />} />
-                    <Route path="/cars/add" element={<AddCar />} />
-                    <Route path="/cars/edit/:id" element={<EditCar />} />
-                    <Route path="/cars/:id" element={<CarDetails />} />
-                    <Route path="/bookings" element={<Bookings />} />
-                    <Route path="/bookings/calendar" element={<Bookings />} />
-                    <Route path="/clients" element={<Clients />} />
-                    <Route path="/clients/add" element={<AddClient />} />
-                    <Route path="/clients/edit/:id" element={<EditClient />} />
-                    <Route path="/clients/:id" element={<ClientDetails />} />
-                    <Route path="/finances" element={<Finances />} />
-                    <Route path="/settings" element={<Settings />} />
-                    <Route path="/data" element={<DataManager />} />
-                    
-                    {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                    <Route path="*" element={<NotFound />} />
-                  </Routes>
-                </Layout>
-              </ProtectedRoute>
-            } />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </DataProvider>
-  </QueryClientProvider>
-);
+const App = () => {
+  // Принудительно очищаем localStorage при загрузке приложения
+  useEffect(() => {
+    localStorage.removeItem('isAuthenticated');
+    localStorage.removeItem('userData');
+    localStorage.removeItem('loginTime');
+  }, []);
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <DataProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Публичный маршрут для входа */}
+              <Route path="/login" element={<Login />} />
+              
+              {/* Защищенные маршруты */}
+              <Route path="/*" element={
+                <ProtectedRoute>
+                  <Layout>
+                    <Routes>
+                      <Route path="/" element={<Dashboard />} />
+                      <Route path="/cars" element={<Cars />} />
+                      <Route path="/cars/add" element={<AddCar />} />
+                      <Route path="/cars/edit/:id" element={<EditCar />} />
+                      <Route path="/cars/:id" element={<CarDetails />} />
+                      <Route path="/bookings" element={<Bookings />} />
+                      <Route path="/bookings/calendar" element={<Bookings />} />
+                      <Route path="/clients" element={<Clients />} />
+                      <Route path="/clients/add" element={<AddClient />} />
+                      <Route path="/clients/edit/:id" element={<EditClient />} />
+                      <Route path="/clients/:id" element={<ClientDetails />} />
+                      <Route path="/finances" element={<Finances />} />
+                      <Route path="/settings" element={<Settings />} />
+                      <Route path="/data" element={<DataManager />} />
+                      
+                      {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                      <Route path="*" element={<NotFound />} />
+                    </Routes>
+                  </Layout>
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </DataProvider>
+    </QueryClientProvider>
+  );
+};
 
 export default App;

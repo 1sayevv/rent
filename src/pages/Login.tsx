@@ -19,14 +19,14 @@ import {
 
 const USER_CREDENTIALS = {
   admin: {
-  email: "admin@mail.com",
+    email: "admin@mail.com",
     password: "1234",
-    name: "Администратор"
+    name: "Administrator"
   },
   manager: {
     email: "manager@mail.com", 
     password: "1234",
-    name: "Менеджер"
+    name: "Manager"
   }
 };
 
@@ -40,9 +40,10 @@ export default function Login() {
 
   // Простая проверка аутентификации через localStorage
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userData = localStorage.getItem('userData');
 
-  // Если пользователь уже авторизован, перенаправляем на главную
-  if (isAuthenticated) {
+  // Если пользователь уже авторизован и есть данные пользователя, перенаправляем на главную
+  if (isAuthenticated && userData) {
     return <Navigate to="/" replace />;
   }
 
@@ -79,18 +80,18 @@ export default function Login() {
       localStorage.setItem('userData', JSON.stringify(userData));
       localStorage.setItem('loginTime', new Date().toISOString());
 
-      const roleText = userRole === 'admin' ? 'администратора' : 'менеджера';
+      const roleText = userRole === 'admin' ? 'administrator' : 'manager';
 
       toast({
-        title: "Успешный вход",
-        description: `Добро пожаловать в систему управления автопрокатом, ${roleText}!`
+        title: "Login successful",
+        description: `Welcome to the car rental management system, ${roleText}!`
       });
 
       navigate("/");
     } else {
       toast({
-        title: "Ошибка входа",
-        description: "Неверный email или пароль",
+        title: "Login error",
+        description: "Invalid email or password",
         variant: "destructive"
       });
     }
@@ -110,7 +111,7 @@ export default function Login() {
             Auto Manage Suite
           </h1>
           <p className="text-muted-foreground">
-            Система управления автопрокатом
+            Car Rental Management System
           </p>
         </div>
 
@@ -118,10 +119,10 @@ export default function Login() {
         <Card className="shadow-2xl border-0 bg-background/80 backdrop-blur-sm">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-2xl font-bold text-center">
-              Вход в систему
+              Sign In
             </CardTitle>
             <p className="text-sm text-muted-foreground text-center">
-              Введите данные для доступа к системе
+              Enter your credentials to access the system
             </p>
           </CardHeader>
           <CardContent>
@@ -135,41 +136,43 @@ export default function Login() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@mail.com или manager@mail.com"
+                    placeholder="admin@mail.com or manager@mail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10"
                     required
+                    className="pl-10"
                   />
                 </div>
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-sm font-medium">
-                  Пароль
+                  Password
                 </Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="••••"
+                    placeholder="Enter your password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10"
                     required
+                    className="pl-10 pr-10"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (
-                      <EyeOff className="h-4 w-4" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
-                  </button>
+                  </Button>
                 </div>
               </div>
 
@@ -178,14 +181,7 @@ export default function Login() {
                 className="w-full bg-gradient-primary hover:bg-primary-hover"
                 disabled={isLoading}
               >
-                {isLoading ? (
-                  <div className="flex items-center gap-2">
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Вход...
-                  </div>
-                ) : (
-                  "Войти в систему"
-                )}
+                {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
 

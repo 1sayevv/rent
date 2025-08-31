@@ -48,30 +48,30 @@ export default function ProfileMenu() {
   const getRoleText = (role: string) => {
     switch (role) {
       case 'admin':
-        return 'Администратор';
+        return 'Administrator';
       case 'manager':
-        return 'Менеджер';
+        return 'Manager';
       default:
-        return 'Пользователь';
+        return 'User';
     }
   };
 
   const getRoleBadge = (role: string) => {
     switch (role) {
       case 'admin':
-        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Админ</Badge>;
+        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Admin</Badge>;
       case 'manager':
-        return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Менеджер</Badge>;
+        return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Manager</Badge>;
       default:
-        return <Badge variant="outline">Пользователь</Badge>;
+        return <Badge variant="outline">User</Badge>;
     }
   };
 
   const handleLogout = () => {
     logout();
     toast({
-      title: "Выход выполнен",
-      description: "Вы успешно вышли из системы"
+      title: "Logged out",
+      description: "You have successfully logged out of the system"
     });
     navigate('/login');
   };
@@ -81,9 +81,9 @@ export default function ProfileMenu() {
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2 px-3 py-2">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary/10 text-primary text-sm">
+        <Button variant="ghost" className="flex items-center gap-2 px-3 py-2 hover:bg-accent">
+          <Avatar className="h-8 w-8 border-2 border-primary/20">
+            <AvatarFallback className="bg-primary/10 text-primary text-sm font-medium">
               {getInitials(user.email)}
             </AvatarFallback>
           </Avatar>
@@ -106,12 +106,12 @@ export default function ProfileMenu() {
               {user.email}
             </p>
             <p className="text-xs leading-none text-muted-foreground">
-              {getRoleText(user.role)} системы
+              {getRoleText(user.role)} system
             </p>
             {loginTime && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
                 <Clock className="h-3 w-3" />
-                <span>Вход: {formatLoginTime(loginTime)}</span>
+                <span>Login: {formatLoginTime(loginTime)}</span>
               </div>
             )}
           </div>
@@ -122,7 +122,7 @@ export default function ProfileMenu() {
         {hasPermission('settings', 'view') && (
           <DropdownMenuItem onClick={() => navigate('/settings')}>
             <Settings className="mr-2 h-4 w-4" />
-            <span>Настройки</span>
+            <span>Settings</span>
           </DropdownMenuItem>
         )}
         
@@ -133,7 +133,7 @@ export default function ProfileMenu() {
           className="text-destructive focus:text-destructive"
         >
           <LogOut className="mr-2 h-4 w-4" />
-          <span>Выйти из системы</span>
+          <span>Log out of the system</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

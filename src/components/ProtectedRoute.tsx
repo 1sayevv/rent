@@ -6,11 +6,12 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // Простая проверка аутентификации через localStorage
+  // Проверяем аутентификацию через localStorage
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+  const userData = localStorage.getItem('userData');
 
-  // Если не авторизован, перенаправляем на логин
-  if (!isAuthenticated) {
+  // Если не авторизован или нет данных пользователя, перенаправляем на логин
+  if (!isAuthenticated || !userData) {
     return <Navigate to="/login" replace />;
   }
 

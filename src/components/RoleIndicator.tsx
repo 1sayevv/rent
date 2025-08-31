@@ -11,19 +11,19 @@ export function RoleIndicator() {
     switch (role) {
       case 'admin':
         return {
-          text: 'Администратор',
+          text: 'Administrator',
           icon: Shield,
           className: 'bg-primary/10 text-primary border-primary'
         };
       case 'manager':
         return {
-          text: 'Менеджер',
+          text: 'Manager',
           icon: User,
           className: 'bg-blue-50 text-blue-600 border-blue-200'
         };
       default:
         return {
-          text: 'Пользователь',
+          text: 'User',
           icon: User,
           className: 'bg-gray-50 text-gray-600 border-gray-200'
         };

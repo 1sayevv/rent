@@ -70,17 +70,7 @@ export default function Settings() {
   const { settings, updateSettings } = useData();
   const { toast } = useToast();
   
-  // Проверяем разрешение на просмотр настроек
-  if (!hasPermission('settings', 'view')) {
-    return (
-      <AccessDenied 
-        title="Настройки недоступны"
-        description="Управление системными настройками доступно только администраторам системы."
-      />
-    );
-  }
-
-  // Состояние для категорий
+  // Все useState хуки должны быть в начале компонента
   const [categoriesList, setCategoriesList] = useState(categories);
   const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -111,6 +101,16 @@ export default function Settings() {
   const [termsConditions, setTermsConditions] = useState(
     "1. Общие положения\n\nНастоящие условия аренды определяют порядок предоставления услуг аренды автомобилей.\n\n2. Права и обязанности сторон\n\nАрендатор обязуется:\n- Предоставить действующие документы\n- Соблюдать правила дорожного движения\n- Вернуть автомобиль в оговоренное время\n\n3. Ответственность\n\nЗа нарушение условий договора стороны несут ответственность в соответствии с действующим законодательством."
   );
+  
+  // Проверяем разрешение на просмотр настроек
+  if (!hasPermission('settings', 'view')) {
+    return (
+      <AccessDenied 
+        title="Настройки недоступны"
+        description="Управление системными настройками доступно только администраторам системы."
+      />
+    );
+  }
 
   // Функции для работы с категориями
   const handleAddCategory = () => {

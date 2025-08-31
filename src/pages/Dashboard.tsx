@@ -87,100 +87,95 @@ export default function Dashboard() {
   // Упрощенная версия для менеджера
   if (userRole === 'manager') {
     return (
-      <div className="space-y-4 sm:space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-black">
+            <h1 className="text-3xl font-bold text-black">
               Dashboard
             </h1>
-            <p className="text-black text-sm sm:text-base">Обзор автопарка и активных бронирований</p>
+            <p className="text-black">Обзор автопарка и активных бронирований</p>
           </div>
-          <div className="text-left sm:text-right">
+          <div className="text-right">
             <p className="text-sm text-muted-foreground">Сегодня</p>
-            <p className="text-base sm:text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
+            <p className="text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
           </div>
         </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {/* Stats Cards для менеджера */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard
-            title="Всего машин"
-            value="24"
-            change="+2"
+            title="Свободные машины"
+            value={24}
+            change="+2 с вчера"
             changeType="positive"
             icon={Car}
             variant="success"
           />
           <StatCard
-            title="Активные брони"
-            value="8"
-            change="+1"
+            title="Занятые машины"
+            value={18}
+            change="-3 с вчера"
+            changeType="negative"
+            icon={AlertCircle}
+            variant="warning"
+          />
+          <StatCard
+            title="Активные бронирования"
+            value={12}
+            change="+3 сегодня"
             changeType="positive"
             icon={Calendar}
             variant="default"
           />
-          <StatCard
-            title="Доход за месяц"
-            value="45,200₼"
-            change="+12%"
-            changeType="positive"
-            icon={DollarSign}
-            variant="revenue"
-          />
-          <StatCard
-            title="Клиенты"
-            value="156"
-            change="+8"
-            changeType="positive"
-            icon={Users}
-            variant="default"
-          />
         </div>
 
-        {/* Recent Bookings */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">Последние бронирования</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {recentBookings.slice(0, 3).map((booking) => (
-                <div key={booking.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/30 rounded-lg">
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm sm:text-base truncate">{booking.client}</p>
-                    <p className="text-sm text-muted-foreground truncate">{booking.car}</p>
-                  </div>
-                  <div className="flex items-center gap-2 mt-2 sm:mt-0">
-                    <span className="text-xs sm:text-sm text-muted-foreground">{booking.date}</span>
-                    {getStatusBadge(booking.status)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Today's Schedule */}
-        <Card className="shadow-card">
-          <CardHeader>
-            <CardTitle className="text-lg sm:text-xl">Расписание на сегодня</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
+        {/* Расписание на сегодня для менеджера */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-black">
+                <Clock className="h-5 w-5 text-primary" />
+                Расписание на сегодня
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
               {todaySchedule.map((item, index) => (
-                <div key={index} className="flex flex-col sm:flex-row sm:items-center justify-between p-3 bg-muted/30 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm sm:text-base font-medium text-primary">{item.time}</div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm sm:text-base truncate">{item.action}</p>
-                      <p className="text-sm text-muted-foreground truncate">{item.client} • {item.car}</p>
-                    </div>
+                <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                  <div className="text-center min-w-[60px]">
+                    <p className="text-xs font-medium text-primary">{item.time}</p>
                   </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{item.action}</p>
+                    <p className="text-xs text-muted-foreground">{item.client} • {item.car}</p>
+                  </div>
+                  <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
+                    {item.action}
+                  </Badge>
                 </div>
               ))}
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-black">
+                <CheckCircle className="h-5 w-5 text-success" />
+                Новые бронирования
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentBookings.slice(0, 4).map((booking) => (
+                <div key={booking.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="font-medium text-sm">{booking.client}</p>
+                    <p className="text-xs text-muted-foreground">{booking.car} • {booking.date}</p>
+                  </div>
+                  {getStatusBadge(booking.status)}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
