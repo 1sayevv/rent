@@ -15,7 +15,8 @@ import {
   LogOut, 
   Settings, 
   Clock,
-  ChevronDown
+  ChevronDown,
+  Shield
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function ProfileMenu() {
   const [isOpen, setIsOpen] = useState(false);
-  const { userEmail, loginTime, logout } = useAuth();
+  const { user, loginTime, logout, hasPermission } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -44,6 +45,28 @@ export default function ProfileMenu() {
     });
   };
 
+  const getRoleText = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return 'Администратор';
+      case 'manager':
+        return 'Менеджер';
+      default:
+        return 'Пользователь';
+    }
+  };
+
+  const getRoleBadge = (role: string) => {
+    switch (role) {
+      case 'admin':
+        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Админ</Badge>;
+      case 'manager':
+        return <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">Менеджер</Badge>;
+      default:
+        return <Badge variant="outline">Пользователь</Badge>;
+    }
+  };
+
   const handleLogout = () => {
     logout();
     toast({
@@ -53,18 +76,20 @@ export default function ProfileMenu() {
     navigate('/login');
   };
 
+  if (!user) return null;
+
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="flex items-center gap-2 px-3 py-2">
           <Avatar className="h-8 w-8">
             <AvatarFallback className="bg-primary/10 text-primary text-sm">
-              {getInitials(userEmail)}
+              {getInitials(user.email)}
             </AvatarFallback>
           </Avatar>
           <div className="hidden md:flex flex-col items-start">
-            <span className="text-sm font-medium">{userEmail}</span>
-            <span className="text-xs text-muted-foreground">Администратор</span>
+            <span className="text-sm font-medium">{user.name}</span>
+            <span className="text-xs text-muted-foreground">{getRoleText(user.role)}</span>
           </div>
           <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </Button>
@@ -73,9 +98,15 @@ export default function ProfileMenu() {
       <DropdownMenuContent align="end" className="w-64">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userEmail}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium leading-none">{user.name}</p>
+              {getRoleBadge(user.role)}
+            </div>
             <p className="text-xs leading-none text-muted-foreground">
-              Администратор системы
+              {user.email}
+            </p>
+            <p className="text-xs leading-none text-muted-foreground">
+              {getRoleText(user.role)} системы
             </p>
             {loginTime && (
               <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1">
@@ -88,10 +119,12 @@ export default function ProfileMenu() {
         
         <DropdownMenuSeparator />
         
-        <DropdownMenuItem onClick={() => navigate('/settings')}>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Настройки</span>
-        </DropdownMenuItem>
+        {hasPermission('settings', 'view') && (
+          <DropdownMenuItem onClick={() => navigate('/settings')}>
+            <Settings className="mr-2 h-4 w-4" />
+            <span>Настройки</span>
+          </DropdownMenuItem>
+        )}
         
         <DropdownMenuSeparator />
         

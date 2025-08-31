@@ -1,18 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import { UserRole, User } from '@/types';
+
+// Выносим разрешения за пределы хука для стабильности
+const MANAGER_PERMISSIONS: Record<string, string[]> = {
+  'dashboard': ['view'],
+  'cars': ['view', 'create', 'edit', 'delete'],
+  'bookings': ['view', 'create', 'edit', 'confirm', 'reject', 'complete'],
+  'clients': ['view', 'create', 'edit'],
+  'finances': [],
+  'settings': [],
+  'data': []
+};
 
 export function useAuth() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [userEmail, setUserEmail] = useState("");
+  const [user, setUser] = useState<User | null>(null);
   const [loginTime, setLoginTime] = useState("");
 
   useEffect(() => {
     const checkAuth = () => {
       const auth = localStorage.getItem('isAuthenticated') === 'true';
-      const email = localStorage.getItem('adminEmail') || "";
+      const userData = localStorage.getItem('userData');
       const time = localStorage.getItem('loginTime') || "";
       
       setIsAuthenticated(auth);
-      setUserEmail(email);
+      setUser(userData ? JSON.parse(userData) : null);
       setLoginTime(time);
     };
 
@@ -30,31 +42,57 @@ export function useAuth() {
     };
   }, []);
 
-  const login = (email: string) => {
+  const login = (email: string, role: UserRole, name: string) => {
+    const userData: User = {
+      id: Date.now(),
+      email,
+      role,
+      name,
+      createdAt: new Date().toISOString()
+    };
+
     localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('adminEmail', email);
+    localStorage.setItem('userData', JSON.stringify(userData));
     localStorage.setItem('loginTime', new Date().toISOString());
     
     setIsAuthenticated(true);
-    setUserEmail(email);
+    setUser(userData);
     setLoginTime(new Date().toISOString());
   };
 
   const logout = () => {
     localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('adminEmail');
+    localStorage.removeItem('userData');
     localStorage.removeItem('loginTime');
     
     setIsAuthenticated(false);
-    setUserEmail("");
+    setUser(null);
     setLoginTime("");
   };
 
+  const hasPermission = useCallback((resource: string, action: string): boolean => {
+    if (!user) return false;
+
+    // Админ имеет все права
+    if (user.role === 'admin') return true;
+
+    // Права для manager
+    if (user.role === 'manager') {
+      const permissions = MANAGER_PERMISSIONS[resource];
+      return permissions ? permissions.includes(action) : false;
+    }
+
+    return false;
+  }, [user]);
+
   return {
     isAuthenticated,
-    userEmail,
+    user,
+    userEmail: user?.email || "",
+    userRole: user?.role || null,
     loginTime,
     login,
-    logout
+    logout,
+    hasPermission
   };
 } 

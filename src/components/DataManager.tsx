@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessDenied } from "@/components/AccessDenied";
 import { 
   Download, 
   Upload, 
@@ -15,6 +17,7 @@ import { useData } from "@/context/DataContext";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DataManager() {
+  const { hasPermission } = useAuth();
   const { 
     cars, 
     clients, 
@@ -30,6 +33,16 @@ export default function DataManager() {
   
   const { toast } = useToast();
   const [importFile, setImportFile] = useState<File | null>(null);
+
+  // Проверяем разрешение на управление данными
+  if (!hasPermission('data', 'view')) {
+    return (
+      <AccessDenied 
+        title="Управление данными недоступно"
+        description="Управление данными системы доступно только администраторам."
+      />
+    );
+  }
 
   const exportData = () => {
     const data = {

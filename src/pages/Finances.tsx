@@ -3,6 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessDenied } from "@/components/AccessDenied";
 import { 
   DollarSign, 
   TrendingUp, 
@@ -115,8 +117,19 @@ const debts = [
 ];
 
 export default function Finances() {
+  const { hasPermission } = useAuth();
   const { financialRecords, bookings, cars, clients } = useData();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+  // Проверяем разрешение на просмотр финансов
+  if (!hasPermission('finances', 'view')) {
+    return (
+      <AccessDenied 
+        title="Финансы недоступны"
+        description="Просмотр финансовой информации доступен только администраторам системы."
+      />
+    );
+  }
 
   // Подготовка данных для экспорта
   const financialReport = prepareFinancialData(financialRecords, bookings, cars, clients);

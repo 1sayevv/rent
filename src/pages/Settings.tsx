@@ -9,6 +9,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessDenied } from "@/components/AccessDenied";
 import { 
   Settings as SettingsIcon, 
   Save,
@@ -64,9 +66,20 @@ const users = [
 ];
 
 export default function Settings() {
+  const { hasPermission } = useAuth();
   const { settings, updateSettings } = useData();
   const { toast } = useToast();
   
+  // Проверяем разрешение на просмотр настроек
+  if (!hasPermission('settings', 'view')) {
+    return (
+      <AccessDenied 
+        title="Настройки недоступны"
+        description="Управление системными настройками доступно только администраторам системы."
+      />
+    );
+  }
+
   // Состояние для категорий
   const [categoriesList, setCategoriesList] = useState(categories);
   const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);

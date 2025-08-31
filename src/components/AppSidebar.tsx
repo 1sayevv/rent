@@ -10,6 +10,7 @@ import {
   Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 import {
   Sidebar,
@@ -24,7 +25,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const mainItems = [
+const adminItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
   { title: "Машины", url: "/cars", icon: Car },
   { title: "Бронирования", url: "/bookings", icon: CalendarDays },
@@ -34,7 +35,19 @@ const mainItems = [
   { title: "Данные", url: "/data", icon: Database },
 ];
 
-const quickActions = [
+const managerItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Машины", url: "/cars", icon: Car },
+  { title: "Бронирования", url: "/bookings", icon: CalendarDays },
+  { title: "Клиенты", url: "/clients", icon: Users },
+];
+
+const adminQuickActions = [
+  { title: "Добавить машину", url: "/cars/add", icon: Plus },
+  { title: "Календарь бронирований", url: "/bookings/calendar", icon: BookOpen },
+];
+
+const managerQuickActions = [
   { title: "Добавить машину", url: "/cars/add", icon: Plus },
   { title: "Календарь бронирований", url: "/bookings/calendar", icon: BookOpen },
 ];
@@ -44,6 +57,7 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
+  const { userRole } = useAuth();
 
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";
@@ -55,6 +69,10 @@ export function AppSidebar() {
       ? "bg-sidebar-accent text-sidebar-primary font-medium" 
       : "hover:bg-sidebar-accent/50 text-sidebar-foreground hover:text-sidebar-primary";
 
+  // Выбираем пункты меню в зависимости от роли
+  const mainItems = userRole === 'admin' ? adminItems : managerItems;
+  const quickActions = userRole === 'admin' ? adminQuickActions : managerQuickActions;
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="p-4">
@@ -65,7 +83,9 @@ export function AppSidebar() {
             </div>
             <div>
               <h1 className="text-lg font-bold text-sidebar-foreground">RentaCar</h1>
-              <p className="text-xs text-sidebar-foreground/70">Админ-панель</p>
+              <p className="text-xs text-sidebar-foreground/70">
+                {userRole === 'admin' ? 'Админ-панель' : 'Панель менеджера'}
+              </p>
             </div>
           </div>
         )}
@@ -120,8 +140,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-
       </SidebarContent>
     </Sidebar>
   );

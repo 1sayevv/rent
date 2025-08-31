@@ -1,22 +1,33 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { UserRole } from "@/types";
 import { 
   Car, 
   Eye, 
   EyeOff, 
   Lock, 
-  Mail
+  Mail,
+  Shield,
+  User
 } from "lucide-react";
 
-const ADMIN_CREDENTIALS = {
-  email: "admin@mail.com",
-  password: "1234"
+const USER_CREDENTIALS = {
+  admin: {
+    email: "admin@mail.com",
+    password: "1234",
+    name: "Администратор"
+  },
+  manager: {
+    email: "manager@mail.com", 
+    password: "1234",
+    name: "Менеджер"
+  }
 };
 
 export default function Login() {
@@ -26,12 +37,13 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
-  const { login, isAuthenticated } = useAuth();
+
+  // Простая проверка аутентификации через localStorage
+  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
 
   // Если пользователь уже авторизован, перенаправляем на главную
   if (isAuthenticated) {
-    navigate("/");
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -41,13 +53,37 @@ export default function Login() {
     // Имитация задержки для лучшего UX
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      // Используем хук для авторизации
-      login(email);
+    // Проверяем учетные данные для обеих ролей
+    let userRole: UserRole | null = null;
+    let userName = "";
 
+    if (email === USER_CREDENTIALS.admin.email && password === USER_CREDENTIALS.admin.password) {
+      userRole = 'admin';
+      userName = USER_CREDENTIALS.admin.name;
+    } else if (email === USER_CREDENTIALS.manager.email && password === USER_CREDENTIALS.manager.password) {
+      userRole = 'manager';
+      userName = USER_CREDENTIALS.manager.name;
+    }
+
+    if (userRole) {
+      // Сохраняем данные пользователя
+      const userData = {
+        id: Date.now(),
+        email,
+        role: userRole,
+        name: userName,
+        createdAt: new Date().toISOString()
+      };
+
+      localStorage.setItem('isAuthenticated', 'true');
+      localStorage.setItem('userData', JSON.stringify(userData));
+      localStorage.setItem('loginTime', new Date().toISOString());
+
+      const roleText = userRole === 'admin' ? 'администратора' : 'менеджера';
+      
       toast({
         title: "Успешный вход",
-        description: "Добро пожаловать в систему управления автопрокатом!"
+        description: `Добро пожаловать в систему управления автопрокатом, ${roleText}!`
       });
 
       navigate("/");
@@ -85,21 +121,21 @@ export default function Login() {
               Вход в систему
             </CardTitle>
             <p className="text-sm text-muted-foreground text-center">
-              Введите данные администратора для доступа
+              Введите данные для доступа к системе
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email администратора
+                  Email
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@mail.com"
+                    placeholder="admin@mail.com или manager@mail.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
@@ -153,7 +189,25 @@ export default function Login() {
               </Button>
             </form>
 
-
+            {/* Информация о тестовых аккаунтах */}
+            <div className="mt-6 p-4 bg-muted/30 rounded-lg">
+              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                <Shield className="h-4 w-4" />
+                Тестовые аккаунты:
+              </h4>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <User className="h-3 w-3 text-primary" />
+                  <span className="font-medium">Администратор:</span>
+                  <span className="text-muted-foreground">admin@mail.com / 1234</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-3 w-3 text-primary" />
+                  <span className="font-medium">Менеджер:</span>
+                  <span className="text-muted-foreground">manager@mail.com / 1234</span>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
 

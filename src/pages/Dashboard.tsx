@@ -2,6 +2,7 @@ import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/useAuth";
 import { 
   Car, 
   Users, 
@@ -68,6 +69,8 @@ const todaySchedule = [
 ];
 
 export default function Dashboard() {
+  const { userRole } = useAuth();
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -81,6 +84,103 @@ export default function Dashboard() {
     }
   };
 
+  // Упрощенная версия для менеджера
+  if (userRole === 'manager') {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-black">
+              Dashboard
+            </h1>
+            <p className="text-black">Обзор автопарка и активных бронирований</p>
+          </div>
+          <div className="text-right">
+            <p className="text-sm text-muted-foreground">Сегодня</p>
+            <p className="text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
+          </div>
+        </div>
+
+        {/* Stats Cards для менеджера */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <StatCard
+            title="Свободные машины"
+            value={24}
+            change="+2 с вчера"
+            changeType="positive"
+            icon={Car}
+            variant="success"
+          />
+          <StatCard
+            title="Занятые машины"
+            value={18}
+            change="-3 с вчера"
+            changeType="negative"
+            icon={AlertCircle}
+            variant="warning"
+          />
+          <StatCard
+            title="Активные бронирования"
+            value={12}
+            change="+3 сегодня"
+            changeType="positive"
+            icon={Calendar}
+            variant="default"
+          />
+        </div>
+
+        {/* Расписание на сегодня для менеджера */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-black">
+                <Clock className="h-5 w-5 text-primary" />
+                Расписание на сегодня
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {todaySchedule.map((item, index) => (
+                <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
+                  <div className="text-center min-w-[60px]">
+                    <p className="text-xs font-medium text-primary">{item.time}</p>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-medium">{item.action}</p>
+                    <p className="text-xs text-muted-foreground">{item.client} • {item.car}</p>
+                  </div>
+                  <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
+                    {item.action}
+                  </Badge>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-black">
+                <CheckCircle className="h-5 w-5 text-success" />
+                Новые бронирования
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {recentBookings.slice(0, 4).map((booking) => (
+                <div key={booking.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
+                  <div>
+                    <p className="font-medium text-sm">{booking.client}</p>
+                    <p className="text-xs text-muted-foreground">{booking.car} • {booking.date}</p>
+                  </div>
+                  {getStatusBadge(booking.status)}
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Полная версия для админа
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

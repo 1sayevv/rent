@@ -82,4 +82,26 @@ export interface Settings {
     sms: boolean;
     push: boolean;
   };
+}
+
+// Типы для пользователей и ролей
+export type UserRole = 'admin' | 'manager';
+
+export interface User {
+  id: number;
+  email: string;
+  role: UserRole;
+  name: string;
+  createdAt: string;
+}
+
+// Типы для разрешений
+export interface Permission {
+  resource: string;
+  actions: string[];
+}
+
+export interface RolePermissions {
+  admin: Permission[];
+  manager: Permission[];
 } 

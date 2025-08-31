@@ -30,7 +30,7 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-                <BrowserRouter>
+        <BrowserRouter>
           <Routes>
             {/* Публичный маршрут для входа */}
             <Route path="/login" element={<Login />} />
@@ -54,6 +54,7 @@ const App = () => (
                     <Route path="/finances" element={<Finances />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/data" element={<DataManager />} />
+                    
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                     <Route path="*" element={<NotFound />} />
                   </Routes>
