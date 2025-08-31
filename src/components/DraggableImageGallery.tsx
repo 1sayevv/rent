@@ -210,7 +210,7 @@ export default function DraggableImageGallery({
       {(isLegacyMode ? legacyImages.length < maxImages : modernImages.length < maxImages) && (
       <div
         className={cn(
-            "border-2 border-dashed rounded-lg p-8 sm:p-12 text-center transition-all duration-200 max-w-4xl mx-auto",
+            "border-2 border-dashed rounded-lg p-6 sm:p-8 text-center transition-all duration-200 max-w-4xl mx-auto",
             isDragOver 
               ? "border-primary bg-primary/10 scale-105 shadow-lg" 
               : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50",
@@ -236,16 +236,16 @@ export default function DraggableImageGallery({
             isDragOver ? "scale-110" : ""
           )}>
             {isUploading ? (
-              <div className="h-16 w-16 mx-auto mb-4 animate-spin rounded-full border-3 border-primary border-t-transparent" />
+              <div className="h-12 w-12 mx-auto mb-3 animate-spin rounded-full border-2 border-primary border-t-transparent" />
             ) : (
               <Upload className={cn(
-                "h-16 w-16 mx-auto mb-4 transition-colors duration-200",
+                "h-12 w-12 mx-auto mb-3 transition-colors duration-200",
                 isDragOver ? "text-primary" : "text-muted-foreground"
               )} />
             )}
           </div>
           <p className={cn(
-            "text-lg font-medium transition-colors duration-200",
+            "text-base font-medium transition-colors duration-200",
             isDragOver ? "text-primary" : "text-foreground"
           )}>
             {isUploading 
@@ -255,7 +255,7 @@ export default function DraggableImageGallery({
                 : "Загрузить изображения"
             }
           </p>
-          <p className="text-base text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Drag & Drop поддерживается • {isLegacyMode ? legacyImages.length : modernImages.length}/{maxImages}
           </p>
         </div>
@@ -289,7 +289,7 @@ export default function DraggableImageGallery({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto"
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto"
                 >
                   {(isLegacyMode ? legacyImages : modernImages).map((image, index) => (
                     <Draggable 
@@ -303,7 +303,7 @@ export default function DraggableImageGallery({
                           {...provided.draggableProps}
                           className="relative group overflow-hidden"
                         >
-                          <div className="aspect-[4/3] relative">
+                          <div className="aspect-square relative">
                             <img
                               src={isLegacyMode ? image as string : (image as ImageFile).preview}
                               alt={`Preview ${index + 1}`}
@@ -312,22 +312,22 @@ export default function DraggableImageGallery({
                             
                             <div
                               {...provided.dragHandleProps}
-                              className="absolute top-2 left-2 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-1 left-1 bg-black/50 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition-opacity"
                             >
-                              <GripVertical className="h-3 w-3" />
+                              <GripVertical className="h-2 w-2" />
                             </div>
 
                             <Button
                               size="sm"
                               variant="destructive"
-                              className="absolute top-2 right-2 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute top-1 right-1 h-5 w-5 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
                               onClick={() => removeImage(isLegacyMode ? index : (image as ImageFile).id)}
                             >
-                              <X className="h-3 w-3" />
+                              <X className="h-2 w-2" />
                             </Button>
 
                             {/* Image number */}
-                            <div className="absolute bottom-2 right-2 bg-black/50 text-white text-sm font-bold px-1.5 py-0.5 rounded">
+                            <div className="absolute bottom-1 right-1 bg-black/50 text-white text-xs font-bold px-1 py-0.5 rounded">
                               {index + 1}
                             </div>
                           </div>
