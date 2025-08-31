@@ -17,7 +17,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import { useToast } from "@/hooks/use-toast";
-import { DraggableImageGallery } from "@/components/DraggableImageGallery";
+import DraggableImageGallery from "@/components/DraggableImageGallery";
 
 export default function AddCar() {
   const { addCar } = useData();

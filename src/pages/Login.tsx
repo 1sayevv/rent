@@ -19,7 +19,7 @@ import {
 
 const USER_CREDENTIALS = {
   admin: {
-    email: "admin@mail.com",
+  email: "admin@mail.com",
     password: "1234",
     name: "Администратор"
   },
@@ -80,7 +80,7 @@ export default function Login() {
       localStorage.setItem('loginTime', new Date().toISOString());
 
       const roleText = userRole === 'admin' ? 'администратора' : 'менеджера';
-      
+
       toast({
         title: "Успешный вход",
         description: `Добро пожаловать в систему управления автопрокатом, ${roleText}!`

@@ -42,18 +42,18 @@ export function StatCard({
   return (
     <Card className={cn("shadow-card hover:shadow-elevated transition-smooth", variantClasses[variant])}>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-black">
+        <CardTitle className="text-xs sm:text-sm font-medium text-black">
           {title}
         </CardTitle>
         <div className={cn(
-          "p-2 rounded-lg", 
+          "p-1.5 sm:p-2 rounded-lg", 
           variant === "default" ? "bg-primary/10" : "bg-white/20"
         )}>
-          <Icon className={cn("h-4 w-4", iconClasses[variant])} />
+          <Icon className={cn("h-3 w-3 sm:h-4 sm:w-4", iconClasses[variant])} />
         </div>
       </CardHeader>
-      <CardContent>
-        <div className="text-2xl font-bold text-black">{value}</div>
+      <CardContent className="pt-0">
+        <div className="text-lg sm:text-2xl font-bold text-black">{value}</div>
         {change && (
           <p className={cn("text-xs", changeClasses[changeType])}>
             {changeType === "positive" && "↗"} 
