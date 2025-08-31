@@ -195,9 +195,9 @@ export default function EditCar() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="space-y-6">
         {/* Main Form */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Basic Information */}
           <Card className="shadow-card">
             <CardHeader>
@@ -259,10 +259,11 @@ export default function EditCar() {
                       <SelectValue placeholder="Выберите категорию" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Эконом">Эконом</SelectItem>
-                      <SelectItem value="Бизнес">Бизнес</SelectItem>
-                      <SelectItem value="Премиум">Премиум</SelectItem>
-                      <SelectItem value="Джип">Джип</SelectItem>
+                      <SelectItem value="economy">Эконом</SelectItem>
+                      <SelectItem value="business">Бизнес</SelectItem>
+                      <SelectItem value="premium">Премиум</SelectItem>
+                      <SelectItem value="suv">Внедорожник</SelectItem>
+                      <SelectItem value="sport">Спортивный</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -273,10 +274,10 @@ export default function EditCar() {
                       <SelectValue placeholder="Тип топлива" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Бензин">Бензин</SelectItem>
-                      <SelectItem value="Дизель">Дизель</SelectItem>
-                      <SelectItem value="Гибрид">Гибрид</SelectItem>
-                      <SelectItem value="Электрическая">Электрическая</SelectItem>
+                      <SelectItem value="petrol">Бензин</SelectItem>
+                      <SelectItem value="diesel">Дизель</SelectItem>
+                      <SelectItem value="hybrid">Гибрид</SelectItem>
+                      <SelectItem value="electric">Электрическая</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -287,8 +288,8 @@ export default function EditCar() {
                       <SelectValue placeholder="КПП" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Автомат">Автомат</SelectItem>
-                      <SelectItem value="Механика">Механика</SelectItem>
+                      <SelectItem value="automatic">Автомат</SelectItem>
+                      <SelectItem value="manual">Механика</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -418,47 +419,44 @@ export default function EditCar() {
           </Card>
         </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Images Upload */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImagePlus className="h-5 w-5 text-primary" />
-                Фотографии
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Нажмите для загрузки фотографий
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    PNG, JPG до 10MB
-                  </p>
-                </label>
-              </div>
+        {/* Images Upload */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ImagePlus className="h-5 w-5 text-primary" />
+              Фотографии
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
+              <input
+                type="file"
+                multiple
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+                id="image-upload"
+              />
+              <label htmlFor="image-upload" className="cursor-pointer">
+                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-sm text-muted-foreground">
+                  Нажмите для загрузки фотографий
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  PNG, JPG до 10MB
+                </p>
+              </label>
+            </div>
 
-              {images.length > 0 && (
-                <DraggableImageGallery
-                  images={images}
-                  onImagesChange={handleImagesChange}
-                  onRemoveImage={removeImage}
-                />
-              )}
-            </CardContent>
-          </Card>
-        </div>
+            {images.length > 0 && (
+              <DraggableImageGallery
+                images={images}
+                onImagesChange={handleImagesChange}
+                onRemoveImage={removeImage}
+              />
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
