@@ -106,34 +106,34 @@ export default function AddCar() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center gap-4">
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <Link to="/cars">
-          <Button variant="outline" size="icon">
-            <ArrowLeft className="h-4 w-4" />
+          <Button variant="outline" size="icon" className="h-8 w-8 sm:h-10 sm:w-10">
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
             Добавить машину
           </h1>
-          <p className="text-muted-foreground">Заполните информацию о новом автомобиле</p>
+          <p className="text-sm sm:text-base text-muted-foreground">Заполните информацию о новом автомобиле</p>
         </div>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Main Form */}
-        <div className="space-y-6">
+        <div className="space-y-4 sm:space-y-6">
           {/* Basic Information */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Car className="h-5 w-5 text-primary" />
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+                <Car className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 Основная информация
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="name">Название машины</Label>
                   <Input 
@@ -154,7 +154,7 @@ export default function AddCar() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="year">Год выпуска</Label>
                   <Input 
@@ -177,7 +177,7 @@ export default function AddCar() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <Label>Категория</Label>
                   <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
@@ -238,10 +238,10 @@ export default function AddCar() {
           {/* Pricing */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="text-revenue">Ценообразование</CardTitle>
+              <CardTitle className="text-base sm:text-lg text-revenue">Ценообразование</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor="dailyPrice">Цена за день (₼)</Label>
                   <Input 
@@ -279,7 +279,7 @@ export default function AddCar() {
           {/* Description */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Описание</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Описание</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea 
@@ -294,7 +294,7 @@ export default function AddCar() {
           {/* Status */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Статус</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Статус</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
@@ -313,7 +313,7 @@ export default function AddCar() {
           {/* Documents */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Документы</CardTitle>
+              <CardTitle className="text-base sm:text-lg">Документы</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
@@ -347,13 +347,13 @@ export default function AddCar() {
         {/* Images Upload */}
         <Card className="shadow-card">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ImagePlus className="h-5 w-5 text-primary" />
+            <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+              <ImagePlus className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
               Фотографии
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
+            <div className="border-2 border-dashed border-border rounded-lg p-4 sm:p-6 text-center hover:border-primary transition-smooth">
               <input
                 type="file"
                 multiple
@@ -363,8 +363,8 @@ export default function AddCar() {
                 id="image-upload"
               />
               <label htmlFor="image-upload" className="cursor-pointer">
-                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
+                <Upload className="h-6 w-6 sm:h-8 sm:w-8 mx-auto text-muted-foreground mb-2" />
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   Нажмите для загрузки фотографий
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
