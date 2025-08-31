@@ -17,6 +17,7 @@ import {
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useData } from "@/context/DataContext";
 import { useToast } from "@/hooks/use-toast";
+import { DraggableImageGallery } from "@/components/DraggableImageGallery";
 
 export default function EditCar() {
   const { id } = useParams();
@@ -31,6 +32,7 @@ export default function EditCar() {
     category: "",
     fuelType: "",
     transmission: "",
+    seats: "",
     dailyPrice: "",
     weeklyPrice: "",
     monthlyPrice: "",
@@ -52,6 +54,7 @@ export default function EditCar() {
         category: car.category,
         fuelType: car.fuelType,
         transmission: car.transmission,
+        seats: car.seats.toString(),
         dailyPrice: car.pricePerDay.toString(),
         weeklyPrice: car.weeklyPrice?.toString() || "",
         monthlyPrice: car.monthlyPrice?.toString() || "",
@@ -86,6 +89,10 @@ export default function EditCar() {
 
   const removeImage = (index: number) => {
     setImages(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleImagesChange = (newImages: string[]) => {
+    setImages(newImages);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -123,6 +130,7 @@ export default function EditCar() {
       mileage: parseInt(formData.mileage) || 0,
       fuelType: formData.fuelType,
       transmission: formData.transmission,
+      seats: parseInt(formData.seats) || 5,
       status: formData.status as 'available' | 'rented' | 'maintenance' | 'unavailable',
       description: formData.description,
       image: images[0] || "/placeholder.svg",
@@ -204,7 +212,7 @@ export default function EditCar() {
                   <Label htmlFor="name">Название машины</Label>
                   <Input 
                     id="name"
-                    placeholder="Toyota Camry"
+                    placeholder="Toyota"
                     value={formData.name}
                     onChange={(e) => handleInputChange("name", e.target.value)}
                   />
@@ -213,7 +221,7 @@ export default function EditCar() {
                   <Label htmlFor="model">Модель</Label>
                   <Input 
                     id="model"
-                    placeholder="2023"
+                    placeholder="Camry"
                     value={formData.model}
                     onChange={(e) => handleInputChange("model", e.target.value)}
                   />
@@ -243,7 +251,7 @@ export default function EditCar() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label>Категория</Label>
                   <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
@@ -283,6 +291,18 @@ export default function EditCar() {
                       <SelectItem value="Механика">Механика</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+                <div>
+                  <Label htmlFor="seats">Количество сидений</Label>
+                  <Input 
+                    id="seats"
+                    type="number"
+                    min="2"
+                    max="9"
+                    placeholder="5"
+                    value={formData.seats}
+                    onChange={(e) => handleInputChange("seats", e.target.value)}
+                  />
                 </div>
               </div>
             </CardContent>
@@ -377,23 +397,11 @@ export default function EditCar() {
               </div>
 
               {images.length > 0 && (
-                <div className="grid grid-cols-2 gap-2">
-                  {images.map((image, index) => (
-                    <div key={index} className="relative group">
-                      <img 
-                        src={image} 
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-20 object-cover rounded-lg"
-                      />
-                      <button
-                        onClick={() => removeImage(index)}
-                        className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
+                <DraggableImageGallery
+                  images={images}
+                  onImagesChange={handleImagesChange}
+                  onRemoveImage={removeImage}
+                />
               )}
             </CardContent>
           </Card>

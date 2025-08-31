@@ -17,7 +17,6 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useData } from "@/context/DataContext";
-import { ClientDetailsModal } from "@/components/ClientDetailsModal";
 import { Client } from "@/types";
 import { useNavigate } from "react-router-dom";
 
@@ -28,8 +27,6 @@ export default function Clients() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -62,12 +59,6 @@ export default function Clients() {
   const newClients = clients.filter(c => c.status === "new").length;
   const totalRevenue = clients.reduce((sum, client) => sum + client.totalSpent, 0);
 
-  // Функции для работы с модальным окном
-  const handleViewClient = (client: Client) => {
-    setSelectedClient(client);
-    setIsModalOpen(true);
-  };
-
   const handleEditClient = (client: Client) => {
     // Переход на страницу редактирования клиента
     navigate(`/clients/edit/${client.id}`);
@@ -75,11 +66,6 @@ export default function Clients() {
 
   const handleDeleteClient = (clientId: number) => {
     deleteClient(clientId);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedClient(null);
   };
 
   return (
@@ -238,7 +224,7 @@ export default function Clients() {
                   variant="outline" 
                   size="sm" 
                   className="flex-1"
-                  onClick={() => handleViewClient(client)}
+                  onClick={() => navigate(`/clients/${client.id}`)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
                   Просмотр
@@ -274,16 +260,7 @@ export default function Clients() {
         </div>
       )}
 
-      {/* Модальное окно с деталями клиента */}
-      <ClientDetailsModal
-        client={selectedClient}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        onEdit={handleEditClient}
-        onDelete={handleDeleteClient}
-        bookings={bookings}
-        cars={cars}
-      />
+
     </div>
   );
 }

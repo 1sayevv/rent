@@ -14,11 +14,11 @@ import {
   Eye,
   Fuel,
   Settings,
-  Calendar
+  Calendar,
+  Users
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useData } from "@/context/DataContext";
-import { CarDetailsModal } from "@/components/CarDetailsModal";
 import { Car as CarType } from "@/types";
 
 export default function Cars() {
@@ -27,18 +27,6 @@ export default function Cars() {
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedCar, setSelectedCar] = useState<CarType | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleViewCar = (car: CarType) => {
-    setSelectedCar(car);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedCar(null);
-  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -217,7 +205,7 @@ export default function Cars() {
               <div className="space-y-3">
                 <div>
                   <h3 className="font-semibold text-lg">{car.name}</h3>
-                  <p className="text-sm text-muted-foreground">{car.model} год</p>
+                  <p className="text-sm text-muted-foreground">{car.model} {car.year}</p>
                 </div>
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
@@ -226,8 +214,8 @@ export default function Cars() {
                     {car.fuelType}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Settings className="h-4 w-4" />
-                    {car.transmission}
+                    <Users className="h-4 w-4" />
+                    {car.seats} мест
                   </div>
                 </div>
 
@@ -246,7 +234,7 @@ export default function Cars() {
                     variant="outline" 
                     size="sm" 
                     className="flex-1 min-w-0"
-                    onClick={() => handleViewCar(car)}
+                    onClick={() => navigate(`/cars/${car.id}`)}
                   >
                     <Eye className="h-4 w-4 mr-1 flex-shrink-0" />
                     <span className="truncate">Просмотр</span>
@@ -289,12 +277,7 @@ export default function Cars() {
         </div>
       )}
 
-      {/* Модальное окно с деталями машины */}
-      <CarDetailsModal
-        car={selectedCar}
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-      />
+
     </div>
   );
 }

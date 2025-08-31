@@ -11,10 +11,12 @@ import Dashboard from "./pages/Dashboard";
 import Cars from "./pages/Cars";
 import AddCar from "./pages/AddCar";
 import EditCar from "./pages/EditCar";
+import CarDetails from "./pages/CarDetails";
 import Bookings from "./pages/Bookings";
 import Clients from "./pages/Clients";
 import AddClient from "./pages/AddClient";
 import EditClient from "./pages/EditClient";
+import ClientDetails from "./pages/ClientDetails";
 import Finances from "./pages/Finances";
 import Settings from "./pages/Settings";
 import DataManager from "./components/DataManager";
@@ -42,11 +44,13 @@ const App = () => (
                     <Route path="/cars" element={<Cars />} />
                     <Route path="/cars/add" element={<AddCar />} />
                     <Route path="/cars/edit/:id" element={<EditCar />} />
+                    <Route path="/cars/:id" element={<CarDetails />} />
                     <Route path="/bookings" element={<Bookings />} />
                     <Route path="/bookings/calendar" element={<Bookings />} />
                     <Route path="/clients" element={<Clients />} />
                     <Route path="/clients/add" element={<AddClient />} />
                     <Route path="/clients/edit/:id" element={<EditClient />} />
+                    <Route path="/clients/:id" element={<ClientDetails />} />
                     <Route path="/finances" element={<Finances />} />
                     <Route path="/settings" element={<Settings />} />
                     <Route path="/data" element={<DataManager />} />

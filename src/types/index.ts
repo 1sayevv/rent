@@ -11,6 +11,7 @@ export interface Car {
   mileage: number;
   fuelType: string;
   transmission: string;
+  seats: number;
   status: 'available' | 'rented' | 'maintenance' | 'unavailable';
   description?: string;
   image: string;
