@@ -10,6 +10,7 @@ import {
   Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 import {
   Sidebar,
@@ -24,26 +25,31 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const mainItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
-  { title: "Машины", url: "/cars", icon: Car },
-  { title: "Бронирования", url: "/bookings", icon: CalendarDays },
-  { title: "Клиенты", url: "/clients", icon: Users },
-  { title: "Финансы", url: "/finances", icon: DollarSign },
-  { title: "Настройки", url: "/settings", icon: Settings },
-  { title: "Данные", url: "/data", icon: Database },
+const allMainItems = [
+  { title: "Dashboard", url: "/", icon: LayoutDashboard, roles: ['admin', 'manager'] },
+  { title: "Машины", url: "/cars", icon: Car, roles: ['admin', 'manager'] },
+  { title: "Бронирования", url: "/bookings", icon: CalendarDays, roles: ['admin', 'manager'] },
+  { title: "Клиенты", url: "/clients", icon: Users, roles: ['admin', 'manager'] },
+  { title: "Финансы", url: "/finances", icon: DollarSign, roles: ['admin'] },
+  { title: "Настройки", url: "/settings", icon: Settings, roles: ['admin'] },
+  { title: "Данные", url: "/data", icon: Database, roles: ['admin'] },
 ];
 
-const quickActions = [
-  { title: "Добавить машину", url: "/cars/add", icon: Plus },
-  { title: "Календарь бронирований", url: "/bookings/calendar", icon: BookOpen },
+const allQuickActions = [
+  { title: "Добавить машину", url: "/cars/add", icon: Plus, roles: ['admin', 'manager'] },
+  { title: "Календарь бронирований", url: "/bookings/calendar", icon: BookOpen, roles: ['admin', 'manager'] },
 ];
 
 export function AppSidebar() {
   const { state } = useSidebar();
+  const { userRole } = useAuth();
   const location = useLocation();
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
+
+  // Фильтруем пункты меню по роли пользователя
+  const mainItems = allMainItems.filter(item => item.roles.includes(userRole));
+  const quickActions = allQuickActions.filter(item => item.roles.includes(userRole));
 
   const isActive = (path: string) => {
     if (path === "/") return currentPath === "/";

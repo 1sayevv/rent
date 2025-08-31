@@ -1,58 +1,14 @@
-import { useAuth } from "@/hooks/useAuth";
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { 
   Car, 
   Users, 
-  DollarSign, 
   Calendar,
-  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle
 } from "lucide-react";
-import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  Tooltip,
-  Legend
-} from "recharts";
-import ManagerDashboard from "./ManagerDashboard";
-
-const weeklyBookings = [
-  { day: "Пн", bookings: 12 },
-  { day: "Вт", bookings: 19 },
-  { day: "Ср", bookings: 15 },
-  { day: "Чт", bookings: 25 },
-  { day: "Пт", bookings: 22 },
-  { day: "Сб", bookings: 30 },
-  { day: "Вс", bookings: 28 }
-];
-
-const monthlyRevenue = [
-  { month: "Янв", revenue: 45000 },
-  { month: "Фев", revenue: 52000 },
-  { month: "Мар", revenue: 48000 },
-  { month: "Апр", revenue: 61000 },
-  { month: "Май", revenue: 55000 },
-  { month: "Июн", revenue: 67000 }
-];
-
-const topCars = [
-  { name: "Toyota Camry", bookings: 45, revenue: "28,500₼" },
-  { name: "BMW X5", bookings: 38, revenue: "35,200₼" },
-  { name: "Mercedes E-Class", bookings: 32, revenue: "42,800₼" },
-  { name: "Hyundai Sonata", bookings: 28, revenue: "18,900₼" },
-  { name: "Audi Q7", bookings: 25, revenue: "38,600₼" }
-];
 
 const recentBookings = [
   { id: 1, client: "Али Алиев", car: "BMW X5", date: "Сегодня", status: "confirmed" },
@@ -69,14 +25,7 @@ const todaySchedule = [
   { time: "16:30", action: "Возврат", client: "Кямал Набиев", car: "Hyundai Sonata" }
 ];
 
-export default function Dashboard() {
-  const { userRole } = useAuth();
-  
-  // Показываем упрощенную версию для менеджера
-  if (userRole === 'manager') {
-    return <ManagerDashboard />;
-  }
-
+export default function ManagerDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
@@ -97,7 +46,7 @@ export default function Dashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold text-black">
             Dashboard
           </h1>
-          <p className="text-black text-sm sm:text-base">Обзор вашего автопарка</p>
+          <p className="text-black text-sm sm:text-base">Управление автопарком</p>
         </div>
         <div className="text-left sm:text-right">
           <p className="text-sm text-muted-foreground">Сегодня</p>
@@ -106,7 +55,7 @@ export default function Dashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <StatCard
           title="Свободные машины"
           value={24}
@@ -130,73 +79,16 @@ export default function Dashboard() {
           changeType="positive"
           icon={Users}
         />
-        <StatCard
-          title="Доход за месяц"
-          value="67,500₼"
-          change="+15.2% с прошлого месяца"
-          changeType="positive"
-          icon={DollarSign}
-          variant="revenue"
-        />
       </div>
 
-      {/* Charts Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
-        <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-black text-lg">
-              <Calendar className="h-5 w-5 text-primary" />
-              Бронирования по дням недели
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyBookings}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="day" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="bookings" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-black text-lg">
-              <TrendingUp className="h-5 w-5 text-revenue" />
-              Доход по месяцам
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyRevenue}>
-                <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
-                <XAxis dataKey="month" />
-                <YAxis />
-                <Tooltip formatter={(value) => [`${value}₼`, 'Доход']} />
-                <Line 
-                  type="monotone" 
-                  dataKey="revenue" 
-                  stroke="hsl(var(--revenue))" 
-                  strokeWidth={3}
-                  dot={{ fill: "hsl(var(--revenue))", strokeWidth: 2 }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Bottom Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+      {/* Content Row */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Bookings */}
         <Card className="shadow-card">
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-black text-lg">
               <CheckCircle className="h-5 w-5 text-success" />
-              Новые бронирования
+              Активные бронирования
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -236,29 +128,6 @@ export default function Dashboard() {
                   <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
                     {item.action}
                   </Badge>
-                </div>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        {/* Top Cars */}
-        <Card className="shadow-card">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center gap-2 text-black text-lg">
-              <Car className="h-5 w-5 text-primary" />
-              ТОП-5 популярных машин
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {topCars.map((car, index) => (
-              <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
-                <div className="flex-1">
-                  <p className="font-medium text-sm">{car.name}</p>
-                  <p className="text-xs text-muted-foreground">{car.bookings} бронирований</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-medium text-revenue">{car.revenue}</p>
                 </div>
               </div>
             ))}

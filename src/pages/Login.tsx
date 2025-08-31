@@ -3,25 +3,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth, UserRole } from "@/hooks/useAuth";
 import { 
   Car, 
   Eye, 
   EyeOff, 
   Lock, 
-  Mail
+  Mail,
+  UserCheck
 } from "lucide-react";
 
-const ADMIN_CREDENTIALS = {
-  email: "admin@mail.com",
-  password: "1234"
+const CREDENTIALS = {
+  admin: { email: "admin@mail.com", password: "1234" },
+  manager: { email: "manager@mail.com", password: "1234" }
 };
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState<UserRole>('manager');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -41,20 +44,20 @@ export default function Login() {
     // Имитация задержки для лучшего UX
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    if (email === ADMIN_CREDENTIALS.email && password === ADMIN_CREDENTIALS.password) {
-      // Используем хук для авторизации
-      login(email);
+    if (email === CREDENTIALS[role].email && password === CREDENTIALS[role].password) {
+      // Используем хук для авторизации с ролью
+      login(email, role);
 
       toast({
         title: "Успешный вход",
-        description: "Добро пожаловать в систему управления автопрокатом!"
+        description: `Добро пожаловать в систему управления автопрокатом! Роль: ${role === 'admin' ? 'Администратор' : 'Менеджер'}`
       });
 
       navigate("/");
     } else {
       toast({
         title: "Ошибка входа",
-        description: "Неверный email или пароль",
+        description: "Неверный email, пароль или роль",
         variant: "destructive"
       });
     }
@@ -85,21 +88,42 @@ export default function Login() {
               Вход в систему
             </CardTitle>
             <p className="text-sm text-muted-foreground text-center">
-              Введите данные администратора для доступа
+              Выберите роль и введите данные для доступа
             </p>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
+                <Label htmlFor="role" className="text-sm font-medium">
+                  Роль пользователя
+                </Label>
+                <div className="relative">
+                  <UserCheck className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground z-10" />
+                  <Select value={role} onValueChange={(value: UserRole) => {
+                    setRole(value);
+                    setEmail(CREDENTIALS[value].email);
+                  }}>
+                    <SelectTrigger className="pl-10">
+                      <SelectValue placeholder="Выберите роль" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="manager">Менеджер</SelectItem>
+                      <SelectItem value="admin">Администратор</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email администратора
+                  Email
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
                     type="email"
-                    placeholder="admin@mail.com"
+                    placeholder={CREDENTIALS[role].email}
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="pl-10"
