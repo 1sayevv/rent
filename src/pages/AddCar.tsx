@@ -289,48 +289,6 @@ export default function AddCar() {
               />
             </CardContent>
           </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Images Upload */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <ImagePlus className="h-5 w-5 text-primary" />
-                Фотографии
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
-                <input
-                  type="file"
-                  multiple
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="hidden"
-                  id="image-upload"
-                />
-                <label htmlFor="image-upload" className="cursor-pointer">
-                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                  <p className="text-sm text-muted-foreground">
-                    Нажмите для загрузки фотографий
-                  </p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    PNG, JPG до 10MB
-                  </p>
-                </label>
-              </div>
-
-              {images.length > 0 && (
-                <DraggableImageGallery
-                  images={images}
-                  onImagesChange={handleImagesChange}
-                  onRemoveImage={removeImage}
-                />
-              )}
-            </CardContent>
-          </Card>
 
           {/* Status */}
           <Card className="shadow-card">
@@ -381,6 +339,48 @@ export default function AddCar() {
               <Button variant="outline" className="w-full">
                 Сохранить как черновик
               </Button>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-6">
+          {/* Images Upload */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ImagePlus className="h-5 w-5 text-primary" />
+                Фотографии
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                  id="image-upload"
+                />
+                <label htmlFor="image-upload" className="cursor-pointer">
+                  <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                  <p className="text-sm text-muted-foreground">
+                    Нажмите для загрузки фотографий
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    PNG, JPG до 10MB
+                  </p>
+                </label>
+              </div>
+
+              {images.length > 0 && (
+                <DraggableImageGallery
+                  images={images}
+                  onImagesChange={handleImagesChange}
+                  onRemoveImage={removeImage}
+                />
+              )}
             </CardContent>
           </Card>
         </div>

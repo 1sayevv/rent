@@ -289,7 +289,7 @@ export default function DraggableImageGallery({
                 <div
                   {...provided.droppableProps}
                   ref={provided.innerRef}
-                  className="grid grid-cols-1 gap-8 max-w-5xl mx-auto"
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto"
                 >
                   {(isLegacyMode ? legacyImages : modernImages).map((image, index) => (
                     <Draggable 
@@ -303,7 +303,7 @@ export default function DraggableImageGallery({
                           {...provided.draggableProps}
                           className="relative group overflow-hidden"
                         >
-                          <div className="aspect-[16/10] relative">
+                          <div className="aspect-[4/3] relative">
                             <img
                               src={isLegacyMode ? image as string : (image as ImageFile).preview}
                               alt={`Preview ${index + 1}`}
