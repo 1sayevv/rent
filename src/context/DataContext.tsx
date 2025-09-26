@@ -2,18 +2,18 @@ import React, { createContext, useContext, ReactNode } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { Car, Client, Booking, FinancialRecord, Settings } from '@/types';
 
-// Начальные данные
+// Initial data
 const initialCars: Car[] = [
   {
     id: 1,
     name: "Toyota Camry",
     model: "Camry",
     year: "2023",
-    category: "Бизнес",
+    category: "Business",
     pricePerDay: 45,
     mileage: 12500,
-    fuelType: "Бензин",
-    transmission: "Автомат",
+    fuelType: "Petrol",
+    transmission: "Automatic",
     seats: 5,
     status: "available",
     image: "/placeholder.svg",
@@ -25,11 +25,11 @@ const initialCars: Car[] = [
     name: "BMW X5",
     model: "X5",
     year: "2022",
-    category: "Премиум",
+    category: "Premium",
     pricePerDay: 85,
     mileage: 8500,
-    fuelType: "Бензин",
-    transmission: "Автомат",
+    fuelType: "Petrol",
+    transmission: "Automatic",
     seats: 7,
     status: "rented",
     image: "/placeholder.svg",
@@ -41,11 +41,11 @@ const initialCars: Car[] = [
     name: "Mercedes C-Class",
     model: "C-Class",
     year: "2023",
-    category: "Премиум",
+    category: "Premium",
     pricePerDay: 75,
     mileage: 5200,
-    fuelType: "Бензин",
-    transmission: "Автомат",
+    fuelType: "Petrol",
+    transmission: "Automatic",
     seats: 5,
     status: "available",
     image: "/placeholder.svg",
@@ -57,11 +57,11 @@ const initialCars: Car[] = [
     name: "Hyundai Sonata",
     model: "Sonata",
     year: "2022",
-    category: "Эконом",
+    category: "Economy",
     pricePerDay: 35,
     mileage: 18000,
-    fuelType: "Бензин",
-    transmission: "Автомат",
+    fuelType: "Petrol",
+    transmission: "Automatic",
     seats: 5,
     status: "maintenance",
     image: "/placeholder.svg",
@@ -73,11 +73,11 @@ const initialCars: Car[] = [
     name: "Audi Q7",
     model: "Q7",
     year: "2023",
-    category: "Премиум",
+    category: "Premium",
     pricePerDay: 95,
     mileage: 3200,
-    fuelType: "Бензин",
-    transmission: "Автомат",
+    fuelType: "Petrol",
+    transmission: "Automatic",
     seats: 7,
     status: "available",
     image: "/placeholder.svg",
@@ -89,11 +89,11 @@ const initialCars: Car[] = [
     name: "Kia Rio",
     model: "Rio",
     year: "2021",
-    category: "Эконом", 
+    category: "Economy", 
     pricePerDay: 25,
     mileage: 32000,
-    fuelType: "Бензин",
-    transmission: "Механика",
+    fuelType: "Petrol",
+    transmission: "Manual",
     seats: 5,
     status: "rented",
     image: "/placeholder.svg",
@@ -105,7 +105,7 @@ const initialCars: Car[] = [
 const initialClients: Client[] = [
   {
     id: 1,
-    name: "Али Алиев",
+    name: "Ali Aliyev",
     email: "ali.aliev@email.com",
     phone: "+994 55 123 45 67",
     totalBookings: 12,
@@ -119,7 +119,7 @@ const initialClients: Client[] = [
   },
   {
     id: 2,
-    name: "Лейла Мамедова",
+    name: "Leyla Mamedova",
     email: "leyla.mamedova@email.com", 
     phone: "+994 50 987 65 43",
     totalBookings: 8,
@@ -133,7 +133,7 @@ const initialClients: Client[] = [
   },
   {
     id: 3,
-    name: "Расим Гасанов",
+    name: "Rasim Gasanov",
     email: "rasim.gasanov@email.com",
     phone: "+994 77 555 33 22", 
     totalBookings: 15,
@@ -147,7 +147,7 @@ const initialClients: Client[] = [
   },
   {
     id: 4,
-    name: "Нигяр Исмайылова",
+    name: "Nigar Ismayilova",
     email: "nigar.ismayilova@email.com",
     phone: "+994 51 444 77 88",
     totalBookings: 5,
@@ -161,7 +161,7 @@ const initialClients: Client[] = [
   },
   {
     id: 5,
-    name: "Эльчин Керимов",
+    name: "Elchin Kerimov",
     email: "elchin.kerimov@email.com",
     phone: "+994 70 111 22 33",
     totalBookings: 3,
@@ -175,7 +175,7 @@ const initialClients: Client[] = [
   },
   {
     id: 6,
-    name: "Сабина Ахмедова",
+    name: "Sabina Ahmadova",
     email: "sabina.ahmadova@email.com",
     phone: "+994 55 777 88 99",
     totalBookings: 20,
@@ -194,7 +194,7 @@ const initialBookings: Booking[] = [
     id: 1,
     clientId: 1,
     client: {
-      name: "Али Алиев",
+      name: "Ali Aliyev",
       phone: "+994 55 123 45 67",
       email: "ali.aliev@email.com"
     },
@@ -202,8 +202,8 @@ const initialBookings: Booking[] = [
     car: "BMW X5 (2022)",
     startDate: "2024-06-15",
     endDate: "2024-06-20",
-    pickupLocation: "Аэропорт Гейдар Алиев",
-    returnLocation: "Центральный офис",
+    pickupLocation: "Gəyədar Aliyev Airport",
+    returnLocation: "Central Office",
     totalPrice: 425,
     status: "confirmed",
     createdAt: "2024-06-10",
@@ -213,7 +213,7 @@ const initialBookings: Booking[] = [
     id: 2,
     clientId: 2,
     client: {
-      name: "Лейла Мамедова",
+      name: "Leyla Mamedova",
       phone: "+994 50 987 65 43",
       email: "leyla.mamedova@email.com"
     },
@@ -221,8 +221,8 @@ const initialBookings: Booking[] = [
     car: "Mercedes C-Class (2023)",
     startDate: "2024-06-16",
     endDate: "2024-06-18",
-    pickupLocation: "Отель Four Seasons",
-    returnLocation: "Отель Four Seasons",
+    pickupLocation: "Four Seasons Hotel",
+    returnLocation: "Four Seasons Hotel",
     totalPrice: 150,
     status: "pending",
     createdAt: "2024-06-14",
@@ -232,7 +232,7 @@ const initialBookings: Booking[] = [
     id: 3,
     clientId: 3,
     client: {
-      name: "Расим Гасанов",
+      name: "Rasim Gasanov",
       phone: "+994 77 555 33 22",
       email: "rasim.gasanov@email.com"
     },
@@ -240,8 +240,8 @@ const initialBookings: Booking[] = [
     car: "Toyota Camry (2023)",
     startDate: "2024-06-12",
     endDate: "2024-06-16",
-    pickupLocation: "Центральный офис",
-    returnLocation: "Аэропорт Гейдар Алиев",
+    pickupLocation: "Central Office",
+    returnLocation: "Gəyədar Aliyev Airport",
     totalPrice: 180,
     status: "active",
     createdAt: "2024-06-08",
@@ -251,7 +251,7 @@ const initialBookings: Booking[] = [
     id: 4,
     clientId: 4,
     client: {
-      name: "Нигяр Исмайылова",
+      name: "Nigar Ismayilova",
       phone: "+994 51 444 77 88",
       email: "nigar.ismayilova@email.com"
     },
@@ -259,8 +259,8 @@ const initialBookings: Booking[] = [
     car: "Audi Q7 (2023)",
     startDate: "2024-06-18",
     endDate: "2024-06-25",
-    pickupLocation: "Торговый центр Park Bulvar",
-    returnLocation: "Центральный офис",
+    pickupLocation: "Park Bulvar Shopping Center",
+    returnLocation: "Central Office",
     totalPrice: 665,
     status: "confirmed",
     createdAt: "2024-06-13",
@@ -270,7 +270,7 @@ const initialBookings: Booking[] = [
     id: 5,
     clientId: 5,
     client: {
-      name: "Эльчин Керимов",
+      name: "Elchin Kerimov",
       phone: "+994 70 111 22 33",
       email: "elchin.kerimov@email.com"
     },
@@ -278,8 +278,8 @@ const initialBookings: Booking[] = [
     car: "Audi Q7 (2023)",
     startDate: "2024-06-20",
     endDate: "2024-06-27",
-    pickupLocation: "Аэропорт Гейдар Алиев",
-    returnLocation: "Аэропорт Гейдар Алиев",
+    pickupLocation: "Gəyədar Aliyev Airport",
+    returnLocation: "Gəyədar Aliyev Airport",
     totalPrice: 665,
     status: "pending",
     createdAt: "2024-06-15",
@@ -291,7 +291,7 @@ const initialSettings: Settings = {
   companyName: "Auto Manage Suite",
   companyEmail: "info@automanage.az",
   companyPhone: "+994 12 345 67 89",
-  companyAddress: "Баку, Азербайджан",
+  companyAddress: "Baku, Azerbaijan",
   currency: "₼",
   timezone: "Asia/Baku",
   language: "ru",
@@ -303,35 +303,35 @@ const initialSettings: Settings = {
 };
 
 interface DataContextType {
-  // Автомобили
+  // Cars
   cars: Car[];
   setCars: (cars: Car[] | ((prev: Car[]) => Car[])) => void;
   addCar: (car: Omit<Car, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateCar: (id: number, car: Partial<Car>) => void;
   deleteCar: (id: number) => void;
   
-  // Клиенты
+  // Clients
   clients: Client[];
   setClients: (clients: Client[] | ((prev: Client[]) => Client[])) => void;
   addClient: (client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateClient: (id: number, client: Partial<Client>) => void;
   deleteClient: (id: number) => void;
   
-  // Бронирования
+  // Bookings
   bookings: Booking[];
   setBookings: (bookings: Booking[] | ((prev: Booking[]) => Booking[])) => void;
   addBooking: (booking: Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>) => void;
   updateBooking: (id: number, booking: Partial<Booking>) => void;
   deleteBooking: (id: number) => void;
   
-  // Финансы
+  // Financial Records
   financialRecords: FinancialRecord[];
   setFinancialRecords: (records: FinancialRecord[] | ((prev: FinancialRecord[]) => FinancialRecord[])) => void;
   addFinancialRecord: (record: Omit<FinancialRecord, 'id' | 'createdAt'>) => void;
   updateFinancialRecord: (id: number, record: Partial<FinancialRecord>) => void;
   deleteFinancialRecord: (id: number) => void;
   
-  // Настройки
+  // Settings
   settings: Settings;
   setSettings: (settings: Settings | ((prev: Settings) => Settings)) => void;
   updateSettings: (settings: Partial<Settings>) => void;
@@ -346,7 +346,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const [financialRecords, setFinancialRecords] = useLocalStorage<FinancialRecord[]>('financialRecords', []);
   const [settings, setSettings] = useLocalStorage<Settings>('settings', initialSettings);
 
-  // Функции для работы с автомобилями
+  // Functions for working with cars
   const addCar = (carData: Omit<Car, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newCar: Car = {
       ...carData,
@@ -369,7 +369,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setCars(prev => prev.filter(car => car.id !== id));
   };
 
-  // Функции для работы с клиентами
+  // Functions for working with clients
   const addClient = (clientData: Omit<Client, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newClient: Client = {
       ...clientData,
@@ -392,7 +392,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setClients(prev => prev.filter(client => client.id !== id));
   };
 
-  // Функции для работы с бронированиями
+  // Functions for working with bookings
   const addBooking = (bookingData: Omit<Booking, 'id' | 'createdAt' | 'updatedAt'>) => {
     const newBooking: Booking = {
       ...bookingData,
@@ -415,7 +415,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setBookings(prev => prev.filter(booking => booking.id !== id));
   };
 
-  // Функции для работы с финансовыми записями
+  // Functions for working with financial records
   const addFinancialRecord = (recordData: Omit<FinancialRecord, 'id' | 'createdAt'>) => {
     const newRecord: FinancialRecord = {
       ...recordData,
@@ -437,7 +437,7 @@ export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     setFinancialRecords(prev => prev.filter(record => record.id !== id));
   };
 
-  // Функции для работы с настройками
+  // Functions for working with settings
   const updateSettings = (settingsData: Partial<Settings>) => {
     setSettings(prev => ({ ...prev, ...settingsData }));
   };

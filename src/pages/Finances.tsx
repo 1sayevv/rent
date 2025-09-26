@@ -17,7 +17,7 @@ import {
 } from "lucide-react";
 import { ExportModal } from "@/components/ExportModal";
 import { prepareFinancialData } from "@/utils/exportUtils";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import {
   LineChart,
   Line,
@@ -35,12 +35,12 @@ import {
 } from "recharts";
 
 const monthlyRevenue = [
-  { month: "Янв", revenue: 45000, expenses: 12000, profit: 33000 },
-  { month: "Фев", revenue: 52000, expenses: 15000, profit: 37000 },
-  { month: "Мар", revenue: 48000, expenses: 13000, profit: 35000 },
-  { month: "Апр", revenue: 61000, expenses: 18000, profit: 43000 },
-  { month: "Май", revenue: 55000, expenses: 16000, profit: 39000 },
-  { month: "Июн", revenue: 67000, expenses: 19000, profit: 48000 }
+  { month: "Jan", revenue: 45000, expenses: 12000, profit: 33000 },
+  { month: "Feb", revenue: 52000, expenses: 15000, profit: 37000 },
+  { month: "Mar", revenue: 48000, expenses: 13000, profit: 35000 },
+  { month: "Apr", revenue: 61000, expenses: 18000, profit: 43000 },
+  { month: "May", revenue: 55000, expenses: 16000, profit: 39000 },
+  { month: "Jun", revenue: 67000, expenses: 19000, profit: 48000 }
 ];
 
 const topCars = [
@@ -52,47 +52,47 @@ const topCars = [
 ];
 
 const revenueByCategory = [
-  { name: "Эконом", value: 28500, color: "#10b981" },
-  { name: "Бизнес", value: 45200, color: "#3b82f6" },
-  { name: "Премиум", value: 67800, color: "#f59e0b" },
-  { name: "Джип", value: 38600, color: "#8b5cf6" }
+  { name: "Economy", value: 28500, color: "#10b981" },
+  { name: "Business", value: 45200, color: "#3b82f6" },
+  { name: "Premium", value: 67800, color: "#f59e0b" },
+  { name: "SUV", value: 38600, color: "#8b5cf6" }
 ];
 
 const recentPayments = [
   {
     id: 1,
-    client: "Али Алиев",
+    client: "Ali Aliyev",
     car: "BMW X5",
     amount: 425,
     date: "2024-06-15",
-    method: "Карта",
+    method: "Card",
     status: "completed"
   },
   {
     id: 2,
-    client: "Лейла Мамедова", 
+    client: "Leyla Mamedova", 
     car: "Mercedes C-Class",
     amount: 150,
     date: "2024-06-14",
-    method: "Наличные",
+    method: "Cash",
     status: "completed"
   },
   {
     id: 3,
-    client: "Расим Гасанов",
+    client: "Rasim Gasanov",
     car: "Toyota Camry",
     amount: 180,
     date: "2024-06-13",
-    method: "Банковский перевод",
+    method: "Bank Transfer",
     status: "pending"
   },
   {
     id: 4,
-    client: "Нигяр Исмайылова",
+    client: "Nigyar Ismayilova",
     car: "Hyundai Tucson", 
     amount: 280,
     date: "2024-06-12",
-    method: "Карта",
+    method: "Card",
     status: "completed"
   }
 ];
@@ -100,7 +100,7 @@ const recentPayments = [
 const debts = [
   {
     id: 1,
-    client: "Кямал Набиев",
+    client: "Kyamal Nabiyev",
     car: "Audi A6",
     amount: 320,
     dueDate: "2024-06-10",
@@ -108,7 +108,7 @@ const debts = [
   },
   {
     id: 2,
-    client: "Самир Гулиев",
+    client: "Samir Guliyev",
     car: "BMW X3",
     amount: 180,
     dueDate: "2024-06-08",
@@ -121,29 +121,29 @@ export default function Finances() {
   const { financialRecords, bookings, cars, clients } = useData();
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
 
-  // Проверяем разрешение на просмотр финансов
+  // Check permission to view finances
   if (!hasPermission('finances', 'view')) {
     return (
       <AccessDenied 
-        title="Финансы недоступны"
-        description="Просмотр финансовой информации доступен только администраторам системы."
+        title="Finances unavailable"
+        description="Viewing financial information is only available to system administrators."
       />
     );
   }
 
-  // Подготовка данных для экспорта
+  // Prepare data for export
   const financialReport = prepareFinancialData(financialRecords, bookings, cars, clients);
 
   const getPaymentStatusBadge = (status: string) => {
     switch (status) {
       case "completed":
-        return <Badge className="bg-success text-success-foreground">Оплачено</Badge>;
+        return <Badge className="bg-success text-success-foreground">Paid</Badge>;
       case "pending":
-        return <Badge className="bg-warning text-warning-foreground">Ожидает</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Pending</Badge>;
       case "failed":
-        return <Badge className="bg-destructive text-destructive-foreground">Отклонено</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Rejected</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -157,16 +157,16 @@ export default function Finances() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-revenue bg-clip-text text-transparent">
-            Финансы
+            Finances
           </h1>
-          <p className="text-muted-foreground">Анализ доходов и расходов</p>
+          <p className="text-muted-foreground">Income and expense analysis</p>
         </div>
         <Button 
           className="bg-gradient-primary hover:bg-primary-hover"
           onClick={() => setIsExportModalOpen(true)}
         >
           <Download className="h-4 w-4 mr-2" />
-          Экспорт отчета
+          Export Report
         </Button>
       </div>
 
@@ -176,11 +176,11 @@ export default function Finances() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Общий доход</p>
+                <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold text-revenue">{totalRevenue.toLocaleString()}₼</p>
                 <p className="text-xs text-success flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  +12.5% с прошлого месяца
+                  +12.5% from last month
                 </p>
               </div>
               <div className="w-8 h-8 bg-revenue/20 rounded-full flex items-center justify-center">
@@ -194,11 +194,11 @@ export default function Finances() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Чистая прибыль</p>
+                <p className="text-sm text-muted-foreground">Net Profit</p>
                 <p className="text-2xl font-bold text-success">{totalProfit.toLocaleString()}₼</p>
                 <p className="text-xs text-success flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  +8.2% с прошлого месяца
+                  +8.2% from last month
                 </p>
               </div>
               <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
@@ -212,11 +212,11 @@ export default function Finances() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Расходы</p>
+                <p className="text-sm text-muted-foreground">Expenses</p>
                 <p className="text-2xl font-bold text-destructive">{totalExpenses.toLocaleString()}₼</p>
                 <p className="text-xs text-destructive flex items-center gap-1">
                   <TrendingUp className="h-3 w-3" />
-                  +5.1% с прошлого месяца
+                  +5.1% from last month
                 </p>
               </div>
               <div className="w-8 h-8 bg-destructive/20 rounded-full flex items-center justify-center">
@@ -230,11 +230,11 @@ export default function Finances() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Задолженности</p>
+                <p className="text-sm text-muted-foreground">Debts</p>
                 <p className="text-2xl font-bold text-warning">{totalDebts}₼</p>
                 <p className="text-xs text-warning flex items-center gap-1">
                   <AlertTriangle className="h-3 w-3" />
-                  {debts.length} просроченных
+                  {debts.length} overdue
                 </p>
               </div>
               <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
@@ -247,10 +247,10 @@ export default function Finances() {
 
       <Tabs defaultValue="overview" className="w-full">
         <TabsList className="grid w-fit grid-cols-4">
-          <TabsTrigger value="overview">Обзор</TabsTrigger>
-          <TabsTrigger value="revenue">Доходы</TabsTrigger>
-          <TabsTrigger value="payments">Платежи</TabsTrigger>
-          <TabsTrigger value="debts">Долги</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="revenue">Revenue</TabsTrigger>
+          <TabsTrigger value="payments">Payments</TabsTrigger>
+          <TabsTrigger value="debts">Debts</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview" className="space-y-6">
@@ -260,7 +260,7 @@ export default function Finances() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5 text-revenue" />
-                  Доходы и прибыль по месяцам
+                  Monthly Revenue and Profit
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -276,14 +276,14 @@ export default function Finances() {
                       dataKey="revenue" 
                       stroke="hsl(var(--revenue))" 
                       strokeWidth={3}
-                      name="Доходы"
+                      name="Revenue"
                     />
                     <Line 
                       type="monotone" 
                       dataKey="profit" 
                       stroke="hsl(var(--success))" 
                       strokeWidth={3}
-                      name="Прибыль"
+                      name="Profit"
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -295,7 +295,7 @@ export default function Finances() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Car className="h-5 w-5 text-primary" />
-                  Доходы по категориям
+                  Revenue by Category
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -313,7 +313,7 @@ export default function Finances() {
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [`${value}₼`, 'Доход']} />
+                    <Tooltip formatter={(value) => [`${value}₼`, 'Revenue']} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -325,7 +325,7 @@ export default function Finances() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Car className="h-5 w-5 text-primary" />
-                ТОП-5 машин по доходу
+                Top 5 Cars by Revenue
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -339,7 +339,7 @@ export default function Finances() {
                       <div>
                         <p className="font-medium">{car.name}</p>
                         <p className="text-sm text-muted-foreground">
-                          {car.bookings} бронирований • {car.avgPrice}₼ за день
+                          {car.bookings} bookings • {car.avgPrice}₼ per day
                         </p>
                       </div>
                     </div>
@@ -356,7 +356,7 @@ export default function Finances() {
         <TabsContent value="revenue" className="space-y-6">
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Детальный анализ доходов</CardTitle>
+              <CardTitle>Detailed Revenue Analysis</CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
@@ -366,8 +366,8 @@ export default function Finances() {
                   <YAxis />
                   <Tooltip formatter={(value) => [`${value}₼`, '']} />
                   <Legend />
-                  <Bar dataKey="revenue" fill="hsl(var(--revenue))" name="Доходы" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="expenses" fill="hsl(var(--destructive))" name="Расходы" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="revenue" fill="hsl(var(--revenue))" name="Revenue" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="expenses" fill="hsl(var(--destructive))" name="Expenses" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </CardContent>
@@ -379,7 +379,7 @@ export default function Finances() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-revenue" />
-                История платежей
+                Payment History
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -419,7 +419,7 @@ export default function Finances() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <AlertTriangle className="h-5 w-5 text-warning" />
-                Просроченные задолженности
+                Overdue Debts
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -433,10 +433,10 @@ export default function Finances() {
                       <div>
                         <p className="font-medium">{debt.client}</p>
                         <p className="text-sm text-muted-foreground">
-                          {debt.car} • Срок: {new Date(debt.dueDate).toLocaleDateString('ru-RU')}
+                          {debt.car} • Due date: {new Date(debt.dueDate).toLocaleDateString('ru-RU')}
                         </p>
                         <Badge className="bg-destructive text-destructive-foreground mt-1">
-                          Просрочено на {debt.daysOverdue} дней
+                          Overdue by {debt.daysOverdue} days
                         </Badge>
                       </div>
                     </div>
@@ -446,10 +446,10 @@ export default function Finances() {
                       </div>
                       <div className="flex gap-2">
                         <Button size="sm" className="bg-success hover:bg-success/90">
-                          Оплачено
+                          Paid
                         </Button>
                         <Button variant="outline" size="sm">
-                          Связаться
+                          Contact
                         </Button>
                       </div>
                     </div>
@@ -459,8 +459,8 @@ export default function Finances() {
                 {debts.length === 0 && (
                   <div className="text-center py-8">
                     <DollarSign className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">Нет задолженностей</h3>
-                    <p className="text-muted-foreground">Все платежи поступают вовремя!</p>
+                    <h3 className="text-lg font-semibold mb-2">No Debts</h3>
+                    <p className="text-muted-foreground">All payments are made on time!</p>
                   </div>
                 )}
               </div>
@@ -469,7 +469,7 @@ export default function Finances() {
         </TabsContent>
       </Tabs>
 
-      {/* Модальное окно экспорта */}
+      {/* Export Modal */}
       <ExportModal
         isOpen={isExportModalOpen}
         onClose={() => setIsExportModalOpen(false)}

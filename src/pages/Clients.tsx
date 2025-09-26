@@ -16,7 +16,7 @@ import {
   UserPlus
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { Client } from "@/types";
 import { useNavigate } from "react-router-dom";
 
@@ -33,11 +33,11 @@ export default function Clients() {
       case "vip":
         return <Badge className="bg-revenue text-revenue-foreground">VIP</Badge>;
       case "regular":
-        return <Badge className="bg-primary text-primary-foreground">Постоянный</Badge>;
+        return <Badge className="bg-primary text-primary-foreground">Regular</Badge>;
       case "new":
-        return <Badge className="bg-success text-success-foreground">Новый</Badge>;
+        return <Badge className="bg-success text-success-foreground">New</Badge>;
       default:
-        return <Badge variant="outline">Обычный</Badge>;
+        return <Badge variant="outline">Regular</Badge>;
     }
   };
 
@@ -60,7 +60,7 @@ export default function Clients() {
   const totalRevenue = clients.reduce((sum, client) => sum + client.totalSpent, 0);
 
   const handleEditClient = (client: Client) => {
-    // Переход на страницу редактирования клиента
+    // Navigate to client edit page
     navigate(`/clients/edit/${client.id}`);
   };
 
@@ -73,16 +73,16 @@ export default function Clients() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Клиенты
+            Clients
           </h1>
-          <p className="text-muted-foreground">Управление клиентской базой</p>
+          <p className="text-muted-foreground">Client database management</p>
         </div>
         <Button 
           className="bg-gradient-primary hover:bg-primary-hover"
           onClick={() => navigate("/clients/add")}
         >
           <UserPlus className="h-4 w-4 mr-2" />
-          Добавить клиента
+          Add Client
         </Button>
       </div>
 
@@ -92,7 +92,7 @@ export default function Clients() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Всего клиентов</p>
+                <p className="text-sm text-muted-foreground">Total Clients</p>
                 <p className="text-2xl font-bold">{clients.length}</p>
               </div>
               <Users className="h-8 w-8 text-primary" />
@@ -104,7 +104,7 @@ export default function Clients() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">VIP клиенты</p>
+                <p className="text-sm text-muted-foreground">VIP Clients</p>
                 <p className="text-2xl font-bold text-revenue">{vipClients}</p>
               </div>
               <div className="w-8 h-8 bg-revenue/20 rounded-full flex items-center justify-center">
@@ -118,7 +118,7 @@ export default function Clients() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Новые клиенты</p>
+                <p className="text-sm text-muted-foreground">New Clients</p>
                 <p className="text-2xl font-bold text-success">{newClients}</p>
               </div>
               <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
@@ -132,7 +132,7 @@ export default function Clients() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Общий доход</p>
+                <p className="text-sm text-muted-foreground">Total Revenue</p>
                 <p className="text-2xl font-bold text-revenue">{totalRevenue.toLocaleString()}₼</p>
               </div>
               <div className="w-8 h-8 bg-revenue/20 rounded-full flex items-center justify-center">
@@ -150,7 +150,7 @@ export default function Clients() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Поиск по имени, email или телефону..." 
+                placeholder="Search by name, email or phone..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -158,13 +158,13 @@ export default function Clients() {
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Статус клиента" />
+                <SelectValue placeholder="Client Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все статусы</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="vip">VIP</SelectItem>
-                <SelectItem value="regular">Постоянный</SelectItem>
-                <SelectItem value="new">Новый</SelectItem>
+                <SelectItem value="regular">Regular</SelectItem>
+                <SelectItem value="new">New</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -204,18 +204,18 @@ export default function Clients() {
                 
                 <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Calendar className="h-4 w-4" />
-                  <span>Клиент с {new Date(client.joinDate).toLocaleDateString('ru-RU')}</span>
+                  <span>Client since {new Date(client.joinDate).toLocaleDateString('en-US')}</span>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4 mt-4 pt-4 border-t">
                 <div className="text-center">
                   <p className="text-lg font-bold text-primary">{client.totalBookings}</p>
-                  <p className="text-xs text-muted-foreground">Бронирований</p>
+                  <p className="text-xs text-muted-foreground">Bookings</p>
                 </div>
                 <div className="text-center">
                   <p className="text-lg font-bold text-revenue">{client.totalSpent}₼</p>
-                  <p className="text-xs text-muted-foreground">Потрачено</p>
+                  <p className="text-xs text-muted-foreground">Spent</p>
                 </div>
               </div>
 
@@ -227,7 +227,7 @@ export default function Clients() {
                   onClick={() => navigate(`/clients/${client.id}`)}
                 >
                   <Eye className="h-4 w-4 mr-1" />
-                  Просмотр
+                  View
                 </Button>
                 <Button 
                   variant="outline" 
@@ -236,13 +236,13 @@ export default function Clients() {
                   onClick={() => handleEditClient(client)}
                 >
                   <Edit className="h-4 w-4 mr-1" />
-                  Изменить
+                  Edit
                 </Button>
               </div>
 
               <div className="mt-3 pt-3 border-t">
                 <p className="text-xs text-muted-foreground">
-                  Последнее бронирование: {new Date(client.lastBooking).toLocaleDateString('ru-RU')}
+                  Last booking: {new Date(client.lastBooking).toLocaleDateString('en-US')}
                 </p>
               </div>
             </CardContent>
@@ -253,9 +253,9 @@ export default function Clients() {
       {filteredClients.length === 0 && (
         <div className="text-center py-12">
           <Users className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Клиенты не найдены</h3>
+          <h3 className="text-lg font-semibold mb-2">No clients found</h3>
           <p className="text-muted-foreground mb-4">
-            Попробуйте изменить параметры поиска или фильтры
+            Try changing search parameters or filters
           </p>
         </div>
       )}

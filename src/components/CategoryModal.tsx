@@ -64,11 +64,11 @@ export function CategoryModal({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Название категории обязательно';
+      newErrors.name = 'Category name is required';
     }
 
     if (!formData.description.trim()) {
-      newErrors.description = 'Описание категории обязательно';
+      newErrors.description = 'Category description is required';
     }
 
     setErrors(newErrors);
@@ -90,7 +90,7 @@ export function CategoryModal({
       }
       onClose();
     } catch (error) {
-      console.error('Ошибка при сохранении категории:', error);
+      console.error('Error saving category:', error);
     } finally {
       setIsLoading(false);
     }
@@ -102,30 +102,30 @@ export function CategoryModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Palette className="h-5 w-5 text-primary" />
-            {isEditing ? 'Редактировать категорию' : 'Добавить категорию'}
+            {isEditing ? 'Edit Category' : 'Add Category'}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="category-name">Название категории *</Label>
+            <Label htmlFor="category-name">Category Name *</Label>
             <Input
               id="category-name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Например: Эконом, Бизнес, Премиум"
+              placeholder="For example: Economy, Business, Premium"
               className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="category-description">Описание *</Label>
+            <Label htmlFor="category-description">Description *</Label>
             <Textarea
               id="category-description"
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-              placeholder="Краткое описание категории"
+              placeholder="Brief category description"
               className={errors.description ? "border-destructive" : ""}
               rows={3}
             />
@@ -138,7 +138,7 @@ export function CategoryModal({
               checked={formData.active}
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
             />
-            <Label htmlFor="category-active">Активная категория</Label>
+            <Label htmlFor="category-active">Active Category</Label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
@@ -148,7 +148,7 @@ export function CategoryModal({
               onClick={onClose}
               disabled={isLoading}
             >
-              Отмена
+              Cancel
             </Button>
             <Button 
               type="submit" 
@@ -158,12 +158,12 @@ export function CategoryModal({
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Сохранение...
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Обновить' : 'Создать'}
+                  {isEditing ? 'Update' : 'Create'}
                 </>
               )}
             </Button>

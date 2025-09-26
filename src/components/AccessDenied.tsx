@@ -10,8 +10,8 @@ interface AccessDeniedProps {
 }
 
 export function AccessDenied({ 
-  title = "Доступ ограничен", 
-  description = "Эта функция доступна только администраторам системы.",
+  title = "Access Restricted", 
+  description = "This feature is only available to system administrators.",
   showBackButton = true 
 }: AccessDeniedProps) {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ export function AccessDenied({
               className="w-full bg-gradient-primary hover:bg-primary-hover"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Вернуться на главную
+              Back to Home
             </Button>
           )}
         </CardContent>

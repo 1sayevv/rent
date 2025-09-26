@@ -1,36 +1,36 @@
-# DraggableImageGallery - Компонент загрузки изображений
+# DraggableImageGallery - Image Upload Component
 
-## Обновления
+## Updates
 
-Компонент `DraggableImageGallery` был значительно улучшен и теперь поддерживает полноценную функциональность drag and drop для загрузки изображений.
+The `DraggableImageGallery` component has been significantly improved and now supports full drag and drop functionality for image uploads.
 
-## Новые возможности
+## New Features
 
-### ✅ Drag and Drop загрузка
-- Перетаскивание файлов из проводника в зону загрузки
-- Визуальная обратная связь при перетаскивании
-- Поддержка множественной загрузки файлов
+### ✅ Drag and Drop Upload
+- Drag files from explorer to upload area
+- Visual feedback when dragging
+- Support for multiple file uploads
 
-### ✅ Валидация файлов
-- Проверка типа файла (только изображения)
-- Ограничение размера файла (до 10MB)
-- Ограничение количества изображений (по умолчанию 10)
+### ✅ File Validation
+- File type checking (images only)
+- File size limitation (up to 10MB)
+- Image count limitation (default 10)
 
-### ✅ Улучшенный UX
-- Индикатор загрузки
-- Toast уведомления об ошибках и успешной загрузке
-- Счетчик изображений
-- Анимации и переходы
-- Автоматическое скрытие зоны загрузки при достижении лимита
+### ✅ Enhanced UX
+- Upload indicator
+- Toast notifications for errors and successful uploads
+- Image counter
+- Animations and transitions
+- Automatic upload area hiding when limit is reached
 
-### ✅ Совместимость
-- Поддержка старого интерфейса (string[])
-- Поддержка нового интерфейса (ImageFile[])
-- Обратная совместимость с существующим кодом
+### ✅ Compatibility
+- Support for old interface (string[])
+- Support for new interface (ImageFile[])
+- Backward compatibility with existing code
 
-## Использование
+## Usage
 
-### Базовое использование (старый интерфейс)
+### Basic Usage (old interface)
 ```tsx
 import DraggableImageGallery from '@/components/DraggableImageGallery';
 
@@ -43,7 +43,7 @@ const [images, setImages] = useState<string[]>([]);
 />
 ```
 
-### Расширенное использование (новый интерфейс)
+### Advanced Usage (new interface)
 ```tsx
 interface ImageFile {
   id: string;
@@ -60,53 +60,53 @@ const [images, setImages] = useState<ImageFile[]>([]);
 />
 ```
 
-## События
+## Events
 
 ### onImagesChange
-Вызывается при изменении списка изображений (добавление, удаление, перестановка).
+Called when the image list changes (add, remove, reorder).
 
-### onRemoveImage (опционально)
-Для совместимости со старым интерфейсом - вызывается при удалении изображения по индексу.
+### onRemoveImage (optional)
+For compatibility with old interface - called when removing image by index.
 
-## Валидация
+## Validation
 
-Компонент автоматически проверяет:
-- **Тип файла**: только изображения (image/*)
-- **Размер файла**: максимум 10MB
-- **Количество файлов**: максимум указанное в `maxImages`
+The component automatically checks:
+- **File type**: images only (image/*)
+- **File size**: maximum 10MB
+- **File count**: maximum specified in `maxImages`
 
-## Обратная связь
+## Feedback
 
-### Toast уведомления
-- ✅ Успешная загрузка
-- ❌ Ошибки валидации
-- ❌ Превышение лимитов
+### Toast Notifications
+- ✅ Successful upload
+- ❌ Validation errors
+- ❌ Limit exceeded
 
-### Визуальные индикаторы
-- Спиннер загрузки
-- Изменение стилей при drag over
-- Счетчик изображений
-- Сообщение о достижении лимита
+### Visual Indicators
+- Upload spinner
+- Style changes on drag over
+- Image counter
+- Limit reached message
 
-## Стилизация
+## Styling
 
-Компонент использует Tailwind CSS и поддерживает:
-- Темную/светлую тему
-- Адаптивный дизайн
-- Плавные анимации
-- Hover эффекты
+The component uses Tailwind CSS and supports:
+- Dark/light theme
+- Responsive design
+- Smooth animations
+- Hover effects
 
-## Примеры ошибок
+## Error Examples
 
 ```
-"file.jpg - не является изображением"
-"large-image.png - размер превышает 10MB"
-"Достигнут лимит изображений (10)"
+"file.jpg - is not an image"
+"large-image.png - size exceeds 10MB"
+"Image limit reached (10)"
 ```
 
-## Технические детали
+## Technical Details
 
-- Использует `@hello-pangea/dnd` для drag and drop функциональности
-- Поддерживает FileReader API для конвертации в base64
-- Использует URL.createObjectURL для предварительного просмотра
-- Автоматически очищает объектные URL при удалении изображений 
+- Uses `@hello-pangea/dnd` for drag and drop functionality
+- Supports FileReader API for base64 conversion
+- Uses URL.createObjectURL for preview
+- Automatically cleans up object URLs when removing images 

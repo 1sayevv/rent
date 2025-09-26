@@ -20,7 +20,7 @@ import {
   Edit,
   User
 } from "lucide-react";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { Car as CarType } from "@/types";
 
 export default function CarDetails() {
@@ -28,7 +28,7 @@ export default function CarDetails() {
   const navigate = useNavigate();
   const { cars } = useData();
 
-  // Проверяем, что ID является числом
+  // Check that ID is a number
   const carId = Number(id);
   const car = isNaN(carId) ? null : cars.find(c => c.id === carId);
 
@@ -42,14 +42,14 @@ export default function CarDetails() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад к машинам
+            Back to Cars
           </Button>
         </div>
         <div className="text-center py-12">
           <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Машина не найдена</h3>
+          <h3 className="text-lg font-semibold mb-2">Car not found</h3>
           <p className="text-muted-foreground">
-            Запрашиваемая машина не существует или была удалена
+            The requested car does not exist or has been deleted
           </p>
         </div>
       </div>
@@ -59,26 +59,26 @@ export default function CarDetails() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "available":
-        return <Badge className="bg-success text-success-foreground">Доступна</Badge>;
+        return <Badge className="bg-success text-success-foreground">Available</Badge>;
       case "rented":
-        return <Badge className="bg-warning text-warning-foreground">Занята</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Rented</Badge>;
       case "maintenance":
-        return <Badge className="bg-destructive text-destructive-foreground">Ремонт</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Maintenance</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
-      case "Эконом":
-        return <Badge variant="outline" className="text-muted-foreground">Эконом</Badge>;
-      case "Бизнес":
-        return <Badge variant="outline" className="text-primary border-primary">Бизнес</Badge>;
-      case "Премиум":
-        return <Badge variant="outline" className="text-revenue border-revenue">Премиум</Badge>;
-      case "Джип":
-        return <Badge variant="outline" className="text-success border-success">Джип</Badge>;
+      case "Economy":
+        return <Badge variant="outline" className="text-muted-foreground">Economy</Badge>;
+      case "Business":
+        return <Badge variant="outline" className="text-primary border-primary">Business</Badge>;
+      case "Premium":
+        return <Badge variant="outline" className="text-revenue border-revenue">Premium</Badge>;
+      case "SUV":
+        return <Badge variant="outline" className="text-success border-success">SUV</Badge>;
       default:
         return <Badge variant="outline">{category}</Badge>;
     }
@@ -86,7 +86,7 @@ export default function CarDetails() {
 
   return (
     <div className="space-y-6">
-      {/* Заголовок и навигация */}
+      {/* Header and navigation */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Button 
@@ -95,13 +95,13 @@ export default function CarDetails() {
             className="flex items-center gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Назад к машинам
+            Back to Cars
           </Button>
           <div>
             <h1 className="text-3xl font-bold text-black">
-              Детали автомобиля
+              Car Details
             </h1>
-            <p className="text-muted-foreground">Подробная информация о машине</p>
+            <p className="text-muted-foreground">Detailed car information</p>
           </div>
         </div>
         <Button 
@@ -109,14 +109,14 @@ export default function CarDetails() {
           className="bg-gradient-primary hover:bg-primary-hover"
         >
           <Edit className="h-4 w-4 mr-2" />
-          Редактировать
+          Edit
         </Button>
       </div>
 
       <div className="space-y-6">
-        {/* Основная информация */}
+        {/* Basic Information */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Изображение */}
+          {/* Image */}
           <Card className="shadow-card">
             <CardContent className="p-6">
               <div className="space-y-4">
@@ -135,7 +135,7 @@ export default function CarDetails() {
             </CardContent>
           </Card>
 
-          {/* Информация о машине */}
+          {/* Car Information */}
           <Card className="shadow-card">
             <CardContent className="p-6">
               <div className="space-y-4">
@@ -147,35 +147,35 @@ export default function CarDetails() {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <Hash className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Год выпуска: {car.year}</span>
+                    <span className="text-black">Year of Manufacture: {car.year}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Tag className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Категория: {car.category}</span>
+                    <span className="text-black">Category: {car.category}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Fuel className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Тип топлива: {car.fuelType}</span>
+                    <span className="text-black">Fuel Type: {car.fuelType}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Settings className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Коробка передач: {car.transmission}</span>
+                    <span className="text-black">Transmission: {car.transmission}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <User className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Количество сидений: {car.seats}</span>
+                    <span className="text-black">Number of Seats: {car.seats}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Пробег: {car.mileage.toLocaleString()} км</span>
+                    <span className="text-black">Mileage: {car.mileage.toLocaleString()} km</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Добавлена: {new Date(car.createdAt).toLocaleDateString('ru-RU')}</span>
+                    <span className="text-black">Added: {new Date(car.createdAt).toLocaleDateString('ru-RU')}</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Обновлена: {new Date(car.updatedAt).toLocaleDateString('ru-RU')}</span>
+                    <span className="text-black">Updated: {new Date(car.updatedAt).toLocaleDateString('ru-RU')}</span>
                   </div>
                 </div>
               </div>
@@ -183,19 +183,19 @@ export default function CarDetails() {
           </Card>
         </div>
 
-        {/* Цены */}
+        {/* Prices */}
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-black flex items-center gap-2">
                 <DollarSign className="h-5 w-5 text-revenue" />
-                Тарифы
+                Rates
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-black">За день</span>
+                    <span className="font-medium text-black">Per Day</span>
                   </div>
                   <p className="text-2xl font-bold text-primary">{car.pricePerDay}₼</p>
                 </div>
@@ -203,7 +203,7 @@ export default function CarDetails() {
                   <div className="p-4 border rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-black">За неделю</span>
+                      <span className="font-medium text-black">Per Week</span>
                     </div>
                     <p className="text-2xl font-bold text-primary">{car.weeklyPrice}₼</p>
                   </div>
@@ -212,7 +212,7 @@ export default function CarDetails() {
                   <div className="p-4 border rounded-lg">
                     <div className="flex items-center gap-2 mb-2">
                       <Calendar className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-black">За месяц</span>
+                      <span className="font-medium text-black">Per Month</span>
                     </div>
                     <p className="text-2xl font-bold text-primary">{car.monthlyPrice}₼</p>
                   </div>
@@ -222,14 +222,14 @@ export default function CarDetails() {
           </CardContent>
         </Card>
 
-        {/* Описание */}
+        {/* Description */}
         {car.description && (
           <Card className="shadow-card">
             <CardContent className="p-6">
               <div className="space-y-4">
                 <h3 className="text-xl font-semibold text-black flex items-center gap-2">
                   <FileText className="h-5 w-5 text-primary" />
-                  Описание
+                  Description
                 </h3>
                 <div className="p-4 border rounded-lg bg-muted/30">
                   <p className="text-black leading-relaxed">{car.description}</p>
@@ -239,18 +239,18 @@ export default function CarDetails() {
           </Card>
         )}
 
-        {/* Дополнительные изображения */}
+        {/* Additional Images */}
         {car.images && car.images.length > 0 && (
           <Card className="shadow-card">
             <CardContent className="p-6">
               <div className="space-y-4">
-                <h3 className="text-xl font-semibold text-black">Дополнительные фото</h3>
+                <h3 className="text-xl font-semibold text-black">Additional Photos</h3>
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   {car.images.map((image, index) => (
                     <div key={index} className="aspect-square bg-muted rounded-lg overflow-hidden">
                       <img 
                         src={image} 
-                        alt={`${car.name} - фото ${index + 1}`}
+                        alt={`${car.name} - photo ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -261,26 +261,26 @@ export default function CarDetails() {
           </Card>
         )}
 
-        {/* Техническая информация */}
+        {/* Technical Information */}
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-black flex items-center gap-2">
                 <Settings className="h-5 w-5 text-primary" />
-                Техническая информация
+                Technical Information
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <Car className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-black">ID автомобиля</span>
+                    <span className="font-medium text-black">Car ID</span>
                   </div>
                   <p className="text-lg font-bold text-primary">#{car.id}</p>
                 </div>
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <MapPin className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-black">Статус</span>
+                    <span className="font-medium text-black">Status</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {getStatusBadge(car.status)}
@@ -291,38 +291,38 @@ export default function CarDetails() {
           </CardContent>
         </Card>
 
-        {/* Статистика */}
+        {/* Statistics */}
         <Card className="shadow-card">
           <CardContent className="p-6">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold text-black flex items-center gap-2">
                 <Star className="h-5 w-5 text-warning" />
-                Статистика
+                Statistics
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="p-4 border rounded-lg text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Users className="h-4 w-4 text-success" />
-                    <span className="font-medium text-black">Бронирования</span>
+                    <span className="font-medium text-black">Bookings</span>
                   </div>
                   <p className="text-2xl font-bold text-success">0</p>
-                  <p className="text-sm text-muted-foreground">всего</p>
+                  <p className="text-sm text-muted-foreground">total</p>
                 </div>
                 <div className="p-4 border rounded-lg text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Star className="h-4 w-4 text-warning" />
-                    <span className="font-medium text-black">Рейтинг</span>
+                    <span className="font-medium text-black">Rating</span>
                   </div>
                   <p className="text-2xl font-bold text-warning">4.8</p>
-                  <p className="text-sm text-muted-foreground">из 5</p>
+                  <p className="text-sm text-muted-foreground">out of 5</p>
                 </div>
                 <div className="p-4 border rounded-lg text-center">
                   <div className="flex items-center justify-center gap-2 mb-2">
                     <Clock className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-black">Доход</span>
+                    <span className="font-medium text-black">Revenue</span>
                   </div>
                   <p className="text-2xl font-bold text-primary">0₼</p>
-                  <p className="text-sm text-muted-foreground">за все время</p>
+                  <p className="text-sm text-muted-foreground">all time</p>
                 </div>
               </div>
             </div>

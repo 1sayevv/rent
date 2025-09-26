@@ -1,127 +1,124 @@
 # Auto Manage Suite
 
-Система управления автопрокатом с сохранением всех данных в localStorage браузера.
+Car rental management system with all data stored in browser localStorage.
 
-## Особенности
+## Features
 
-- **Система авторизации**: Защищенный вход для администратора с отдельной страницей логина
-- **Полное сохранение в localStorage**: Все данные (автомобили, клиенты, бронирования, финансы, настройки) автоматически сохраняются в localStorage браузера
-- **Экспорт/Импорт данных**: Возможность экспорта всех данных в JSON файл и импорта из резервной копии
-- **Управление автомобилями**: Добавление, редактирование, удаление автомобилей
-- **Управление клиентами**: База данных клиентов с историей бронирований
-- **Система бронирований**: Создание и управление бронированиями с различными статусами
-- **Финансовый учет**: Отслеживание доходов и расходов
-- **Настройки системы**: Конфигурация компании и системных параметров
+- **Authentication System**: Secure login for administrators with separate login page
+- **Complete localStorage Storage**: All data (cars, clients, bookings, finances, settings) automatically saved in browser localStorage
+- **Data Export/Import**: Ability to export all data to JSON file and import from backup
+- **Car Management**: Add, edit, delete cars
+- **Client Management**: Client database with booking history
+- **Booking System**: Create and manage bookings with various statuses
+- **Financial Accounting**: Track income and expenses
+- **System Settings**: Company configuration and system parameters
 
-## Структура данных
+## Data Structure
 
-### Автомобили (Cars)
+### Cars
+- Basic information (name, model, year)
+- Technical specifications (fuel, transmission, mileage)
+- Pricing (daily, weekly, monthly rates)
+- Status (available, rented, under maintenance)
+- Images
 
-- Основная информация (название, модель, год)
-- Технические характеристики (топливо, КПП, пробег)
+### Clients
+- Contact information (name, email, phone)
+- Statistics (number of bookings, total amount)
+- Status (VIP, regular, new)
+- Activity history
 
-- 
-- Ценообразование (дневная, недельная, месячная ставки)
-- Статус (доступен, занят, на ремонте)
-- Изображения
+### Bookings
+- Connection with client and car
+- Rental dates (start and end)
+- Pickup and return locations
+- Status (confirmed, pending, active, completed, cancelled)
+- Total cost
 
-### Клиенты (Clients)
-- Контактная информация (имя, email, телефон)
-- Статистика (количество бронирований, общая сумма)
-- Статус (VIP, постоянный, новый)
-- История активности
+### Financial Records
+- Type (income/expense)
+- Category
+- Amount
+- Description
+- Date
 
-### Бронирования (Bookings)
-- Связь с клиентом и автомобилем
-- Даты аренды (начало и конец)
-- Локации получения и возврата
-- Статус (подтвержден, ожидает, активен, завершен, отменен)
-- Общая стоимость
+### Settings
+- Company information
+- Currency and timezone
+- Interface language
+- Notification settings
 
-### Финансовые записи (Financial Records)
-- Тип (доход/расход)
-- Категория
-- Сумма
-- Описание
-- Дата
+## localStorage Functions
 
-### Настройки (Settings)
-- Информация о компании
-- Валюта и часовой пояс
-- Язык интерфейса
-- Настройки уведомлений
+### Automatic Saving
+All data changes are automatically saved in browser localStorage:
+- `cars` - car data
+- `clients` - client data  
+- `bookings` - booking data
+- `financialRecords` - financial records
+- `settings` - system settings
 
-## Функции localStorage
+### Data Export
+- Download all data to JSON file
+- Includes metadata (export date, version)
+- Used for backup
 
-### Автоматическое сохранение
-Все изменения в данных автоматически сохраняются в localStorage браузера:
-- `cars` - данные автомобилей
-- `clients` - данные клиентов  
-- `bookings` - данные бронирований
-- `financialRecords` - финансовые записи
-- `settings` - настройки системы
+### Data Import
+- Load data from JSON file
+- Complete replacement of existing data
+- Restore from backup
 
-### Экспорт данных
-- Скачивание всех данных в JSON файл
-- Включает метаданные (дата экспорта, версия)
-- Используется для резервного копирования
+### Data Cleanup
+- Delete all data from localStorage
+- Action confirmation to prevent accidental loss
 
-### Импорт данных
-- Загрузка данных из JSON файла
-- Полная замена существующих данных
-- Восстановление из резервной копии
-
-### Очистка данных
-- Удаление всех данных из localStorage
-- Подтверждение действия для предотвращения случайной потери
-
-## Установка и запуск
+## Installation and Setup
 
 ```bash
-# Установка зависимостей
+# Install dependencies
 npm install
 
-# Запуск в режиме разработки
+# Run in development mode
 npm run dev
 
-# Сборка для продакшена
+# Build for production
 npm run build
 ```
 
-## Использование
+## Usage
 
-1. **Вход в систему**: Перейдите на `/login` и введите данные администратора
-2. **Добавление автомобиля**: Перейдите в раздел "Машины" → "Добавить машину"
-3. **Управление клиентами**: Раздел "Клиенты" для работы с клиентской базой
-4. **Создание бронирования**: Раздел "Бронирования" для управления заказами
-5. **Настройки**: Раздел "Настройки" для конфигурации системы
-6. **Управление данными**: Раздел "Данные" для экспорта/импорта
+1. **System Login**: Go to `/login` and enter administrator credentials
+2. **Add Car**: Go to "Cars" section → "Add Car"
+3. **Client Management**: "Clients" section for working with client database
+4. **Create Booking**: "Bookings" section for managing orders
+5. **Settings**: "Settings" section for system configuration
+6. **Data Management**: "Data" section for export/import
 
-## Данные для входа
+## Login Credentials
 
 - **Email**: admin@mail.com
-- **Пароль**: 1234
+- **Password**: 1234
 
-## Технические детали
+## Technical Details
 
-- **React 18** с TypeScript
-- **Vite** для сборки
-- **Tailwind CSS** для стилизации
-- **React Router** для навигации
-- **Context API** для управления состоянием
-- **localStorage API** для хранения данных
+- **React 18** with TypeScript
+- **Vite** for building
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **Context API** for state management
+- **localStorage API** for data storage
 
-## Безопасность
+## Security
 
-⚠️ **Важно**: Данные хранятся локально в браузере пользователя. При очистке кэша или смене браузера данные могут быть потеряны. Рекомендуется регулярно экспортировать данные для резервного копирования.
+⚠️ **Important**: Data is stored locally in the user's browser. Data may be lost when clearing cache or changing browsers. Regular data export is recommended for backup.
 
-## Поддержка браузеров
+## Browser Support
 
-Система работает во всех современных браузерах, поддерживающих:
+The system works in all modern browsers that support:
 - localStorage API
-- ES6+ синтаксис
-- CSS Grid и Flexbox
+- ES6+ syntax
+- CSS Grid and Flexbox
 
-## Лицензия
+## License
 
 MIT License

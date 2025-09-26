@@ -15,7 +15,7 @@ import {
   ImagePlus
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 import DraggableImageGallery from "@/components/DraggableImageGallery";
 
@@ -70,8 +70,8 @@ export default function AddCar() {
   const handleSaveCar = () => {
     if (!formData.name || !formData.model || !formData.category || !formData.dailyPrice) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, заполните все обязательные поля",
+        title: "Error",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
@@ -98,8 +98,8 @@ export default function AddCar() {
     addCar(carData);
     
     toast({
-      title: "Успешно",
-      description: "Автомобиль добавлен в автопарк"
+      title: "Success",
+      description: "Car added to fleet"
     });
 
     navigate("/cars");
@@ -115,9 +115,9 @@ export default function AddCar() {
         </Link>
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Добавить машину
+            Add Car
           </h1>
-          <p className="text-muted-foreground">Заполните информацию о новом автомобиле</p>
+          <p className="text-muted-foreground">Fill in information about the new car</p>
         </div>
       </div>
 
@@ -129,13 +129,13 @@ export default function AddCar() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Car className="h-5 w-5 text-primary" />
-                Основная информация
+                Basic Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Название машины</Label>
+                  <Label htmlFor="name">Car Name</Label>
                   <Input 
                     id="name"
                     placeholder="Toyota"
@@ -144,7 +144,7 @@ export default function AddCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="model">Модель</Label>
+                  <Label htmlFor="model">Model</Label>
                   <Input 
                     id="model"
                     placeholder="Camry"
@@ -156,7 +156,7 @@ export default function AddCar() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="year">Год выпуска</Label>
+                  <Label htmlFor="year">Year of Manufacture</Label>
                   <Input 
                     id="year"
                     type="number"
@@ -166,7 +166,7 @@ export default function AddCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mileage">Пробег (км)</Label>
+                  <Label htmlFor="mileage">Mileage (km)</Label>
                   <Input 
                     id="mileage"
                     type="number"
@@ -179,48 +179,48 @@ export default function AddCar() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label>Категория</Label>
+                  <Label>Category</Label>
                   <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="economy">Эконом</SelectItem>
-                      <SelectItem value="business">Бизнес</SelectItem>
-                      <SelectItem value="premium">Премиум</SelectItem>
-                      <SelectItem value="suv">Внедорожник</SelectItem>
-                      <SelectItem value="sport">Спортивный</SelectItem>
+                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                      <SelectItem value="sport">Sport</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Тип топлива</Label>
+                  <Label>Fuel Type</Label>
                   <Select value={formData.fuelType} onValueChange={(value) => handleInputChange("fuelType", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Тип топлива" />
+                      <SelectValue placeholder="Fuel type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="petrol">Бензин</SelectItem>
-                      <SelectItem value="diesel">Дизель</SelectItem>
-                      <SelectItem value="hybrid">Гибрид</SelectItem>
-                      <SelectItem value="electric">Электрическая</SelectItem>
+                      <SelectItem value="petrol">Petrol</SelectItem>
+                      <SelectItem value="diesel">Diesel</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>КПП</Label>
+                  <Label>Transmission</Label>
                   <Select value={formData.transmission} onValueChange={(value) => handleInputChange("transmission", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="КПП" />
+                      <SelectValue placeholder="Transmission" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="automatic">Автомат</SelectItem>
-                      <SelectItem value="manual">Механика</SelectItem>
+                      <SelectItem value="automatic">Automatic</SelectItem>
+                      <SelectItem value="manual">Manual</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="seats">Количество сидений</Label>
+                  <Label htmlFor="seats">Number of Seats</Label>
                   <Input 
                     id="seats"
                     type="number"
@@ -238,12 +238,12 @@ export default function AddCar() {
           {/* Pricing */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="text-revenue">Ценообразование</CardTitle>
+              <CardTitle className="text-revenue">Pricing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="dailyPrice">Цена за день (₼)</Label>
+                  <Label htmlFor="dailyPrice">Price per day (₼)</Label>
                   <Input 
                     id="dailyPrice"
                     type="number"
@@ -253,7 +253,7 @@ export default function AddCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weeklyPrice">Цена за неделю (₼)</Label>
+                  <Label htmlFor="weeklyPrice">Price per week (₼)</Label>
                   <Input 
                     id="weeklyPrice"
                     type="number"
@@ -263,7 +263,7 @@ export default function AddCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="monthlyPrice">Цена за месяц (₼)</Label>
+                  <Label htmlFor="monthlyPrice">Price per month (₼)</Label>
                   <Input 
                     id="monthlyPrice"
                     type="number"
@@ -279,11 +279,11 @@ export default function AddCar() {
           {/* Description */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Описание</CardTitle>
+              <CardTitle>Description</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea 
-                placeholder="Дополнительная информация о автомобиле..."
+                placeholder="Additional information about the car..."
                 className="min-h-[100px]"
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
@@ -294,7 +294,7 @@ export default function AddCar() {
           {/* Status */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Статус</CardTitle>
+              <CardTitle>Status</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
@@ -302,9 +302,9 @@ export default function AddCar() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="available">Доступна</SelectItem>
-                  <SelectItem value="maintenance">На ремонте</SelectItem>
-                  <SelectItem value="unavailable">Недоступна</SelectItem>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="maintenance">Under Maintenance</SelectItem>
+                  <SelectItem value="unavailable">Unavailable</SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
@@ -313,16 +313,16 @@ export default function AddCar() {
           {/* Documents */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Документы</CardTitle>
+              <CardTitle>Documents</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить страховку
+                Upload Insurance
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить техпаспорт
+                Upload Registration
               </Button>
             </CardContent>
           </Card>
@@ -335,10 +335,10 @@ export default function AddCar() {
                 onClick={handleSaveCar}
               >
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить машину
+                Save Car
               </Button>
               <Button variant="outline" className="w-full">
-                Сохранить как черновик
+                Save as Draft
               </Button>
             </CardContent>
           </Card>
@@ -349,7 +349,7 @@ export default function AddCar() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImagePlus className="h-5 w-5 text-primary" />
-              Фотографии
+              Photos
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -365,10 +365,10 @@ export default function AddCar() {
               <label htmlFor="image-upload" className="cursor-pointer">
                 <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Нажмите для загрузки фотографий
+                  Click to upload photos
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG до 10MB
+                  PNG, JPG up to 10MB
                 </p>
               </label>
             </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
-  // Получаем значение из localStorage или используем начальное значение
+  // Get value from localStorage or use initial value
   const [storedValue, setStoredValue] = useState<T>(() => {
     try {
       const item = window.localStorage.getItem(key);
@@ -12,13 +12,13 @@ export function useLocalStorage<T>(key: string, initialValue: T) {
     }
   });
 
-  // Функция для установки значения
+  // Function to set value
   const setValue = (value: T | ((val: T) => T)) => {
     try {
-      // Позволяем value быть функцией, чтобы у нас была та же API, что и useState
+      // Allow value to be a function so we have the same API as useState
       const valueToStore = value instanceof Function ? value(storedValue) : value;
       setStoredValue(valueToStore);
-      // Сохраняем в localStorage
+      // Save to localStorage
       window.localStorage.setItem(key, JSON.stringify(valueToStore));
     } catch (error) {
       console.error(`Error setting localStorage key "${key}":`, error);

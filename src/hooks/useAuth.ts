@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { UserRole, User } from '@/types';
 
-// Выносим разрешения за пределы хука для стабильности
+// Move permissions outside the hook for stability
 const MANAGER_PERMISSIONS: Record<string, string[]> = {
   'dashboard': ['view'],
   'cars': ['view', 'create', 'edit', 'delete'],
@@ -30,7 +30,7 @@ export function useAuth() {
 
     checkAuth();
 
-    // Слушаем изменения в localStorage
+    // Listen for changes in localStorage
     const handleStorageChange = () => {
       checkAuth();
     };
@@ -73,10 +73,10 @@ export function useAuth() {
   const hasPermission = useCallback((resource: string, action: string): boolean => {
     if (!user) return false;
 
-    // Админ имеет все права
+    // Admin has all permissions
     if (user.role === 'admin') return true;
 
-    // Права для manager
+    // Permissions for manager
     if (user.role === 'manager') {
       const permissions = MANAGER_PERMISSIONS[resource];
       return permissions ? permissions.includes(action) : false;

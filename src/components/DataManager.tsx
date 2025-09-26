@@ -13,7 +13,7 @@ import {
   AlertTriangle,
   CheckCircle
 } from "lucide-react";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 
 export default function DataManager() {

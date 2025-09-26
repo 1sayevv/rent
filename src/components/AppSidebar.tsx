@@ -69,7 +69,7 @@ export function AppSidebar() {
       ? "bg-sidebar-accent text-sidebar-primary font-medium" 
       : "hover:bg-sidebar-accent/50 text-sidebar-foreground hover:text-sidebar-primary";
 
-  // Выбираем пункты меню в зависимости от роли
+  // Select menu items based on role
   const mainItems = userRole === 'admin' ? adminItems : managerItems;
   const quickActions = userRole === 'admin' ? adminQuickActions : managerQuickActions;
 

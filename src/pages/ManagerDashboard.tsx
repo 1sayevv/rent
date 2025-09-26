@@ -11,31 +11,31 @@ import {
 } from "lucide-react";
 
 const recentBookings = [
-  { id: 1, client: "Али Алиев", car: "BMW X5", date: "Сегодня", status: "confirmed" },
-  { id: 2, client: "Лейла Мамедова", car: "Mercedes C-Class", date: "Завтра", status: "pending" },
-  { id: 3, client: "Расим Гасанов", car: "Toyota Camry", date: "15.06", status: "active" },
-  { id: 4, client: "Нигяр Исмайылова", car: "Hyundai Tucson", date: "16.06", status: "confirmed" },
-  { id: 5, client: "Эльчин Керимов", car: "Audi Q7", date: "18.06", status: "pending" }
+  { id: 1, client: "Ali Aliyev", car: "BMW X5", date: "Today", status: "confirmed" },
+  { id: 2, client: "Leyla Mamedova", car: "Mercedes C-Class", date: "Tomorrow", status: "pending" },
+  { id: 3, client: "Rasim Gasanov", car: "Toyota Camry", date: "15.06", status: "active" },
+  { id: 4, client: "Nigyar Ismayilova", car: "Hyundai Tucson", date: "16.06", status: "confirmed" },
+  { id: 5, client: "Elchin Kerimov", car: "Audi Q7", date: "18.06", status: "pending" }
 ];
 
 const todaySchedule = [
-  { time: "09:00", action: "Выдача", client: "Али Алиев", car: "BMW X5" },
-  { time: "11:30", action: "Возврат", client: "Самир Гулиев", car: "Toyota Corolla" },
-  { time: "14:00", action: "Выдача", client: "Лейла Мамедова", car: "Mercedes C-Class" },
-  { time: "16:30", action: "Возврат", client: "Кямал Набиев", car: "Hyundai Sonata" }
+  { time: "09:00", action: "Pickup", client: "Ali Aliyev", car: "BMW X5" },
+  { time: "11:30", action: "Return", client: "Samir Guliyev", car: "Toyota Corolla" },
+  { time: "14:00", action: "Pickup", client: "Leyla Mamedova", car: "Mercedes C-Class" },
+  { time: "16:30", action: "Return", client: "Kyamal Nabiyev", car: "Hyundai Sonata" }
 ];
 
 export default function ManagerDashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge variant="outline" className="bg-success-light text-success border-success">Подтвержден</Badge>;
+        return <Badge variant="outline" className="bg-success-light text-success border-success">Confirmed</Badge>;
       case "pending":
-        return <Badge variant="outline" className="bg-warning-light text-warning border-warning">Ожидает</Badge>;
+        return <Badge variant="outline" className="bg-warning-light text-warning border-warning">Pending</Badge>;
       case "active":
-        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Активен</Badge>;
+        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Active</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -46,36 +46,36 @@ export default function ManagerDashboard() {
           <h1 className="text-2xl sm:text-3xl font-bold text-black">
             Dashboard
           </h1>
-          <p className="text-black text-sm sm:text-base">Управление автопарком</p>
+          <p className="text-black text-sm sm:text-base">Fleet management</p>
         </div>
         <div className="text-left sm:text-right">
-          <p className="text-sm text-muted-foreground">Сегодня</p>
-          <p className="text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
+          <p className="text-sm text-muted-foreground">Today</p>
+          <p className="text-lg font-semibold">{new Date().toLocaleDateString('en-US')}</p>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         <StatCard
-          title="Свободные машины"
+          title="Available Cars"
           value={24}
-          change="+2 с вчера"
+          change="+2 from yesterday"
           changeType="positive"
           icon={Car}
           variant="success"
         />
         <StatCard
-          title="Занятые машины"
+          title="Occupied Cars"
           value={18}
-          change="-3 с вчера"
+          change="-3 from yesterday"
           changeType="negative"
           icon={AlertCircle}
           variant="warning"
         />
         <StatCard
-          title="Всего клиентов"
+          title="Total Clients"
           value={1205}
-          change="+12 за неделю"
+          change="+12 this week"
           changeType="positive"
           icon={Users}
         />
@@ -88,7 +88,7 @@ export default function ManagerDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-black text-lg">
               <CheckCircle className="h-5 w-5 text-success" />
-              Активные бронирования
+              Active Bookings
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -111,7 +111,7 @@ export default function ManagerDashboard() {
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2 text-black text-lg">
               <Clock className="h-5 w-5 text-primary" />
-              Расписание на сегодня
+              Today's Schedule
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -125,7 +125,7 @@ export default function ManagerDashboard() {
                   <p className="text-xs text-muted-foreground">{item.client} • {item.car}</p>
                 </div>
                 <div className="self-start sm:self-center">
-                  <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
+                  <Badge variant={item.action === "Pickup" ? "default" : "secondary"}>
                     {item.action}
                   </Badge>
                 </div>

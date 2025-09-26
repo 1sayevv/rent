@@ -1,4 +1,4 @@
-// Типы для автомобилей
+// Types for cars
 export interface Car {
   id: number;
   name: string;
@@ -20,7 +20,7 @@ export interface Car {
   updatedAt: string;
 }
 
-// Типы для клиентов
+// Types for clients
 export interface Client {
   id: number;
   name: string;
@@ -36,7 +36,7 @@ export interface Client {
   updatedAt: string;
 }
 
-// Типы для бронирований
+// Types for bookings
 export interface Booking {
   id: number;
   clientId: number;
@@ -57,7 +57,7 @@ export interface Booking {
   updatedAt: string;
 }
 
-// Типы для финансов
+// Types for finances
 export interface FinancialRecord {
   id: number;
   type: 'income' | 'expense';
@@ -68,7 +68,7 @@ export interface FinancialRecord {
   createdAt: string;
 }
 
-// Типы для настроек
+// Types for settings
 export interface Settings {
   companyName: string;
   companyEmail: string;
@@ -84,7 +84,7 @@ export interface Settings {
   };
 }
 
-// Типы для пользователей и ролей
+// Types for users and roles
 export type UserRole = 'admin' | 'manager';
 
 export interface User {
@@ -95,7 +95,7 @@ export interface User {
   createdAt: string;
 }
 
-// Типы для разрешений
+// Types for permissions
 export interface Permission {
   resource: string;
   actions: string[];

@@ -4,7 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Layout } from "@/components/Layout";
-import { DataProvider } from "@/context/DataContext";
+import { SupabaseDataProvider } from "@/context/SupabaseDataContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
@@ -26,7 +26,7 @@ import { useEffect } from "react";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Принудительно очищаем localStorage при загрузке приложения
+  // Force clear localStorage when app loads
   useEffect(() => {
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userData');
@@ -35,16 +35,16 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DataProvider>
+      <SupabaseDataProvider>
         <TooltipProvider>
           <Toaster />
           <Sonner />
           <BrowserRouter>
             <Routes>
-              {/* Публичный маршрут для входа */}
+              {/* Public route for login */}
               <Route path="/login" element={<Login />} />
               
-              {/* Защищенные маршруты */}
+              {/* Protected routes */}
               <Route path="/*" element={
                 <ProtectedRoute>
                   <Layout>
@@ -73,7 +73,7 @@ const App = () => {
             </Routes>
           </BrowserRouter>
         </TooltipProvider>
-      </DataProvider>
+      </SupabaseDataProvider>
     </QueryClientProvider>
   );
 };

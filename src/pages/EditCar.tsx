@@ -15,7 +15,7 @@ import {
   ImagePlus
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 import DraggableImageGallery from "@/components/DraggableImageGallery";
 
@@ -41,10 +41,10 @@ export default function EditCar() {
     description: ""
   });
 
-  // Находим машину по ID
+  // Find car by ID
   const car = cars.find(c => c.id === Number(id));
 
-  // Загружаем данные машины при загрузке компонента
+  // Load car data when component loads
   useEffect(() => {
     if (car) {
       setFormData({
@@ -63,7 +63,7 @@ export default function EditCar() {
         description: car.description || ""
       });
       
-      // Загружаем изображения
+      // Load images
       if (car.images && car.images.length > 0) {
         setImages(car.images);
       } else if (car.image) {
@@ -102,8 +102,8 @@ export default function EditCar() {
   const handleUpdateCar = () => {
     if (!formData.name || !formData.model || !formData.category || !formData.dailyPrice) {
       toast({
-        title: "Ошибка",
-        description: "Пожалуйста, заполните все обязательные поля",
+        title: "Error",
+        description: "Please fill in all required fields",
         variant: "destructive"
       });
       return;
@@ -111,8 +111,8 @@ export default function EditCar() {
 
     if (!car) {
       toast({
-        title: "Ошибка",
-        description: "Машина не найдена",
+        title: "Error",
+        description: "Car not found",
         variant: "destructive"
       });
       return;
@@ -141,14 +141,14 @@ export default function EditCar() {
     updateCar(car.id, updatedCarData);
     
     toast({
-      title: "Успешно",
-      description: "Информация об автомобиле обновлена"
+      title: "Success",
+      description: "Car information updated"
     });
 
     navigate("/cars");
   };
 
-  // Если машина не найдена, показываем сообщение
+  // If car is not found, show message
   if (!car) {
     return (
       <div className="space-y-6">
@@ -159,19 +159,19 @@ export default function EditCar() {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-black">Редактировать машину</h1>
-            <p className="text-black">Машина не найдена</p>
+            <h1 className="text-3xl font-bold text-black">Edit Car</h1>
+            <p className="text-black">Car not found</p>
           </div>
         </div>
         <Card className="shadow-card">
           <CardContent className="p-8 text-center">
             <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Машина не найдена</h3>
+            <h3 className="text-lg font-semibold mb-2">Car not found</h3>
             <p className="text-muted-foreground mb-4">
-              Запрашиваемая машина не существует или была удалена
+              The requested car does not exist or has been deleted
             </p>
             <Link to="/cars">
-              <Button>Вернуться к списку машин</Button>
+              <Button>Return to car list</Button>
             </Link>
           </CardContent>
         </Card>
@@ -189,9 +189,9 @@ export default function EditCar() {
         </Link>
         <div>
           <h1 className="text-3xl font-bold text-black">
-            Редактировать машину
+            Edit Car
           </h1>
-          <p className="text-black">Обновите информацию об автомобиле</p>
+          <p className="text-black">Update car information</p>
         </div>
       </div>
 
@@ -203,13 +203,13 @@ export default function EditCar() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Car className="h-5 w-5 text-primary" />
-                Основная информация
+                Basic Information
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Название машины</Label>
+                  <Label htmlFor="name">Car Name</Label>
                   <Input 
                     id="name"
                     placeholder="Toyota"
@@ -218,7 +218,7 @@ export default function EditCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="model">Модель</Label>
+                  <Label htmlFor="model">Model</Label>
                   <Input 
                     id="model"
                     placeholder="Camry"
@@ -230,7 +230,7 @@ export default function EditCar() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="year">Год выпуска</Label>
+                  <Label htmlFor="year">Year of Manufacture</Label>
                   <Input 
                     id="year"
                     type="number"
@@ -240,7 +240,7 @@ export default function EditCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="mileage">Пробег (км)</Label>
+                  <Label htmlFor="mileage">Mileage (km)</Label>
                   <Input 
                     id="mileage"
                     type="number"
@@ -253,48 +253,48 @@ export default function EditCar() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label>Категория</Label>
+                  <Label>Category</Label>
                   <Select value={formData.category} onValueChange={(value) => handleInputChange("category", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Выберите категорию" />
+                      <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="economy">Эконом</SelectItem>
-                      <SelectItem value="business">Бизнес</SelectItem>
-                      <SelectItem value="premium">Премиум</SelectItem>
-                      <SelectItem value="suv">Внедорожник</SelectItem>
-                      <SelectItem value="sport">Спортивный</SelectItem>
+                      <SelectItem value="economy">Economy</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="suv">SUV</SelectItem>
+                      <SelectItem value="sport">Sport</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>Тип топлива</Label>
+                  <Label>Fuel Type</Label>
                   <Select value={formData.fuelType} onValueChange={(value) => handleInputChange("fuelType", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Тип топлива" />
+                      <SelectValue placeholder="Fuel type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="petrol">Бензин</SelectItem>
-                      <SelectItem value="diesel">Дизель</SelectItem>
-                      <SelectItem value="hybrid">Гибрид</SelectItem>
-                      <SelectItem value="electric">Электрическая</SelectItem>
+                      <SelectItem value="petrol">Petrol</SelectItem>
+                      <SelectItem value="diesel">Diesel</SelectItem>
+                      <SelectItem value="hybrid">Hybrid</SelectItem>
+                      <SelectItem value="electric">Electric</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label>КПП</Label>
+                  <Label>Transmission</Label>
                   <Select value={formData.transmission} onValueChange={(value) => handleInputChange("transmission", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="КПП" />
+                      <SelectValue placeholder="Transmission" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="automatic">Автомат</SelectItem>
-                      <SelectItem value="manual">Механика</SelectItem>
+                      <SelectItem value="automatic">Automatic</SelectItem>
+                      <SelectItem value="manual">Manual</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="seats">Количество сидений</Label>
+                  <Label htmlFor="seats">Number of Seats</Label>
                   <Input 
                     id="seats"
                     type="number"
@@ -312,12 +312,12 @@ export default function EditCar() {
           {/* Pricing */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle className="text-revenue">Ценообразование</CardTitle>
+              <CardTitle className="text-revenue">Pricing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <Label htmlFor="dailyPrice">Цена за день (₼)</Label>
+                  <Label htmlFor="dailyPrice">Price per day (₼)</Label>
                   <Input 
                     id="dailyPrice"
                     type="number"
@@ -327,7 +327,7 @@ export default function EditCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="weeklyPrice">Цена за неделю (₼)</Label>
+                  <Label htmlFor="weeklyPrice">Price per week (₼)</Label>
                   <Input 
                     id="weeklyPrice"
                     type="number"
@@ -337,7 +337,7 @@ export default function EditCar() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="monthlyPrice">Цена за месяц (₼)</Label>
+                  <Label htmlFor="monthlyPrice">Price per month (₼)</Label>
                   <Input 
                     id="monthlyPrice"
                     type="number"
@@ -353,11 +353,11 @@ export default function EditCar() {
           {/* Description */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Описание</CardTitle>
+              <CardTitle>Description</CardTitle>
             </CardHeader>
             <CardContent>
               <Textarea 
-                placeholder="Дополнительная информация о автомобиле..."
+                placeholder="Additional information about the car..."
                 className="min-h-[100px]"
                 value={formData.description}
                 onChange={(e) => handleInputChange("description", e.target.value)}
@@ -368,7 +368,7 @@ export default function EditCar() {
           {/* Status */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Статус</CardTitle>
+              <CardTitle>Status</CardTitle>
             </CardHeader>
             <CardContent>
               <Select value={formData.status} onValueChange={(value) => handleInputChange("status", value)}>
@@ -376,10 +376,10 @@ export default function EditCar() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="available">Доступна</SelectItem>
-                  <SelectItem value="rented">Занята</SelectItem>
-                  <SelectItem value="maintenance">На ремонте</SelectItem>
-                  <SelectItem value="unavailable">Недоступна</SelectItem>
+                  <SelectItem value="available">Available</SelectItem>
+                  <SelectItem value="rented">Rented</SelectItem>
+                  <SelectItem value="maintenance">Under Maintenance</SelectItem>
+                  <SelectItem value="unavailable">Unavailable</SelectItem>
                 </SelectContent>
               </Select>
             </CardContent>
@@ -388,16 +388,16 @@ export default function EditCar() {
           {/* Documents */}
           <Card className="shadow-card">
             <CardHeader>
-              <CardTitle>Документы</CardTitle>
+              <CardTitle>Documents</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button variant="outline" className="w-full justify-start">
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить страховку
+                Upload Insurance
               </Button>
               <Button variant="outline" className="w-full justify-start">
                 <Upload className="h-4 w-4 mr-2" />
-                Загрузить техпаспорт
+                Upload Registration
               </Button>
             </CardContent>
           </Card>
@@ -410,10 +410,10 @@ export default function EditCar() {
                 onClick={handleUpdateCar}
               >
                 <Save className="h-4 w-4 mr-2" />
-                Обновить машину
+                Update Car
               </Button>
               <Button variant="outline" className="w-full">
-                Сохранить как черновик
+                Save as Draft
               </Button>
             </CardContent>
           </Card>
@@ -424,7 +424,7 @@ export default function EditCar() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImagePlus className="h-5 w-5 text-primary" />
-              Фотографии
+              Photos
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -440,10 +440,10 @@ export default function EditCar() {
               <label htmlFor="image-upload" className="cursor-pointer">
                 <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                 <p className="text-sm text-muted-foreground">
-                  Нажмите для загрузки фотографий
+                  Click to upload photos
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG до 10MB
+                  PNG, JPG up to 10MB
                 </p>
               </label>
             </div>

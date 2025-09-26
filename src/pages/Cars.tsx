@@ -18,7 +18,7 @@ import {
   Users
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { Car as CarType } from "@/types";
 
 export default function Cars() {
@@ -31,26 +31,26 @@ export default function Cars() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "available":
-        return <Badge className="bg-success text-success-foreground">Доступна</Badge>;
+        return <Badge className="bg-success text-success-foreground">Available</Badge>;
       case "rented":
-        return <Badge className="bg-warning text-warning-foreground">Занята</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Rented</Badge>;
       case "maintenance":
-        return <Badge className="bg-destructive text-destructive-foreground">Ремонт</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Maintenance</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
   const getCategoryBadge = (category: string) => {
     switch (category) {
-      case "Эконом":
-        return <Badge variant="outline" className="text-muted-foreground">Эконом</Badge>;
-      case "Бизнес":
-        return <Badge variant="outline" className="text-primary border-primary">Бизнес</Badge>;
-      case "Премиум":
-        return <Badge variant="outline" className="text-revenue border-revenue">Премиум</Badge>;
-      case "Джип":
-        return <Badge variant="outline" className="text-success border-success">Джип</Badge>;
+      case "Economy":
+        return <Badge variant="outline" className="text-muted-foreground">Economy</Badge>;
+      case "Business":
+        return <Badge variant="outline" className="text-primary border-primary">Business</Badge>;
+      case "Premium":
+        return <Badge variant="outline" className="text-revenue border-revenue">Premium</Badge>;
+      case "SUV":
+        return <Badge variant="outline" className="text-success border-success">SUV</Badge>;
       default:
         return <Badge variant="outline">{category}</Badge>;
     }
@@ -74,14 +74,14 @@ export default function Cars() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-black">
-            Автопарк
+            Fleet
           </h1>
-          <p className="text-black">Управление автомобилями</p>
+          <p className="text-black">Car management</p>
         </div>
         <Link to="/cars/add">
           <Button className="bg-gradient-primary hover:bg-primary-hover">
             <Plus className="h-4 w-4 mr-2" />
-            Добавить машину
+            Add Car
           </Button>
         </Link>
       </div>
@@ -92,7 +92,7 @@ export default function Cars() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Всего машин</p>
+                <p className="text-sm text-muted-foreground">Total Cars</p>
                 <p className="text-2xl font-bold">{cars.length}</p>
               </div>
               <Car className="h-8 w-8 text-primary" />
@@ -104,7 +104,7 @@ export default function Cars() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Доступные</p>
+                <p className="text-sm text-muted-foreground">Available</p>
                 <p className="text-2xl font-bold text-success">{availableCars}</p>
               </div>
               <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
@@ -118,7 +118,7 @@ export default function Cars() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">В аренде</p>
+                <p className="text-sm text-muted-foreground">Rented</p>
                 <p className="text-2xl font-bold text-warning">{rentedCars}</p>
               </div>
               <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
@@ -132,7 +132,7 @@ export default function Cars() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">На ремонте</p>
+                <p className="text-sm text-muted-foreground">In Maintenance</p>
                 <p className="text-2xl font-bold text-destructive">{maintenanceCars}</p>
               </div>
               <div className="w-8 h-8 bg-destructive/20 rounded-full flex items-center justify-center">
@@ -150,7 +150,7 @@ export default function Cars() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
-                placeholder="Поиск по марке или модели..." 
+                placeholder="Search by brand or model..." 
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -158,25 +158,25 @@ export default function Cars() {
             </div>
             <Select value={categoryFilter} onValueChange={setCategoryFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Категория" />
+                <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все категории</SelectItem>
-                <SelectItem value="Эконом">Эконом</SelectItem>
-                <SelectItem value="Бизнес">Бизнес</SelectItem>
-                <SelectItem value="Премиум">Премиум</SelectItem>
-                <SelectItem value="Джип">Джип</SelectItem>
+                <SelectItem value="all">All Categories</SelectItem>
+                <SelectItem value="Economy">Economy</SelectItem>
+                <SelectItem value="Business">Business</SelectItem>
+                <SelectItem value="Premium">Premium</SelectItem>
+                <SelectItem value="SUV">SUV</SelectItem>
               </SelectContent>
             </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Статус" />
+                <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все статусы</SelectItem>
-                <SelectItem value="available">Доступна</SelectItem>
-                <SelectItem value="rented">Занята</SelectItem>
-                <SelectItem value="maintenance">Ремонт</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="available">Available</SelectItem>
+                <SelectItem value="rented">Rented</SelectItem>
+                <SelectItem value="maintenance">Maintenance</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -215,17 +215,17 @@ export default function Cars() {
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-4 w-4" />
-                    {car.seats} мест
+                    {car.seats} seats
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-lg font-bold text-primary">{car.pricePerDay}₼</p>
-                    <p className="text-xs text-muted-foreground">за день</p>
+                    <p className="text-xs text-muted-foreground">per day</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{car.mileage.toLocaleString()} км</p>
+                    <p className="text-sm text-muted-foreground">{car.mileage.toLocaleString()} km</p>
                   </div>
                 </div>
 
@@ -237,7 +237,7 @@ export default function Cars() {
                     onClick={() => navigate(`/cars/${car.id}`)}
                   >
                     <Eye className="h-4 w-4 mr-1 flex-shrink-0" />
-                    <span className="truncate">Просмотр</span>
+                    <span className="truncate">View</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -246,7 +246,7 @@ export default function Cars() {
                     onClick={() => navigate(`/cars/edit/${car.id}`)}
                   >
                     <Edit className="h-4 w-4 mr-1 flex-shrink-0" />
-                    <span className="truncate">Изменить</span>
+                    <span className="truncate">Edit</span>
                   </Button>
                   <Button 
                     variant="outline" 
@@ -266,13 +266,13 @@ export default function Cars() {
       {filteredCars.length === 0 && (
         <div className="text-center py-12">
           <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Машины не найдены</h3>
+          <h3 className="text-lg font-semibold mb-2">No cars found</h3>
           <p className="text-muted-foreground mb-4">
-            Попробуйте изменить параметры поиска или фильтры
+            Try changing search parameters or filters
           </p>
           <Button variant="outline">
             <Filter className="h-4 w-4 mr-2" />
-            Сбросить фильтры
+            Reset Filters
           </Button>
         </div>
       )}

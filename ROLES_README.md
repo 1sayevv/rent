@@ -1,76 +1,76 @@
-# Система ролей пользователей
+# User Role System
 
-## Обзор
+## Overview
 
-В системе реализована система ролей с двумя уровнями доступа:
-- **Администратор (admin)** - полный доступ ко всем функциям
-- **Менеджер (manager)** - ограниченный доступ к основным функциям
+The system implements a role-based system with two access levels:
+- **Administrator (admin)** - full access to all functions
+- **Manager (manager)** - limited access to basic functions
 
-## Учетные данные для тестирования
+## Test Credentials
 
-### Администратор
+### Administrator
 - **Email:** admin@mail.com
-- **Пароль:** 1234
-- **Доступ:** Все функции системы
+- **Password:** 1234
+- **Access:** All system functions
 
-### Менеджер
+### Manager
 - **Email:** manager@mail.com
-- **Пароль:** 1234
-- **Доступ:** Ограниченные функции
+- **Password:** 1234
+- **Access:** Limited functions
 
-## Права доступа по ролям
+## Access Rights by Role
 
-### Администратор (admin)
-✅ **Полный доступ ко всем функциям:**
-- Dashboard (полная версия с аналитикой)
-- Управление машинами (просмотр, добавление, редактирование, удаление)
-- Управление бронированиями (полный функционал)
-- Управление клиентами (полный функционал)
-- Финансы (аналитика, отчеты, экспорт)
-- Настройки системы
-- Управление данными (экспорт/импорт)
+### Administrator (admin)
+✅ **Full access to all functions:**
+- Dashboard (full version with analytics)
+- Car management (view, add, edit, delete)
+- Booking management (full functionality)
+- Client management (full functionality)
+- Finances (analytics, reports, export)
+- System settings
+- Data management (export/import)
 
-### Менеджер (manager)
-✅ **Доступные функции:**
-- Dashboard (упрощенная версия)
-  - Количество свободных и занятых машин
-  - Список активных бронирований
-  - Расписание на сегодня (выдача/возврат машин)
-  - Новые бронирования
+### Manager (manager)
+✅ **Available functions:**
+- Dashboard (simplified version)
+  - Number of available and rented cars
+  - List of active bookings
+  - Today's schedule (car pickup/return)
+  - New bookings
 
-- Управление машинами
-  - Просмотр списка машин
-  - Добавление новых машин
-  - Редактирование информации о машинах
-  - Удаление машин
+- Car management
+  - View car list
+  - Add new cars
+  - Edit car information
+  - Delete cars
 
-- Управление бронированиями
-  - Просмотр списка бронирований
-  - Подтверждение/отклонение бронирований
-  - Завершение бронирований
-  - Календарь бронирований
+- Booking management
+  - View booking list
+  - Confirm/reject bookings
+  - Complete bookings
+  - Booking calendar
 
-- Управление клиентами
-  - Просмотр списка клиентов
-  - Добавление новых клиентов
-  - Редактирование информации о клиентах
-  - Просмотр истории бронирований клиента
+- Client management
+  - View client list
+  - Add new clients
+  - Edit client information
+  - View client booking history
 
-❌ **Недоступные функции:**
-- Финансы (аналитика, отчеты)
-- Настройки системы
-- Управление данными
+❌ **Unavailable functions:**
+- Finances (analytics, reports)
+- System settings
+- Data management
 
-## Техническая реализация
+## Technical Implementation
 
-### Основные компоненты
+### Main Components
 
-1. **useAuth.ts** - хук для управления аутентификацией и ролями
-2. **ProtectedRoute.tsx** - компонент для защиты маршрутов
-3. **RoleIndicator.tsx** - индикатор роли в интерфейсе
-4. **AccessDenied.tsx** - компонент для отображения сообщения о недоступности
+1. **useAuth.ts** - hook for managing authentication and roles
+2. **ProtectedRoute.tsx** - component for protecting routes
+3. **RoleIndicator.tsx** - role indicator in interface
+4. **AccessDenied.tsx** - component for displaying unavailability message
 
-### Система разрешений
+### Permission System
 
 ```typescript
 const managerPermissions = {
@@ -78,23 +78,23 @@ const managerPermissions = {
   'cars': ['view', 'create', 'edit', 'delete'],
   'bookings': ['view', 'create', 'edit', 'confirm', 'reject', 'complete'],
   'clients': ['view', 'create', 'edit'],
-  'finances': [], // Нет доступа
-  'settings': [], // Нет доступа
-  'data': [] // Нет доступа
+  'finances': [], // No access
+  'settings': [], // No access
+  'data': [] // No access
 };
 ```
 
-### Проверка разрешений
+### Permission Checking
 
 ```typescript
-// В компонентах
+// In components
 const { hasPermission } = useAuth();
 
 if (!hasPermission('finances', 'view')) {
   return <AccessDenied />;
 }
 
-// В маршрутах
+// In routes
 <Route path="/finances" element={
   <ProtectedRoute requiredPermission={{ resource: 'finances', action: 'view' }}>
     <Finances />
@@ -102,32 +102,32 @@ if (!hasPermission('finances', 'view')) {
 } />
 ```
 
-## Интерфейс
+## Interface
 
-### Отображение роли
-- В сайдбаре отображается тип панели (Админ-панель / Панель менеджера)
-- В профиле пользователя показывается роль с соответствующим бейджем
-- В заголовке отображается индикатор роли
+### Role Display
+- Sidebar shows panel type (Admin Panel / Manager Panel)
+- User profile shows role with corresponding badge
+- Header displays role indicator
 
-### Адаптивное меню
-- Менеджер видит только доступные пункты меню
-- Скрыты пункты: Финансы, Настройки, Данные
+### Adaptive Menu
+- Manager sees only available menu items
+- Hidden items: Finances, Settings, Data
 
-### Уведомления о недоступности
-- При попытке доступа к недоступным страницам показывается компонент AccessDenied
-- Автоматическое перенаправление на главную страницу
+### Unavailability Notifications
+- When trying to access unavailable pages, AccessDenied component is shown
+- Automatic redirect to main page
 
-## Безопасность
+## Security
 
-- Проверка разрешений происходит на уровне компонентов и маршрутов
-- Роль пользователя хранится в localStorage вместе с данными аутентификации
-- При отсутствии разрешений пользователь перенаправляется на доступные страницы
+- Permission checking happens at component and route level
+- User role is stored in localStorage along with authentication data
+- When permissions are missing, user is redirected to available pages
 
-## Расширение системы
+## System Extension
 
-Для добавления новых ролей:
+To add new roles:
 
-1. Обновите тип `UserRole` в `types/index.ts`
-2. Добавьте разрешения в `useAuth.ts`
-3. Обновите компоненты для проверки новых разрешений
-4. Добавьте учетные данные в `Login.tsx` 
+1. Update `UserRole` type in `types/index.ts`
+2. Add permissions in `useAuth.ts`
+3. Update components to check new permissions
+4. Add credentials in `Login.tsx` 

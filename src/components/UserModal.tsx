@@ -79,25 +79,25 @@ export function UserModal({
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = 'Имя пользователя обязательно';
+      newErrors.name = 'Username is required';
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = 'Email обязателен';
+      newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'Введите корректный email';
+      newErrors.email = 'Please enter a valid email';
     }
 
     if (!isEditing && !formData.password) {
-      newErrors.password = 'Пароль обязателен для нового пользователя';
+      newErrors.password = 'Password is required for new user';
     }
 
     if (formData.password && formData.password.length < 6) {
-      newErrors.password = 'Пароль должен содержать минимум 6 символов';
+      newErrors.password = 'Password must contain at least 6 characters';
     }
 
     if (formData.password && formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = 'Пароли не совпадают';
+      newErrors.confirmPassword = 'Passwords do not match';
     }
 
     setErrors(newErrors);
@@ -127,16 +127,16 @@ export function UserModal({
       }
       onClose();
     } catch (error) {
-      console.error('Ошибка при сохранении пользователя:', error);
+      console.error('Error saving user:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
   const roleOptions = [
-    { value: 'admin', label: 'Администратор', description: 'Полный доступ к системе' },
-    { value: 'manager', label: 'Менеджер', description: 'Управление бронированиями и клиентами' },
-    { value: 'operator', label: 'Оператор', description: 'Базовые операции' }
+    { value: 'admin', label: 'Administrator', description: 'Full system access' },
+    { value: 'manager', label: 'Manager', description: 'Manage bookings and clients' },
+    { value: 'operator', label: 'Operator', description: 'Basic operations' }
   ];
 
   return (
@@ -145,18 +145,18 @@ export function UserModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Users className="h-5 w-5 text-primary" />
-            {isEditing ? 'Редактировать пользователя' : 'Добавить пользователя'}
+            {isEditing ? 'Edit User' : 'Add User'}
           </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="user-name">Имя пользователя *</Label>
+            <Label htmlFor="user-name">Username *</Label>
             <Input
               id="user-name"
               value={formData.name}
               onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-              placeholder="Введите полное имя"
+              placeholder="Enter full name"
               className={errors.name ? "border-destructive" : ""}
             />
             {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
@@ -176,7 +176,7 @@ export function UserModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="user-role">Роль *</Label>
+            <Label htmlFor="user-role">Role *</Label>
             <Select 
               value={formData.role} 
               onValueChange={(value: string) => 
@@ -202,14 +202,14 @@ export function UserModal({
           {!isEditing && (
             <>
               <div className="space-y-2">
-                <Label htmlFor="user-password">Пароль *</Label>
+                <Label htmlFor="user-password">Password *</Label>
                 <div className="relative">
                   <Input
                     id="user-password"
                     type={showPassword ? "text" : "password"}
                     value={formData.password}
                     onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
-                    placeholder="Минимум 6 символов"
+                    placeholder="Minimum 6 characters"
                     className={errors.password ? "border-destructive pr-10" : "pr-10"}
                   />
                   <Button
@@ -230,14 +230,14 @@ export function UserModal({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="user-confirm-password">Подтвердите пароль *</Label>
+                <Label htmlFor="user-confirm-password">Confirm Password *</Label>
                 <div className="relative">
                   <Input
                     id="user-confirm-password"
                     type={showConfirmPassword ? "text" : "password"}
                     value={formData.confirmPassword}
                     onChange={(e) => setFormData(prev => ({ ...prev, confirmPassword: e.target.value }))}
-                    placeholder="Повторите пароль"
+                    placeholder="Repeat password"
                     className={errors.confirmPassword ? "border-destructive pr-10" : "pr-10"}
                   />
                   <Button
@@ -265,7 +265,7 @@ export function UserModal({
               checked={formData.active}
               onCheckedChange={(checked) => setFormData(prev => ({ ...prev, active: checked }))}
             />
-            <Label htmlFor="user-active">Активный пользователь</Label>
+            <Label htmlFor="user-active">Active user</Label>
           </div>
 
           <div className="flex justify-end gap-3 pt-4">
@@ -275,7 +275,7 @@ export function UserModal({
               onClick={onClose}
               disabled={isLoading}
             >
-              Отмена
+              Cancel
             </Button>
             <Button 
               type="submit" 
@@ -285,12 +285,12 @@ export function UserModal({
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Сохранение...
+                  Saving...
                 </>
               ) : (
                 <>
                   <Save className="h-4 w-4 mr-2" />
-                  {isEditing ? 'Обновить' : 'Создать'}
+                  {isEditing ? 'Update' : 'Create'}
                 </>
               )}
             </Button>

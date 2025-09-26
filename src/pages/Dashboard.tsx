@@ -27,22 +27,22 @@ import {
 } from "recharts";
 
 const weeklyBookings = [
-  { day: "Пн", bookings: 12 },
-  { day: "Вт", bookings: 19 },
-  { day: "Ср", bookings: 15 },
-  { day: "Чт", bookings: 25 },
-  { day: "Пт", bookings: 22 },
-  { day: "Сб", bookings: 30 },
-  { day: "Вс", bookings: 28 }
+  { day: "Mon", bookings: 12 },
+  { day: "Tue", bookings: 19 },
+  { day: "Wed", bookings: 15 },
+  { day: "Thu", bookings: 25 },
+  { day: "Fri", bookings: 22 },
+  { day: "Sat", bookings: 30 },
+  { day: "Sun", bookings: 28 }
 ];
 
 const monthlyRevenue = [
-  { month: "Янв", revenue: 45000 },
-  { month: "Фев", revenue: 52000 },
-  { month: "Мар", revenue: 48000 },
-  { month: "Апр", revenue: 61000 },
-  { month: "Май", revenue: 55000 },
-  { month: "Июн", revenue: 67000 }
+  { month: "Jan", revenue: 45000 },
+  { month: "Feb", revenue: 52000 },
+  { month: "Mar", revenue: 48000 },
+  { month: "Apr", revenue: 61000 },
+  { month: "May", revenue: 55000 },
+  { month: "Jun", revenue: 67000 }
 ];
 
 const topCars = [
@@ -54,18 +54,18 @@ const topCars = [
 ];
 
 const recentBookings = [
-  { id: 1, client: "Али Алиев", car: "BMW X5", date: "Сегодня", status: "confirmed" },
-  { id: 2, client: "Лейла Мамедова", car: "Mercedes C-Class", date: "Завтра", status: "pending" },
-  { id: 3, client: "Расим Гасанов", car: "Toyota Camry", date: "15.06", status: "active" },
-  { id: 4, client: "Нигяр Исмайылова", car: "Hyundai Tucson", date: "16.06", status: "confirmed" },
-  { id: 5, client: "Эльчин Керимов", car: "Audi Q7", date: "18.06", status: "pending" }
+  { id: 1, client: "Ali Aliyev", car: "BMW X5", date: "Today", status: "confirmed" },
+  { id: 2, client: "Leyla Mamedova", car: "Mercedes C-Class", date: "Tomorrow", status: "pending" },
+  { id: 3, client: "Rasim Gasanov", car: "Toyota Camry", date: "15.06", status: "active" },
+  { id: 4, client: "Nigyar Ismayilova", car: "Hyundai Tucson", date: "16.06", status: "confirmed" },
+  { id: 5, client: "Elchin Kerimov", car: "Audi Q7", date: "18.06", status: "pending" }
 ];
 
 const todaySchedule = [
-  { time: "09:00", action: "Выдача", client: "Али Алиев", car: "BMW X5" },
-  { time: "11:30", action: "Возврат", client: "Самир Гулиев", car: "Toyota Corolla" },
-  { time: "14:00", action: "Выдача", client: "Лейла Мамедова", car: "Mercedes C-Class" },
-  { time: "16:30", action: "Возврат", client: "Кямал Набиев", car: "Hyundai Sonata" }
+  { time: "09:00", action: "Pickup", client: "Ali Aliyev", car: "BMW X5" },
+  { time: "11:30", action: "Return", client: "Samir Guliyev", car: "Toyota Corolla" },
+  { time: "14:00", action: "Pickup", client: "Leyla Mamedova", car: "Mercedes C-Class" },
+  { time: "16:30", action: "Return", client: "Kyamal Nabiyev", car: "Hyundai Sonata" }
 ];
 
 export default function Dashboard() {
@@ -74,17 +74,17 @@ export default function Dashboard() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge variant="outline" className="bg-success-light text-success border-success">Подтвержден</Badge>;
+        return <Badge variant="outline" className="bg-success-light text-success border-success">Confirmed</Badge>;
       case "pending":
-        return <Badge variant="outline" className="bg-warning-light text-warning border-warning">Ожидает</Badge>;
+        return <Badge variant="outline" className="bg-warning-light text-warning border-warning">Pending</Badge>;
       case "active":
-        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Активен</Badge>;
+        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Active</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
-  // Упрощенная версия для менеджера
+  // Simplified version for manager
   if (userRole === 'manager') {
     return (
       <div className="space-y-6">
@@ -93,49 +93,49 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-black">
               Dashboard
             </h1>
-            <p className="text-black">Обзор автопарка и активных бронирований</p>
+            <p className="text-black">Overview of the fleet and active bookings</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Сегодня</p>
-            <p className="text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
+            <p className="text-sm text-muted-foreground">Today</p>
+            <p className="text-lg font-semibold">{new Date().toLocaleDateString('en-US')}</p>
           </div>
         </div>
 
-        {/* Stats Cards для менеджера */}
+        {/* Stats Cards for manager */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard
-            title="Свободные машины"
+            title="Available Cars"
             value={24}
-            change="+2 с вчера"
+            change="+2 from yesterday"
             changeType="positive"
             icon={Car}
             variant="success"
           />
           <StatCard
-            title="Занятые машины"
+            title="Occupied Cars"
             value={18}
-            change="-3 с вчера"
+            change="-3 from yesterday"
             changeType="negative"
             icon={AlertCircle}
             variant="warning"
           />
           <StatCard
-            title="Активные бронирования"
+            title="Active Bookings"
             value={12}
-            change="+3 сегодня"
+            change="+3 today"
             changeType="positive"
             icon={Calendar}
             variant="default"
           />
         </div>
 
-        {/* Расписание на сегодня для менеджера */}
+        {/* Today's schedule for manager */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="shadow-card">
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-black">
                 <Clock className="h-5 w-5 text-primary" />
-                Расписание на сегодня
+                Today's Schedule
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -148,7 +148,7 @@ export default function Dashboard() {
                     <p className="text-sm font-medium">{item.action}</p>
                     <p className="text-xs text-muted-foreground">{item.client} • {item.car}</p>
                   </div>
-                  <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
+                  <Badge variant={item.action === "Pickup" ? "default" : "secondary"}>
                     {item.action}
                   </Badge>
                 </div>
@@ -160,7 +160,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-black">
                 <CheckCircle className="h-5 w-5 text-success" />
-                Новые бронирования
+                New Bookings
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -180,7 +180,7 @@ export default function Dashboard() {
     );
   }
 
-  // Полная версия для админа
+  // Full version for admin
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -188,43 +188,43 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-black">
             Dashboard
           </h1>
-          <p className="text-black">Обзор вашего автопарка</p>
+          <p className="text-black">Overview of your fleet</p>
         </div>
         <div className="text-right">
-          <p className="text-sm text-muted-foreground">Сегодня</p>
-          <p className="text-lg font-semibold">{new Date().toLocaleDateString('ru-RU')}</p>
+          <p className="text-sm text-muted-foreground">Today</p>
+          <p className="text-lg font-semibold">{new Date().toLocaleDateString('en-US')}</p>
         </div>
       </div>
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
-          title="Свободные машины"
+          title="Available Cars"
           value={24}
-          change="+2 с вчера"
+          change="+2 from yesterday"
           changeType="positive"
           icon={Car}
           variant="success"
         />
         <StatCard
-          title="Занятые машины"
+          title="Occupied Cars"
           value={18}
-          change="-3 с вчера"
+          change="-3 from yesterday"
           changeType="negative"
           icon={AlertCircle}
           variant="warning"
         />
         <StatCard
-          title="Всего клиентов"
+          title="Total Clients"
           value={1205}
-          change="+12 за неделю"
+          change="+12 this week"
           changeType="positive"
           icon={Users}
         />
         <StatCard
-          title="Доход за месяц"
+          title="Monthly Revenue"
           value="67,500₼"
-          change="+15.2% с прошлого месяца"
+          change="+15.2% from last month"
           changeType="positive"
           icon={DollarSign}
           variant="revenue"
@@ -237,7 +237,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <Calendar className="h-5 w-5 text-primary" />
-              Бронирования по дням недели
+              Bookings by Day of Week
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -257,7 +257,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <TrendingUp className="h-5 w-5 text-revenue" />
-              Доход по месяцам
+              Monthly Revenue
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -266,7 +266,7 @@ export default function Dashboard() {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" />
                 <YAxis />
-                <Tooltip formatter={(value) => [`${value}₼`, 'Доход']} />
+                <Tooltip formatter={(value) => [`${value}₼`, 'Revenue']} />
                 <Line 
                   type="monotone" 
                   dataKey="revenue" 
@@ -287,7 +287,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <CheckCircle className="h-5 w-5 text-success" />
-              Новые бронирования
+              New Bookings
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -308,7 +308,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <Clock className="h-5 w-5 text-primary" />
-              Расписание на сегодня
+              Today's Schedule
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -321,7 +321,7 @@ export default function Dashboard() {
                   <p className="text-sm font-medium">{item.action}</p>
                   <p className="text-xs text-muted-foreground">{item.client} • {item.car}</p>
                 </div>
-                <Badge variant={item.action === "Выдача" ? "default" : "secondary"}>
+                <Badge variant={item.action === "Pickup" ? "default" : "secondary"}>
                   {item.action}
                 </Badge>
               </div>
@@ -334,15 +334,15 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <Car className="h-5 w-5 text-primary" />
-              ТОП-5 популярных машин
+              TOP-5 Popular Cars
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {topCars.map((car, index) => (
               <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <div>
-                  <p className="font-medium text-sm">{car.name}</p>
-                  <p className="text-xs text-muted-foreground">{car.bookings} бронирований</p>
+                  <p className="text-sm font-medium">{car.name}</p>
+                  <p className="text-xs text-muted-foreground">{car.bookings} bookings</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-medium text-revenue">{car.revenue}</p>

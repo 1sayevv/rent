@@ -48,17 +48,17 @@ export function BookingDetailsModal({
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge className="bg-success text-success-foreground">Подтвержден</Badge>;
+        return <Badge className="bg-success text-success-foreground">Confirmed</Badge>;
       case "pending":
-        return <Badge className="bg-warning text-warning-foreground">Ожидает</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Pending</Badge>;
       case "active":
-        return <Badge className="bg-primary text-primary-foreground">Активен</Badge>;
+        return <Badge className="bg-primary text-primary-foreground">Active</Badge>;
       case "completed":
-        return <Badge className="bg-muted text-muted-foreground">Завершен</Badge>;
+        return <Badge className="bg-muted text-muted-foreground">Completed</Badge>;
       case "cancelled":
-        return <Badge className="bg-destructive text-destructive-foreground">Отменен</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Cancelled</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -73,7 +73,7 @@ export function BookingDetailsModal({
               onClick={() => onStatusChange(booking.id, 'confirmed')}
             >
               <Check className="h-4 w-4 mr-1" />
-              Подтвердить
+              Confirm
             </Button>
             <Button 
               variant="outline" 
@@ -82,7 +82,7 @@ export function BookingDetailsModal({
               onClick={() => onStatusChange(booking.id, 'cancelled')}
             >
               <X className="h-4 w-4 mr-1" />
-              Отклонить
+              Reject
             </Button>
           </div>
         );
@@ -94,7 +94,7 @@ export function BookingDetailsModal({
             onClick={() => onStatusChange(booking.id, 'active')}
           >
             <Car className="h-4 w-4 mr-1" />
-            Начать аренду
+            Start Rental
           </Button>
         );
       case "active":
@@ -105,7 +105,7 @@ export function BookingDetailsModal({
             onClick={() => onStatusChange(booking.id, 'completed')}
           >
             <Check className="h-4 w-4 mr-1" />
-            Завершить
+            Complete
           </Button>
         );
       default:
@@ -133,12 +133,12 @@ export function BookingDetailsModal({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
-            Детали бронирования #{booking.id}
+            Booking Details #{booking.id}
           </DialogTitle>
         </DialogHeader>
 
         <div className="space-y-6">
-          {/* Статус и действия */}
+          {/* Status and Actions */}
           <Card className="shadow-sm">
             <CardContent className="p-4">
               <div className="flex items-center justify-between">
@@ -147,7 +147,7 @@ export function BookingDetailsModal({
                   {isOverdue() && (
                     <Badge className="bg-destructive text-destructive-foreground">
                       <AlertTriangle className="h-3 w-3 mr-1" />
-                      Просрочено
+                      Overdue
                     </Badge>
                   )}
                 </div>
@@ -159,35 +159,35 @@ export function BookingDetailsModal({
                     onClick={() => onEdit(booking)}
                   >
                     <Edit className="h-4 w-4 mr-1" />
-                    Изменить
+                    Edit
                   </Button>
                   <Button 
                     variant="outline" 
                     size="sm"
                     className="text-destructive hover:bg-destructive/10"
                     onClick={() => {
-                      if (confirm('Вы уверены, что хотите удалить это бронирование?')) {
+                      if (confirm('Are you sure you want to delete this booking?')) {
                         onDelete(booking.id);
                         onClose();
                       }
                     }}
                   >
                     <Trash2 className="h-4 w-4 mr-1" />
-                    Удалить
+                    Delete
                   </Button>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Основная информация */}
+          {/* Basic Information */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Информация о машине */}
+            {/* Car Information */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Car className="h-5 w-5 text-primary" />
-                  Информация о машине
+                  Car Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -196,16 +196,16 @@ export function BookingDetailsModal({
                   {car && (
                     <div className="space-y-2 mt-2">
                       <p className="text-sm text-muted-foreground">
-                        Категория: {car.category}
+                        Category: {car.category}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Топливо: {car.fuelType}
+                        Fuel Type: {car.fuelType}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Трансмиссия: {car.transmission}
+                        Transmission: {car.transmission}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Пробег: {car.mileage.toLocaleString()} км
+                        Mileage: {car.mileage.toLocaleString()} km
                       </p>
                     </div>
                   )}
@@ -213,12 +213,12 @@ export function BookingDetailsModal({
               </CardContent>
             </Card>
 
-            {/* Информация о клиенте */}
+            {/* Client Information */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" />
-                  Информация о клиенте
+                  Client Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -236,7 +236,7 @@ export function BookingDetailsModal({
                     {client && (
                       <div className="flex items-center gap-2 text-sm">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span>Клиент с {format(new Date(client.joinDate), 'dd.MM.yyyy', { locale: ru })}</span>
+                        <span>Client since {format(new Date(client.joinDate), 'dd.MM.yyyy', { locale: ru })}</span>
                       </div>
                     )}
                   </div>
@@ -245,12 +245,12 @@ export function BookingDetailsModal({
             </Card>
           </div>
 
-          {/* Детали бронирования */}
+          {/* Booking Details */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Calendar className="h-5 w-5 text-primary" />
-                Детали бронирования
+                Booking Details
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -259,12 +259,12 @@ export function BookingDetailsModal({
                   <div className="flex items-center gap-3">
                     <Clock className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Период аренды</p>
+                      <p className="font-medium">Rental Period</p>
                       <p className="text-sm text-muted-foreground">
                         {format(new Date(booking.startDate), 'dd MMMM yyyy', { locale: ru })} - {format(new Date(booking.endDate), 'dd MMMM yyyy', { locale: ru })}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Продолжительность: {calculateDuration()} дней
+                        Duration: {calculateDuration()} days
                       </p>
                     </div>
                   </div>
@@ -272,12 +272,12 @@ export function BookingDetailsModal({
                   <div className="flex items-center gap-3">
                     <MapPin className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Локации</p>
+                      <p className="font-medium">Locations</p>
                       <p className="text-sm text-muted-foreground">
-                        Получение: {booking.pickupLocation}
+                        Pickup: {booking.pickupLocation}
                       </p>
                       <p className="text-sm text-muted-foreground">
-                        Возврат: {booking.returnLocation}
+                        Return: {booking.returnLocation}
                       </p>
                     </div>
                   </div>
@@ -287,10 +287,10 @@ export function BookingDetailsModal({
                   <div className="flex items-center gap-3">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Стоимость</p>
+                      <p className="font-medium">Cost</p>
                       <p className="text-2xl font-bold text-revenue">{booking.totalPrice}₼</p>
                       <p className="text-xs text-muted-foreground">
-                        {car && `${car.pricePerDay}₼ за день × ${calculateDuration()} дней`}
+                        {car && `${car.pricePerDay}₼ per day × ${calculateDuration()} days`}
                       </p>
                     </div>
                   </div>
@@ -298,9 +298,9 @@ export function BookingDetailsModal({
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">Дата создания</p>
+                      <p className="font-medium">Created Date</p>
                       <p className="text-sm text-muted-foreground">
-                        {format(new Date(booking.createdAt), 'dd MMMM yyyy в HH:mm', { locale: ru })}
+                        {format(new Date(booking.createdAt), 'dd MMMM yyyy at HH:mm', { locale: ru })}
                       </p>
                     </div>
                   </div>
@@ -309,19 +309,19 @@ export function BookingDetailsModal({
             </CardContent>
           </Card>
 
-          {/* История изменений */}
+          {/* History */}
           <Card className="shadow-sm">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-primary" />
-                История изменений
+                History
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 <div className="flex items-center gap-3 text-sm">
                   <div className="w-2 h-2 bg-primary rounded-full"></div>
-                  <span>Бронирование создано</span>
+                  <span>Booking created</span>
                   <span className="text-muted-foreground">
                     {format(new Date(booking.createdAt), 'dd.MM.yyyy HH:mm', { locale: ru })}
                   </span>
@@ -329,7 +329,7 @@ export function BookingDetailsModal({
                 {booking.updatedAt !== booking.createdAt && (
                   <div className="flex items-center gap-3 text-sm">
                     <div className="w-2 h-2 bg-warning rounded-full"></div>
-                    <span>Бронирование обновлено</span>
+                    <span>Booking updated</span>
                     <span className="text-muted-foreground">
                       {format(new Date(booking.updatedAt), 'dd.MM.yyyy HH:mm', { locale: ru })}
                     </span>

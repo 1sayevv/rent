@@ -18,7 +18,7 @@ import {
   MapPin,
   Clock
 } from "lucide-react";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { BookingDetailsModal } from "@/components/BookingDetailsModal";
 import { useNavigate } from "react-router-dom";
@@ -37,17 +37,17 @@ export default function Bookings() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge className="bg-success text-success-foreground">Подтвержден</Badge>;
+        return <Badge className="bg-success text-success-foreground">Confirmed</Badge>;
       case "pending":
-        return <Badge className="bg-warning text-warning-foreground">Ожидает</Badge>;
+        return <Badge className="bg-warning text-warning-foreground">Pending</Badge>;
       case "active":
-        return <Badge className="bg-primary text-primary-foreground">Активен</Badge>;
+        return <Badge className="bg-primary text-primary-foreground">Active</Badge>;
       case "completed":
-        return <Badge className="bg-muted text-muted-foreground">Завершен</Badge>;
+        return <Badge className="bg-muted text-muted-foreground">Completed</Badge>;
       case "cancelled":
-        return <Badge className="bg-destructive text-destructive-foreground">Отменен</Badge>;
+        return <Badge className="bg-destructive text-destructive-foreground">Cancelled</Badge>;
       default:
-        return <Badge variant="outline">Неизвестно</Badge>;
+        return <Badge variant="outline">Unknown</Badge>;
     }
   };
 
@@ -63,20 +63,20 @@ export default function Bookings() {
   const pendingBookings = bookings.filter(b => b.status === "pending").length;
   const activeBookings = bookings.filter(b => b.status === "active").length;
 
-  // Функции для работы с календарем
+  // Functions for working with calendar
   const handleViewBooking = (booking: Booking) => {
     setSelectedBooking(booking);
     setIsBookingModalOpen(true);
   };
 
   const handleEditBooking = (booking: Booking) => {
-    // Здесь можно добавить переход на страницу редактирования
+    // Here you can add navigation to edit page
     console.log('Edit booking:', booking);
   };
 
   const handleDeleteBooking = (bookingId: number) => {
-    // Удаление бронирования
-    if (confirm('Вы уверены, что хотите удалить это бронирование?')) {
+    // Delete booking
+    if (confirm('Are you sure you want to delete this booking?')) {
       deleteBooking(bookingId);
     }
   };
@@ -86,7 +86,7 @@ export default function Bookings() {
   };
 
   const handleAddBooking = () => {
-    // Здесь можно добавить переход на страницу добавления бронирования
+    // Here you can add navigation to add booking page
     console.log('Add booking');
   };
 
@@ -100,13 +100,13 @@ export default function Bookings() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-            Бронирования
+            Bookings
           </h1>
-          <p className="text-muted-foreground">Управление заказами и резервациями</p>
+          <p className="text-muted-foreground">Order and reservation management</p>
         </div>
         <Button className="bg-gradient-primary hover:bg-primary-hover">
           <Calendar className="h-4 w-4 mr-2" />
-          Календарь
+          Calendar
         </Button>
       </div>
 
@@ -116,7 +116,7 @@ export default function Bookings() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Всего бронирований</p>
+                <p className="text-sm text-muted-foreground">Total Bookings</p>
                 <p className="text-2xl font-bold">{bookings.length}</p>
               </div>
               <Calendar className="h-8 w-8 text-primary" />
@@ -128,7 +128,7 @@ export default function Bookings() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Подтверждены</p>
+                <p className="text-sm text-muted-foreground">Confirmed</p>
                 <p className="text-2xl font-bold text-success">{confirmedBookings}</p>
               </div>
               <div className="w-8 h-8 bg-success/20 rounded-full flex items-center justify-center">
@@ -142,7 +142,7 @@ export default function Bookings() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Ожидают</p>
+                <p className="text-sm text-muted-foreground">Pending</p>
                 <p className="text-2xl font-bold text-warning">{pendingBookings}</p>
               </div>
               <div className="w-8 h-8 bg-warning/20 rounded-full flex items-center justify-center">
@@ -156,7 +156,7 @@ export default function Bookings() {
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground">Активные</p>
+                <p className="text-sm text-muted-foreground">Active</p>
                 <p className="text-2xl font-bold text-primary">{activeBookings}</p>
               </div>
               <div className="w-8 h-8 bg-primary/20 rounded-full flex items-center justify-center">
@@ -170,8 +170,8 @@ export default function Bookings() {
       <Tabs defaultValue="list" className="w-full">
         <div className="flex items-center justify-between">
           <TabsList className="grid w-fit grid-cols-2">
-            <TabsTrigger value="list">Список</TabsTrigger>
-            <TabsTrigger value="calendar">Календарь</TabsTrigger>
+            <TabsTrigger value="list">List</TabsTrigger>
+            <TabsTrigger value="calendar">Calendar</TabsTrigger>
           </TabsList>
 
           <Card className="shadow-card">
@@ -180,7 +180,7 @@ export default function Bookings() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Поиск по клиенту или машине..." 
+                    placeholder="Search by client or car..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -188,15 +188,15 @@ export default function Bookings() {
                 </div>
                 <Select value={statusFilter} onValueChange={setStatusFilter}>
                   <SelectTrigger className="w-full sm:w-48">
-                    <SelectValue placeholder="Статус" />
+                    <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">Все статусы</SelectItem>
-                    <SelectItem value="confirmed">Подтвержден</SelectItem>
-                    <SelectItem value="pending">Ожидает</SelectItem>
-                    <SelectItem value="active">Активен</SelectItem>
-                    <SelectItem value="completed">Завершен</SelectItem>
-                    <SelectItem value="cancelled">Отменен</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
+                    <SelectItem value="confirmed">Confirmed</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -214,9 +214,9 @@ export default function Bookings() {
                       <Calendar className="h-6 w-6 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-lg">Бронирование #{booking.id}</h3>
+                      <h3 className="font-semibold text-lg">Booking #{booking.id}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Создано: {new Date(booking.createdAt).toLocaleDateString('ru-RU')}
+                        Created: {new Date(booking.createdAt).toLocaleDateString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -232,7 +232,7 @@ export default function Bookings() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <User className="h-4 w-4" />
-                      Клиент
+                      Client
                     </div>
                     <div>
                       <p className="font-medium">{booking.client.name}</p>
@@ -250,7 +250,7 @@ export default function Bookings() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Car className="h-4 w-4" />
-                      Автомобиль
+                      Car
                     </div>
                     <div>
                       <p className="font-medium">{booking.car}</p>
@@ -260,11 +260,11 @@ export default function Bookings() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      Даты аренды
+                      Rental Dates
                     </div>
                     <div>
                       <p className="font-medium">
-                        {new Date(booking.startDate).toLocaleDateString('ru-RU')} - {new Date(booking.endDate).toLocaleDateString('ru-RU')}
+                        {new Date(booking.startDate).toLocaleDateString('en-US')} - {new Date(booking.endDate).toLocaleDateString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -272,11 +272,11 @@ export default function Bookings() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4" />
-                      Локации
+                      Locations
                     </div>
                     <div>
-                      <p className="text-sm">Получение: {booking.pickupLocation}</p>
-                      <p className="text-sm">Возврат: {booking.returnLocation}</p>
+                      <p className="text-sm">Pickup: {booking.pickupLocation}</p>
+                      <p className="text-sm">Return: {booking.returnLocation}</p>
                     </div>
                   </div>
                 </div>
@@ -288,7 +288,7 @@ export default function Bookings() {
                     onClick={() => handleViewBooking(booking)}
                   >
                     <Eye className="h-4 w-4 mr-1" />
-                    Просмотр
+                    View
                   </Button>
                   {booking.status === "pending" && (
                     <>
@@ -298,7 +298,7 @@ export default function Bookings() {
                         onClick={() => updateBooking(booking.id, { status: 'confirmed' })}
                       >
                         <Check className="h-4 w-4 mr-1" />
-                        Подтвердить
+                        Confirm
                       </Button>
                       <Button 
                         variant="outline" 
@@ -307,7 +307,7 @@ export default function Bookings() {
                         onClick={() => updateBooking(booking.id, { status: 'cancelled' })}
                       >
                         <X className="h-4 w-4 mr-1" />
-                        Отклонить
+                        Reject
                       </Button>
                     </>
                   )}
@@ -318,7 +318,7 @@ export default function Bookings() {
                       onClick={() => updateBooking(booking.id, { status: 'completed' })}
                     >
                       <Check className="h-4 w-4 mr-1" />
-                      Завершить
+                      Complete
                     </Button>
                   )}
                 </div>
@@ -342,14 +342,14 @@ export default function Bookings() {
       {filteredBookings.length === 0 && (
         <div className="text-center py-12">
           <Calendar className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Бронирования не найдены</h3>
+          <h3 className="text-lg font-semibold mb-2">No bookings found</h3>
           <p className="text-muted-foreground mb-4">
-            Попробуйте изменить параметры поиска или фильтры
+            Try changing search parameters or filters
           </p>
         </div>
       )}
 
-      {/* Модальное окно с деталями бронирования */}
+      {/* Booking details modal */}
       <BookingDetailsModal
         booking={selectedBooking}
         isOpen={isBookingModalOpen}

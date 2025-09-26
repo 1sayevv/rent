@@ -15,7 +15,7 @@ import {
   Upload,
   Trash2
 } from "lucide-react";
-import { useData } from "@/context/DataContext";
+import { useData } from "@/context/SupabaseDataContext";
 
 export default function AddClient() {
   const navigate = useNavigate();
@@ -44,19 +44,19 @@ export default function AddClient() {
     const newErrors: Record<string, string> = {};
 
     if (!formData.name.trim()) {
-      newErrors.name = "Имя обязательно для заполнения";
+      newErrors.name = "Name is required";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email обязателен для заполнения";
+      newErrors.email = "Email is required";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = "Введите корректный email";
+      newErrors.email = "Please enter a valid email";
     }
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Телефон обязателен для заполнения";
+      newErrors.phone = "Phone is required";
     } else if (!/^[\+]?[0-9\s\-\(\)]{10,}$/.test(formData.phone)) {
-      newErrors.phone = "Введите корректный номер телефона";
+      newErrors.phone = "Please enter a valid phone number";
     }
 
     setErrors(newErrors);
@@ -74,7 +74,7 @@ export default function AddClient() {
       addClient(formData);
       navigate("/clients");
     } catch (error) {
-      console.error("Ошибка при добавлении клиента:", error);
+      console.error("Error adding client:", error);
     } finally {
       setIsLoading(false);
     }
@@ -111,28 +111,28 @@ export default function AddClient() {
             onClick={() => navigate("/clients")}
           >
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Назад
+            Back
           </Button>
           <div>
             <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
-              Добавить клиента
+              Add Client
             </h1>
-            <p className="text-muted-foreground">Создайте нового клиента в системе</p>
+            <p className="text-muted-foreground">Create a new client in the system</p>
           </div>
         </div>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Основная информация */}
+        {/* Basic Information */}
         <Card className="shadow-card">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5 text-primary" />
-              Основная информация
+              Basic Information
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Аватар */}
+            {/* Avatar */}
             <div className="flex items-center gap-6">
               <div className="relative">
                 <Avatar className="h-20 w-20">
@@ -158,10 +158,10 @@ export default function AddClient() {
                   <div className="border-2 border-dashed border-border rounded-lg p-4 text-center hover:border-primary transition-colors">
                     <Upload className="h-6 w-6 mx-auto text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">
-                      {formData.avatar ? "Изменить фото" : "Загрузить фото"}
+                      {formData.avatar ? "Change Photo" : "Upload Photo"}
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG до 5MB
+                      PNG, JPG up to 5MB
                     </p>
                   </div>
                 </Label>
@@ -177,12 +177,12 @@ export default function AddClient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="name">Имя клиента *</Label>
+                <Label htmlFor="name">Client Name *</Label>
                 <Input
                   id="name"
                   value={formData.name}
                   onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="Введите полное имя"
+                  placeholder="Enter full name"
                   className={errors.name ? "border-destructive" : ""}
                 />
                 {errors.name && <p className="text-sm text-destructive">{errors.name}</p>}
@@ -202,7 +202,7 @@ export default function AddClient() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone">Телефон *</Label>
+                <Label htmlFor="phone">Phone *</Label>
                 <Input
                   id="phone"
                   value={formData.phone}
@@ -214,7 +214,7 @@ export default function AddClient() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="status">Статус клиента</Label>
+                <Label htmlFor="status">Client Status</Label>
                 <Select 
                   value={formData.status} 
                   onValueChange={(value: "vip" | "regular" | "new") => 
@@ -228,13 +228,13 @@ export default function AddClient() {
                     <SelectItem value="new">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-success rounded-full" />
-                        Новый
+                        New
                       </div>
                     </SelectItem>
                     <SelectItem value="regular">
                       <div className="flex items-center gap-2">
                         <div className="w-2 h-2 bg-primary rounded-full" />
-                        Постоянный
+                        Regular
                       </div>
                     </SelectItem>
                     <SelectItem value="vip">
@@ -250,14 +250,14 @@ export default function AddClient() {
           </CardContent>
         </Card>
 
-        {/* Действия */}
+        {/* Actions */}
         <div className="flex justify-end gap-4">
           <Button 
             type="button" 
             variant="outline"
             onClick={() => navigate("/clients")}
           >
-            Отмена
+            Cancel
           </Button>
           <Button 
             type="submit" 
@@ -265,7 +265,7 @@ export default function AddClient() {
             className="bg-gradient-primary hover:bg-primary-hover"
           >
             <Save className="h-4 w-4 mr-2" />
-            {isLoading ? "Создание..." : "Создать клиента"}
+            {isLoading ? "Creating..." : "Create Client"}
           </Button>
         </div>
       </form>

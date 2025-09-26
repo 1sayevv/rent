@@ -38,11 +38,11 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Простая проверка аутентификации через localStorage
+  // Simple authentication check via localStorage
   const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
   const userData = localStorage.getItem('userData');
 
-  // Если пользователь уже авторизован и есть данные пользователя, перенаправляем на главную
+  // If user is already authenticated and has user data, redirect to home
   if (isAuthenticated && userData) {
     return <Navigate to="/" replace />;
   }
@@ -51,10 +51,10 @@ export default function Login() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Имитация задержки для лучшего UX
+    // Simulate delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Проверяем учетные данные для обеих ролей
+    // Check credentials for both roles
     let userRole: UserRole | null = null;
     let userName = "";
 
@@ -67,7 +67,7 @@ export default function Login() {
     }
 
     if (userRole) {
-      // Сохраняем данные пользователя
+      // Save user data
       const userData = {
         id: Date.now(),
         email,
@@ -102,7 +102,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-primary/10 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        {/* Логотип и заголовок */}
+        {/* Logo and title */}
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto mb-4">
             <Car className="h-8 w-8 text-white" />
@@ -115,7 +115,7 @@ export default function Login() {
           </p>
         </div>
 
-        {/* Форма входа */}
+        {/* Login form */}
         <Card className="shadow-2xl border-0 bg-background/80 backdrop-blur-sm">
           <CardHeader className="space-y-1 pb-4">
             <CardTitle className="text-2xl font-bold text-center">
@@ -185,21 +185,21 @@ export default function Login() {
               </Button>
             </form>
 
-            {/* Информация о тестовых аккаунтах */}
+            {/* Test account information */}
             <div className="mt-6 p-4 bg-muted/30 rounded-lg">
               <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
                 <Shield className="h-4 w-4" />
-                Тестовые аккаунты:
+                Test Accounts:
               </h4>
               <div className="space-y-2 text-xs">
                 <div className="flex items-center gap-2">
                   <User className="h-3 w-3 text-primary" />
-                  <span className="font-medium">Администратор:</span>
+                  <span className="font-medium">Administrator:</span>
                   <span className="text-muted-foreground">admin@mail.com / 1234</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <User className="h-3 w-3 text-primary" />
-                  <span className="font-medium">Менеджер:</span>
+                  <span className="font-medium">Manager:</span>
                   <span className="text-muted-foreground">manager@mail.com / 1234</span>
                 </div>
               </div>
@@ -207,10 +207,10 @@ export default function Login() {
           </CardContent>
         </Card>
 
-        {/* Дополнительная информация */}
+        {/* Additional information */}
         <div className="text-center mt-6">
           <p className="text-xs text-muted-foreground">
-            © 2024 Auto Manage Suite. Все права защищены.
+            © 2024 Auto Manage Suite. All rights reserved.
           </p>
         </div>
       </div>
