@@ -20,11 +20,14 @@ import {
 } from "lucide-react";
 import { useData } from "@/context/SupabaseDataContext";
 import { Client } from "@/types";
+import { clientsApi } from "@/lib/api/clients";
+import { useToast } from "@/hooks/use-toast";
 
 export default function EditClient() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { clients, updateClient } = useData();
+  const { toast } = useToast();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -43,25 +46,47 @@ export default function EditClient() {
 
   // Load client data
   useEffect(() => {
-    if (id) {
-      const client = clients.find(c => c.id === parseInt(id));
-      if (client) {
-        setFormData({
-          name: client.name,
-          email: client.email,
-          phone: client.phone,
-          status: client.status,
-          avatar: client.avatar,
-          totalBookings: client.totalBookings,
-          totalSpent: client.totalSpent,
-          joinDate: client.joinDate,
-          lastBooking: client.lastBooking
+    const loadClient = async () => {
+      if (!id) {
+        navigate("/clients");
+        return;
+      }
+
+      try {
+        const client = await clientsApi.getById(id);
+        if (client) {
+          setFormData({
+            name: client.name,
+            email: client.email,
+            phone: client.phone,
+            status: client.status,
+            avatar: client.avatar,
+            totalBookings: client.totalBookings,
+            totalSpent: client.totalSpent,
+            joinDate: client.joinDate,
+            lastBooking: client.lastBooking
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "Client not found",
+            variant: "destructive"
+          });
+          navigate("/clients");
+        }
+      } catch (error) {
+        console.error('Error loading client:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load client data",
+          variant: "destructive"
         });
-      } else {
         navigate("/clients");
       }
-    }
-  }, [id, clients, navigate]);
+    };
+
+    loadClient();
+  }, [id, navigate, toast]);
 
   const getInitials = (name: string) => {
     return name.split(' ').map(n => n[0]).join('').toUpperCase();
@@ -95,15 +120,37 @@ export default function EditClient() {
     
     if (!validateForm()) return;
 
+    if (!id) {
+      toast({
+        title: "Error",
+        description: "Client ID not found",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsLoading(true);
     
     try {
-      if (id) {
-        updateClient(parseInt(id), formData);
-        navigate("/clients");
-      }
+      // Update through API directly
+      await clientsApi.update(id, formData);
+      
+      // Also update through context for synchronization
+      updateClient(id, formData);
+      
+      toast({
+        title: "Success",
+        description: "Client information updated successfully"
+      });
+      
+      navigate("/clients");
     } catch (error) {
       console.error("Error updating client:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update client information",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }

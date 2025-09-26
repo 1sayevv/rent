@@ -26,7 +26,7 @@ export const clientsApi = {
     }))
   },
 
-  async getById(id: number): Promise<Client | null> {
+  async getById(id: string): Promise<Client | null> {
     const { data, error } = await supabase
       .from('clients')
       .select('*')
@@ -86,7 +86,7 @@ export const clientsApi = {
     }
   },
 
-  async update(id: number, client: Partial<Client>): Promise<Client> {
+  async update(id: string, client: Partial<Client>): Promise<Client> {
     const updateData: any = {}
     
     if (client.name !== undefined) updateData.name = client.name
@@ -124,7 +124,7 @@ export const clientsApi = {
     }
   },
 
-  async delete(id: number): Promise<void> {
+  async delete(id: string): Promise<void> {
     const { error } = await supabase
       .from('clients')
       .delete()
