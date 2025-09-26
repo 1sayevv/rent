@@ -52,13 +52,6 @@ export function AppSidebar() {
     return currentPath.startsWith(path);
   };
 
-  const getNavCls = ({ isActive }: { isActive: boolean }) => {
-    if (isActive) {
-      return "bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-500 shadow-sm";
-    }
-    return "text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm transition-all duration-200 ease-in-out";
-  };
-
   // Select menu items based on role
   const mainItems = userRole === 'admin' ? adminItems : managerItems;
 
@@ -110,6 +103,7 @@ export function AppSidebar() {
                             ? "bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-500 shadow-sm" 
                             : "text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
                         }`}
+                        style={active ? { pointerEvents: 'none' } : {}}
                       >
                         <item.icon className="h-4 w-4 shrink-0 transition-colors duration-200" />
                         {!isCollapsed && (
