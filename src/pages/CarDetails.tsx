@@ -22,17 +22,62 @@ import {
 } from "lucide-react";
 import { useData } from "@/context/SupabaseDataContext";
 import { Car as CarType } from "@/types";
+import { carsApi } from "@/lib/api/cars";
+import { useState, useEffect } from "react";
 
 export default function CarDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { cars } = useData();
+  const [car, setCar] = useState<CarType | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Check that ID is a number
-  const carId = Number(id);
-  const car = isNaN(carId) ? null : cars.find(c => c.id === carId);
+  // Debug information
+  console.log('CarDetails - URL params id:', id);
+  console.log('CarDetails - cars from context:', cars);
 
-  if (!car) {
+  // Load car data from API
+  useEffect(() => {
+    const loadCar = async () => {
+      if (!id) {
+        setError("No car ID provided");
+        setLoading(false);
+        return;
+      }
+
+      try {
+        console.log('Loading car with ID:', id);
+        const carData = await carsApi.getById(id);
+        console.log('Car data loaded:', carData);
+        setCar(carData);
+        
+        if (!carData) {
+          setError(`Car with ID ${id} not found in database`);
+        }
+      } catch (error) {
+        console.error('Error loading car:', error);
+        setError(error instanceof Error ? error.message : 'Failed to load car');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCar();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Загрузка автомобиля ID: {id}...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !car) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -47,9 +92,14 @@ export default function CarDetails() {
         </div>
         <div className="text-center py-12">
           <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-          <h3 className="text-lg font-semibold mb-2">Car not found</h3>
+          <h3 className="text-lg font-semibold mb-2">
+            {error ? 'Error loading car' : 'Car not found'}
+          </h3>
           <p className="text-muted-foreground">
-            The requested car does not exist or has been deleted
+            {error || `Car with ID ${id} doesn't exist.`}
+          </p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Debug: ID = {id}
           </p>
         </div>
       </div>

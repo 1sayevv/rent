@@ -16,15 +16,14 @@ import {
   Phone,
   Mail,
   MapPin,
-  Clock
+  Clock,
+  Plus
 } from "lucide-react";
 import { useData } from "@/context/SupabaseDataContext";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { BookingDetailsModal } from "@/components/BookingDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { Booking } from "@/types";
-
-
 
 export default function Bookings() {
   const { bookings, updateBooking, deleteBooking, cars, clients } = useData();
@@ -86,8 +85,8 @@ export default function Bookings() {
   };
 
   const handleAddBooking = () => {
-    // Here you can add navigation to add booking page
-    console.log('Add booking');
+    // Navigate to add booking page
+    navigate('/bookings/add');
   };
 
   const handleCloseBookingModal = () => {
@@ -104,10 +103,22 @@ export default function Bookings() {
           </h1>
           <p className="text-muted-foreground">Order and reservation management</p>
         </div>
-        <Button className="bg-gradient-primary hover:bg-primary-hover">
-          <Calendar className="h-4 w-4 mr-2" />
-          Calendar
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/bookings/calendar')}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Calendar
+          </Button>
+          <Button 
+            className="bg-gradient-primary hover:bg-primary-hover"
+            onClick={handleAddBooking}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Booking
+          </Button>
+        </div>
       </div>
 
       {/* Statistics */}

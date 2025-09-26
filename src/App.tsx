@@ -13,6 +13,7 @@ import AddCar from "./pages/AddCar";
 import EditCar from "./pages/EditCar";
 import CarDetails from "./pages/CarDetails";
 import Bookings from "./pages/Bookings";
+import AddBooking from "./pages/AddBooking";
 import Clients from "./pages/Clients";
 import AddClient from "./pages/AddClient";
 import EditClient from "./pages/EditClient";
@@ -21,17 +22,13 @@ import Finances from "./pages/Finances";
 import Settings from "./pages/Settings";
 import DataManager from "./components/DataManager";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
+// Убираем импорт useEffect
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Force clear localStorage when app loads
-  useEffect(() => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('loginTime');
-  }, []);
+  // Убираем принудительную очистку localStorage
+  // Это было причиной проблемы с перенаправлением на логин
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -55,6 +52,7 @@ const App = () => {
                       <Route path="/cars/edit/:id" element={<EditCar />} />
                       <Route path="/cars/:id" element={<CarDetails />} />
                       <Route path="/bookings" element={<Bookings />} />
+                      <Route path="/bookings/add" element={<AddBooking />} />
                       <Route path="/bookings/calendar" element={<Bookings />} />
                       <Route path="/clients" element={<Clients />} />
                       <Route path="/clients/add" element={<AddClient />} />

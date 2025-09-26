@@ -6,7 +6,6 @@ import {
   DollarSign, 
   Settings,
   Plus,
-  BookOpen,
   Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -44,12 +43,10 @@ const managerItems = [
 
 const adminQuickActions = [
   { title: "Add Car", url: "/cars/add", icon: Plus },
-  { title: "Booking Calendar", url: "/bookings/calendar", icon: BookOpen },
 ];
 
 const managerQuickActions = [
   { title: "Add Car", url: "/cars/add", icon: Plus },
-  { title: "Booking Calendar", url: "/bookings/calendar", icon: BookOpen },
 ];
 
 export function AppSidebar() {

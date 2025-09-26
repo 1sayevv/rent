@@ -32,7 +32,7 @@ export const carsApi = {
     }))
   },
 
-  async getById(id: number): Promise<Car | null> {
+  async getById(id: string | number): Promise<Car | null> {
     const { data, error } = await supabase
       .from('cars')
       .select('*')

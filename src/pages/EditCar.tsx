@@ -18,13 +18,16 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 import DraggableImageGallery from "@/components/DraggableImageGallery";
+import { carsApi } from "@/lib/api/cars";
+import { Car as CarType } from "@/types";
 
 export default function EditCar() {
   const { id } = useParams();
-  const { cars, updateCar } = useData();
+  const { updateCar } = useData();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [images, setImages] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: "",
     model: "",
@@ -41,36 +44,59 @@ export default function EditCar() {
     description: ""
   });
 
-  // Find car by ID
-  const car = cars.find(c => c.id === Number(id));
-
-  // Load car data when component loads
+  // Load car data from API
   useEffect(() => {
-    if (car) {
-      setFormData({
-        name: car.name,
-        model: car.model,
-        year: car.year,
-        category: car.category,
-        fuelType: car.fuelType,
-        transmission: car.transmission,
-        seats: car.seats.toString(),
-        dailyPrice: car.pricePerDay.toString(),
-        weeklyPrice: car.weeklyPrice?.toString() || "",
-        monthlyPrice: car.monthlyPrice?.toString() || "",
-        mileage: car.mileage.toString(),
-        status: car.status,
-        description: car.description || ""
-      });
-      
-      // Load images
-      if (car.images && car.images.length > 0) {
-        setImages(car.images);
-      } else if (car.image) {
-        setImages([car.image]);
+    const loadCar = async () => {
+      if (!id) {
+        setLoading(false);
+        return;
       }
-    }
-  }, [car]);
+
+      try {
+        const car = await carsApi.getById(id);
+        if (car) {
+          setFormData({
+            name: car.name,
+            model: car.model,
+            year: car.year,
+            category: car.category,
+            fuelType: car.fuelType,
+            transmission: car.transmission,
+            seats: car.seats.toString(),
+            dailyPrice: car.pricePerDay.toString(),
+            weeklyPrice: car.weeklyPrice?.toString() || "",
+            monthlyPrice: car.monthlyPrice?.toString() || "",
+            mileage: car.mileage.toString(),
+            status: car.status,
+            description: car.description || ""
+          });
+          setImages(car.images || []);
+        }
+      } catch (error) {
+        console.error('Error loading car:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load car data",
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCar();
+  }, [id, toast]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Загрузка автомобиля...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -109,17 +135,17 @@ export default function EditCar() {
       return;
     }
 
-    if (!car) {
+    if (!id) { // Check if id is available
       toast({
         title: "Error",
-        description: "Car not found",
+        description: "Car ID not found",
         variant: "destructive"
       });
       return;
     }
 
     const updatedCarData = {
-      ...car,
+      id: Number(id), // Ensure ID is number
       name: formData.name,
       model: formData.model,
       year: formData.year,
@@ -138,7 +164,7 @@ export default function EditCar() {
       updatedAt: new Date().toISOString()
     };
 
-    updateCar(car.id, updatedCarData);
+    updateCar(Number(id), updatedCarData);
     
     toast({
       title: "Success",
@@ -149,7 +175,7 @@ export default function EditCar() {
   };
 
   // If car is not found, show message
-  if (!car) {
+  if (!id) { // Check if id is available
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">

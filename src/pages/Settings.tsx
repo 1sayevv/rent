@@ -70,7 +70,7 @@ export default function Settings() {
   const { settings, updateSettings } = useData();
   const { toast } = useToast();
   
-  // All useState hooks should be at the beginning of the component
+  // Все useState хуки должны быть в начале компонента
   const [categoriesList, setCategoriesList] = useState(categories);
   const [selectedCategory, setSelectedCategory] = useState<typeof categories[0] | null>(null);
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -81,14 +81,26 @@ export default function Settings() {
   const [isUserModalOpen, setIsUserModalOpen] = useState(false);
   
   const [companyInfo, setCompanyInfo] = useState({
-    name: settings.companyName,
-    email: settings.companyEmail,
-    phone: settings.companyPhone,
-    address: settings.companyAddress,
-    currency: settings.currency,
-    timezone: settings.timezone,
-    language: settings.language
+    name: settings?.companyName || "Auto Manage Suite",
+    email: settings?.companyEmail || "info@automanage.az",
+    phone: settings?.companyPhone || "+994 12 345 67 89",
+    address: settings?.companyAddress || "Baku, Azerbaijan",
+    currency: settings?.currency || "₼",
+    timezone: settings?.timezone || "Asia/Baku",
+    language: settings?.language || "ru"
   });
+  
+  // Проверка на undefined ПОСЛЕ всех хуков
+  if (!settings) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Загрузка настроек...</p>
+        </div>
+      </div>
+    );
+  }
 
   const [notifications, setNotifications] = useState(settings.notifications);
 

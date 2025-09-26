@@ -1,25 +1,48 @@
 ﻿import { supabase } from '@/lib/supabase'
 import { Settings } from '@/types'
 
+const defaultSettings: Settings = {
+  companyName: "Auto Manage Suite",
+  companyEmail: "info@automanage.az",
+  companyPhone: "+994 12 345 67 89",
+  companyAddress: "Baku, Azerbaijan",
+  currency: "₼",
+  timezone: "Asia/Baku",
+  language: "ru",
+  notifications: {
+    email: true,
+    sms: false,
+    push: true
+  }
+}
+
 export const settingsApi = {
-  async get(): Promise<Settings | null> {
-    const { data, error } = await supabase
-      .from('settings')
-      .select('*')
-      .eq('id', 1)
-      .single()
-    
-    if (error) return null
-    
-    return {
-      companyName: data.company_name,
-      companyEmail: data.company_email,
-      companyPhone: data.company_phone,
-      companyAddress: data.company_address,
-      currency: data.currency,
-      timezone: data.timezone,
-      language: data.language,
-      notifications: data.notifications
+  async get(): Promise<Settings> {
+    try {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('*')
+        .eq('id', 1)
+        .single()
+      
+      if (error) {
+        console.warn('Settings table not found, using default settings:', error.message);
+        return defaultSettings;
+      }
+      
+      return {
+        companyName: data.company_name,
+        companyEmail: data.company_email,
+        companyPhone: data.company_phone,
+        companyAddress: data.company_address,
+        currency: data.currency,
+        timezone: data.timezone,
+        language: data.language,
+        notifications: data.notifications
+      }
+    } catch (error) {
+      console.warn('Error fetching settings, using default:', error);
+      return defaultSettings;
     }
   },
 
