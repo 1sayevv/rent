@@ -1,202 +1,161 @@
-import { useState, useEffect, useRef } from "react";
-import { Search, X } from "lucide-react";
+import { useState, useMemo } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useData } from "@/context/SupabaseDataContext";
-import { Car, Client, CalendarDays, Users } from "lucide-react";
-
-interface SearchResult {
-  id: string;
-  title: string;
-  subtitle: string;
-  type: 'car' | 'client' | 'booking';
-  url: string;
-  icon: React.ComponentType<{ className?: string }>;
-}
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
 export function SearchBar() {
-  const [query, setQuery] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const searchRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
   const { cars, clients, bookings } = useData();
 
-  // Search function
-  const performSearch = (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      setResults([]);
-      return;
+  const searchResults = useMemo(() => {
+    if (!searchTerm.trim()) return { cars: [], clients: [], bookings: [] };
+
+    const term = searchTerm.toLowerCase();
+    
+    const filteredCars = cars.filter(car => 
+      car.name.toLowerCase().includes(term) || 
+      car.model.toLowerCase().includes(term)
+    ).slice(0, 3);
+
+    const filteredClients = clients.filter(client => 
+      client.name.toLowerCase().includes(term) || 
+      client.email.toLowerCase().includes(term)
+    ).slice(0, 3);
+
+    const filteredBookings = bookings.filter(booking => 
+      booking.client.name.toLowerCase().includes(term) || 
+      booking.car.toLowerCase().includes(term)
+    ).slice(0, 3);
+
+    return { cars: filteredCars, clients: filteredClients, bookings: filteredBookings };
+  }, [searchTerm, cars, clients, bookings]);
+
+  const handleResultClick = (type: string, id: string) => {
+    setIsOpen(false);
+    setSearchTerm("");
+    
+    switch (type) {
+      case 'car':
+        navigate(`/cars/${id}`);
+        break;
+      case 'client':
+        navigate(`/clients/${id}`);
+        break;
+      case 'booking':
+        navigate(`/bookings`);
+        break;
     }
-
-    const searchResults: SearchResult[] = [];
-
-    // Search cars
-    cars.forEach(car => {
-      if (
-        car.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        car.model.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        car.category.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        searchResults.push({
-          id: car.id,
-          title: `${car.name} ${car.model}`,
-          subtitle: `${car.category} • ${car.status}`,
-          type: 'car',
-          url: `/cars/${car.id}`,
-          icon: Car
-        });
-      }
-    });
-
-    // Search clients
-    clients.forEach(client => {
-      if (
-        client.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        client.email.toLowerCase().includes(searchQuery.toLowerCase())
-      ) {
-        searchResults.push({
-          id: client.id,
-          title: client.name,
-          subtitle: client.email,
-          type: 'client',
-          url: `/clients/${client.id}`,
-          icon: Users
-        });
-      }
-    });
-
-    // Search bookings
-    bookings.forEach(booking => {
-      const car = cars.find(c => c.id === booking.carId);
-      const client = clients.find(c => c.id === booking.clientId);
-      
-      if (
-        (car && (car.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                 car.model.toLowerCase().includes(searchQuery.toLowerCase()))) ||
-        (client && client.name.toLowerCase().includes(searchQuery.toLowerCase()))
-      ) {
-        searchResults.push({
-          id: booking.id,
-          title: `Booking #${booking.id.slice(0, 8)}`,
-          subtitle: `${car?.name || 'Unknown Car'} • ${client?.name || 'Unknown Client'}`,
-          type: 'booking',
-          url: `/bookings/${booking.id}`,
-          icon: CalendarDays
-        });
-      }
-    });
-
-    setResults(searchResults.slice(0, 10)); // Limit to 10 results
   };
 
-  // Handle search input
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setQuery(value);
-    performSearch(value);
-  };
-
-  // Handle result click
-  const handleResultClick = (result: SearchResult) => {
-    navigate(result.url);
-    setQuery("");
-    setResults([]);
+  const clearSearch = () => {
+    setSearchTerm("");
     setIsOpen(false);
   };
 
-  // Close search when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        setIsOpen(false);
-        setResults([]);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  // Open search when typing
-  useEffect(() => {
-    if (query.trim()) {
-      setIsOpen(true);
-    } else {
-      setIsOpen(false);
-    }
-  }, [query]);
+  const hasResults = searchResults.cars.length > 0 || searchResults.clients.length > 0 || searchResults.bookings.length > 0;
 
   return (
-    <div className="relative" ref={searchRef}>
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-        <Input
-          type="text"
-          placeholder="Search cars, clients, bookings..."
-          value={query}
-          onChange={handleSearch}
-          onFocus={() => setIsOpen(true)}
-          className="pl-10 pr-10 w-80"
-        />
-        {query && (
-          <Button
-            variant="ghost"
-            size="sm"
-            className="absolute right-1 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
-            onClick={() => {
-              setQuery("");
-              setResults([]);
-            }}
-          >
-            <X className="h-3 w-3" />
-          </Button>
-        )}
-      </div>
-
-      {/* Search Results */}
-      {isOpen && results.length > 0 && (
-        <Card className="absolute top-full left-0 right-0 mt-2 z-50 max-h-96 overflow-y-auto">
-          <CardContent className="p-0">
-            <div className="space-y-1">
-              {results.map((result) => {
-                const IconComponent = result.icon;
-                return (
-                  <div
-                    key={`${result.type}-${result.id}`}
-                    className="flex items-center gap-3 p-3 hover:bg-muted cursor-pointer transition-colors"
-                    onClick={() => handleResultClick(result)}
+    <Popover open={isOpen} onOpenChange={setIsOpen}>
+      <PopoverTrigger asChild>
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+          <Input
+            placeholder="Search cars, clients, bookings..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 pr-10 bg-white border-gray-200 focus:border-blue-500 focus:ring-blue-500/20 transition-all duration-200"
+            onFocus={() => setIsOpen(true)}
+          />
+          {searchTerm && (
+            <button
+              onClick={clearSearch}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          )}
+        </div>
+      </PopoverTrigger>
+      
+      <PopoverContent 
+        className="w-80 p-0 bg-white border-gray-200 shadow-lg" 
+        align="start"
+      >
+        <Command className="bg-white">
+          <CommandList className="max-h-80">
+            {!hasResults && searchTerm && (
+              <CommandEmpty className="py-6 text-center text-gray-500">
+                No results found for "{searchTerm}"
+              </CommandEmpty>
+            )}
+            
+            {searchResults.cars.length > 0 && (
+              <CommandGroup heading="Cars">
+                {searchResults.cars.map((car) => (
+                  <CommandItem
+                    key={car.id}
+                    onSelect={() => handleResultClick('car', car.id)}
+                    className="flex items-center gap-3 p-3 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 cursor-pointer"
                   >
-                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
-                      <IconComponent className="h-4 w-4 text-primary" />
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold text-xs">C</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">{result.title}</p>
-                      <p className="text-xs text-muted-foreground truncate">{result.subtitle}</p>
+                      <p className="font-medium text-gray-900 truncate">{car.name}</p>
+                      <p className="text-sm text-gray-500 truncate">{car.model} • {car.year}</p>
                     </div>
-                    <Badge variant="outline" className="text-xs">
-                      {result.type}
-                    </Badge>
-                  </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* No Results */}
-      {isOpen && query.trim() && results.length === 0 && (
-        <Card className="absolute top-full left-0 right-0 mt-2 z-50">
-          <CardContent className="p-4 text-center">
-            <Search className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-            <p className="text-sm text-muted-foreground">No results found for "{query}"</p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+            
+            {searchResults.clients.length > 0 && (
+              <CommandGroup heading="Clients">
+                {searchResults.clients.map((client) => (
+                  <CommandItem
+                    key={client.id}
+                    onSelect={() => handleResultClick('client', client.id)}
+                    className="flex items-center gap-3 p-3 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
+                      <span className="text-green-600 font-semibold text-xs">U</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{client.name}</p>
+                      <p className="text-sm text-gray-500 truncate">{client.email}</p>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+            
+            {searchResults.bookings.length > 0 && (
+              <CommandGroup heading="Bookings">
+                {searchResults.bookings.map((booking) => (
+                  <CommandItem
+                    key={booking.id}
+                    onSelect={() => handleResultClick('booking', booking.id)}
+                    className="flex items-center gap-3 p-3 hover:bg-blue-50 hover:text-blue-700 transition-colors duration-200 cursor-pointer"
+                  >
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
+                      <span className="text-purple-600 font-semibold text-xs">B</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 truncate">{booking.client.name}</p>
+                      <p className="text-sm text-gray-500 truncate">{booking.car} • {booking.status}</p>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
   );
 }
