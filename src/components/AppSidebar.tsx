@@ -97,24 +97,31 @@ export function AppSidebar() {
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
-              {mainItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink 
-                      to={item.url} 
-                      end={item.url === "/"}
-                      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out group ${getNavCls({ isActive: isActive(item.url) })}`}
-                    >
-                      <item.icon className="h-4 w-4 shrink-0 transition-colors duration-200" />
-                      {!isCollapsed && (
-                        <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
-                          {item.title}
-                        </span>
-                      )}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {mainItems.map((item) => {
+                const active = isActive(item.url);
+                return (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild>
+                      <NavLink 
+                        to={item.url} 
+                        end={item.url === "/"}
+                        className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ease-in-out group ${
+                          active 
+                            ? "bg-blue-50 text-blue-700 font-semibold border-r-2 border-blue-500 shadow-sm" 
+                            : "text-gray-600 hover:bg-blue-50 hover:text-blue-600 hover:shadow-sm"
+                        }`}
+                      >
+                        <item.icon className="h-4 w-4 shrink-0 transition-colors duration-200" />
+                        {!isCollapsed && (
+                          <span className="truncate group-hover:translate-x-0.5 transition-transform duration-200">
+                            {item.title}
+                          </span>
+                        )}
+                      </NavLink>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
