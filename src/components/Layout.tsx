@@ -1,10 +1,8 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
-import { Bell, Search } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import ProfileMenu from "./ProfileMenu";
 import { RoleIndicator } from "./RoleIndicator";
+import { SearchBar } from "./SearchBar";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -21,23 +19,11 @@ export function Layout({ children }: LayoutProps) {
           <header className="h-16 border-b bg-card px-6 flex items-center justify-between shadow-card">
             <div className="flex items-center space-x-4">
               <SidebarTrigger className="text-sidebar-foreground bg-sidebar-accent hover:bg-sidebar-accent/80" />
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search cars, clients..." 
-                  className="pl-10 w-80"
-                />
-              </div>
+              <SearchBar />
             </div>
             
             <div className="flex items-center space-x-3">
               <RoleIndicator />
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="h-5 w-5" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full text-xs flex items-center justify-center text-white">
-                  3
-                </span>
-              </Button>
               <div className="border-l border-border pl-3">
                 <ProfileMenu />
               </div>

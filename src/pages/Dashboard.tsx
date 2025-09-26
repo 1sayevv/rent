@@ -1,8 +1,9 @@
 import { StatCard } from "@/components/StatCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useData } from "@/context/SupabaseDataContext";
+import { useMemo } from "react";
 import { 
   Car, 
   Users, 
@@ -26,63 +27,177 @@ import {
   Legend
 } from "recharts";
 
-const weeklyBookings = [
-  { day: "Mon", bookings: 12 },
-  { day: "Tue", bookings: 19 },
-  { day: "Wed", bookings: 15 },
-  { day: "Thu", bookings: 25 },
-  { day: "Fri", bookings: 22 },
-  { day: "Sat", bookings: 30 },
-  { day: "Sun", bookings: 28 }
-];
-
-const monthlyRevenue = [
-  { month: "Jan", revenue: 45000 },
-  { month: "Feb", revenue: 52000 },
-  { month: "Mar", revenue: 48000 },
-  { month: "Apr", revenue: 61000 },
-  { month: "May", revenue: 55000 },
-  { month: "Jun", revenue: 67000 }
-];
-
-const topCars = [
-  { name: "Toyota Camry", bookings: 45, revenue: "28,500₼" },
-  { name: "BMW X5", bookings: 38, revenue: "35,200₼" },
-  { name: "Mercedes E-Class", bookings: 32, revenue: "42,800₼" },
-  { name: "Hyundai Sonata", bookings: 28, revenue: "18,900₼" },
-  { name: "Audi Q7", bookings: 25, revenue: "38,600₼" }
-];
-
-const recentBookings = [
-  { id: 1, client: "Ali Aliyev", car: "BMW X5", date: "Today", status: "confirmed" },
-  { id: 2, client: "Leyla Mamedova", car: "Mercedes C-Class", date: "Tomorrow", status: "pending" },
-  { id: 3, client: "Rasim Gasanov", car: "Toyota Camry", date: "15.06", status: "active" },
-  { id: 4, client: "Nigyar Ismayilova", car: "Hyundai Tucson", date: "16.06", status: "confirmed" },
-  { id: 5, client: "Elchin Kerimov", car: "Audi Q7", date: "18.06", status: "pending" }
-];
-
-const todaySchedule = [
-  { time: "09:00", action: "Pickup", client: "Ali Aliyev", car: "BMW X5" },
-  { time: "11:30", action: "Return", client: "Samir Guliyev", car: "Toyota Corolla" },
-  { time: "14:00", action: "Pickup", client: "Leyla Mamedova", car: "Mercedes C-Class" },
-  { time: "16:30", action: "Return", client: "Kyamal Nabiyev", car: "Hyundai Sonata" }
-];
-
 export default function Dashboard() {
   const { userRole } = useAuth();
+  const { cars, clients, bookings, financialRecords, isLoading } = useData();
+
+  // Calculate statistics based on real data
+  const dashboardStats = useMemo(() => {
+    const availableCars = cars.filter(car => car.status === 'available').length;
+    const occupiedCars = cars.filter(car => car.status === 'rented').length;
+    const totalClients = clients.length;
+    
+    // Calculate active bookings
+    const activeBookings = bookings.filter(booking => 
+      booking.status === 'confirmed' || booking.status === 'active'
+    ).length;
+
+    // Calculate monthly revenue
+    const currentMonth = new Date().getMonth();
+    const currentYear = new Date().getFullYear();
+    const monthlyRevenue = bookings
+      .filter(booking => {
+        const bookingDate = new Date(booking.createdAt);
+        return bookingDate.getMonth() === currentMonth && 
+               bookingDate.getFullYear() === currentYear &&
+               booking.status !== 'cancelled';
+      })
+      .reduce((total, booking) => total + booking.totalPrice, 0);
+
+    return {
+      availableCars,
+      occupiedCars,
+      totalClients,
+      activeBookings,
+      monthlyRevenue
+    };
+  }, [cars, clients, bookings]);
+
+  // Calculate chart data
+  const chartData = useMemo(() => {
+    // Group bookings by day of week
+    const weeklyBookings = Array.from({ length: 7 }, (_, index) => {
+      const dayNames = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      const bookingsCount = bookings.filter(booking => {
+        const bookingDate = new Date(booking.startDate);
+        return bookingDate.getDay() === (index + 1) % 7; // Monday = 0
+      }).length;
+      
+      return {
+        day: dayNames[index],
+        bookings: bookingsCount
+      };
+    });
+
+    // Calculate revenue by months (last 6 months)
+    const monthlyRevenue = Array.from({ length: 6 }, (_, index) => {
+      const date = new Date();
+      date.setMonth(date.getMonth() - (5 - index));
+      const month = date.toLocaleDateString('en-US', { month: 'short' });
+      
+      const revenue = bookings
+        .filter(booking => {
+          const bookingDate = new Date(booking.createdAt);
+          return bookingDate.getMonth() === date.getMonth() && 
+                 bookingDate.getFullYear() === date.getFullYear() &&
+                 booking.status !== 'cancelled';
+        })
+        .reduce((total, booking) => total + booking.totalPrice, 0);
+
+      return {
+        month,
+        revenue: revenue
+      };
+    });
+
+    return { weeklyBookings, monthlyRevenue };
+  }, [bookings]);
+
+  // Top cars by number of bookings
+  const topCars = useMemo(() => {
+    const carBookings = cars.map(car => {
+      const carBookingCount = bookings.filter(booking => 
+        booking.carId === car.id && booking.status !== 'cancelled'
+      ).length;
+      
+      const carRevenue = bookings
+        .filter(booking => booking.carId === car.id && booking.status !== 'cancelled')
+        .reduce((total, booking) => total + booking.totalPrice, 0);
+
+      return {
+        name: car.name,
+        bookings: carBookingCount,
+        revenue: `${carRevenue.toLocaleString()}₼`
+      };
+    })
+    .filter(car => car.bookings > 0)
+    .sort((a, b) => b.bookings - a.bookings)
+    .slice(0, 5);
+
+    return carBookings;
+  }, [cars, bookings]);
+
+  // Recent bookings
+  const recentBookings = useMemo(() => {
+    return bookings
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, 5)
+      .map(booking => {
+        const client = clients.find(c => c.id === booking.clientId);
+        const car = cars.find(c => c.id === booking.carId);
+        const bookingDate = new Date(booking.startDate);
+        const isToday = bookingDate.toDateString() === new Date().toDateString();
+        const isTomorrow = bookingDate.toDateString() === new Date(Date.now() + 24*60*60*1000).toDateString();
+        
+        let dateText = bookingDate.toLocaleDateString('en-US');
+        if (isToday) dateText = 'Today';
+        else if (isTomorrow) dateText = 'Tomorrow';
+        
+        return {
+          id: booking.id,
+          client: client?.name || 'Unknown Client',
+          car: car?.name || 'Unknown Car',
+          date: dateText,
+          status: booking.status
+        };
+      });
+  }, [bookings, clients, cars]);
+
+  // Today's schedule
+  const todaySchedule = useMemo(() => {
+    const today = new Date().toDateString();
+    const todayBookings = bookings.filter(booking => {
+      const startDate = new Date(booking.startDate).toDateString();
+      const endDate = new Date(booking.endDate).toDateString();
+      return startDate === today || endDate === today;
+    });
+
+    return todayBookings.map(booking => {
+      const client = clients.find(c => c.id === booking.clientId);
+      const car = cars.find(c => c.id === booking.carId);
+      const isPickup = new Date(booking.startDate).toDateString() === today;
+      
+      return {
+        time: isPickup ? "09:00" : "17:00", // Approximate time
+        action: isPickup ? "Pickup" : "Return",
+        client: client?.name || 'Unknown Client',
+        car: car?.name || 'Unknown Car'
+      };
+    }).slice(0, 4);
+  }, [bookings, clients, cars]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "confirmed":
-        return <Badge variant="outline" className="bg-success-light text-success border-success">Confirmed</Badge>;
+        return <Badge variant="outline" className="bg-green-100 text-green-800 border-green-300">Confirmed</Badge>;
       case "pending":
-        return <Badge variant="outline" className="bg-warning-light text-warning border-warning">Pending</Badge>;
+        return <Badge variant="outline" className="bg-yellow-100 text-yellow-800 border-yellow-300">Pending</Badge>;
       case "active":
-        return <Badge variant="outline" className="bg-primary/10 text-primary border-primary">Active</Badge>;
+        return <Badge variant="outline" className="bg-blue-100 text-blue-800 border-blue-300">Active</Badge>;
+      case "completed":
+        return <Badge variant="outline" className="bg-gray-100 text-gray-800 border-gray-300">Completed</Badge>;
       default:
         return <Badge variant="outline">Unknown</Badge>;
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-lg">Loading data...</div>
+      </div>
+    );
+  }
 
   // Simplified version for manager
   if (userRole === 'manager') {
@@ -93,7 +208,7 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-black">
               Dashboard
             </h1>
-            <p className="text-black">Overview of the fleet and active bookings</p>
+            <p className="text-black">Fleet and active bookings overview</p>
           </div>
           <div className="text-right">
             <p className="text-sm text-muted-foreground">Today</p>
@@ -105,24 +220,24 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard
             title="Available Cars"
-            value={24}
-            change="+2 from yesterday"
+            value={dashboardStats.availableCars}
+            change={`Total: ${cars.length}`}
             changeType="positive"
             icon={Car}
             variant="success"
           />
           <StatCard
-            title="Occupied Cars"
-            value={18}
-            change="-3 from yesterday"
-            changeType="negative"
+            title="Rented Cars"
+            value={dashboardStats.occupiedCars}
+            change={`${Math.round((dashboardStats.occupiedCars / cars.length) * 100)}% occupancy`}
+            changeType={dashboardStats.occupiedCars > cars.length * 0.7 ? "negative" : "positive"}
             icon={AlertCircle}
             variant="warning"
           />
           <StatCard
             title="Active Bookings"
-            value={12}
-            change="+3 today"
+            value={dashboardStats.activeBookings}
+            change={`Total bookings: ${bookings.length}`}
             changeType="positive"
             icon={Calendar}
             variant="default"
@@ -139,7 +254,7 @@ export default function Dashboard() {
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              {todaySchedule.map((item, index) => (
+              {todaySchedule.length > 0 ? todaySchedule.map((item, index) => (
                 <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                   <div className="text-center min-w-[60px]">
                     <p className="text-xs font-medium text-primary">{item.time}</p>
@@ -152,7 +267,9 @@ export default function Dashboard() {
                     {item.action}
                   </Badge>
                 </div>
-              ))}
+              )) : (
+                <p className="text-sm text-muted-foreground">No events today</p>
+              )}
             </CardContent>
           </Card>
 
@@ -188,7 +305,7 @@ export default function Dashboard() {
           <h1 className="text-3xl font-bold text-black">
             Dashboard
           </h1>
-          <p className="text-black">Overview of your fleet</p>
+          <p className="text-black">Your fleet overview</p>
         </div>
         <div className="text-right">
           <p className="text-sm text-muted-foreground">Today</p>
@@ -200,31 +317,31 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard
           title="Available Cars"
-          value={24}
-          change="+2 from yesterday"
+          value={dashboardStats.availableCars}
+          change={`Total cars: ${cars.length}`}
           changeType="positive"
           icon={Car}
           variant="success"
         />
         <StatCard
-          title="Occupied Cars"
-          value={18}
-          change="-3 from yesterday"
-          changeType="negative"
+          title="Rented Cars"
+          value={dashboardStats.occupiedCars}
+          change={`${Math.round((dashboardStats.occupiedCars / cars.length) * 100)}% occupancy`}
+          changeType={dashboardStats.occupiedCars > cars.length * 0.7 ? "negative" : "positive"}
           icon={AlertCircle}
           variant="warning"
         />
         <StatCard
           title="Total Clients"
-          value={1205}
-          change="+12 this week"
+          value={dashboardStats.totalClients}
+          change={`VIP clients: ${clients.filter(c => c.status === 'vip').length}`}
           changeType="positive"
           icon={Users}
         />
         <StatCard
           title="Monthly Revenue"
-          value="67,500₼"
-          change="+15.2% from last month"
+          value={`${dashboardStats.monthlyRevenue.toLocaleString()}₼`}
+          change={`Active bookings: ${dashboardStats.activeBookings}`}
           changeType="positive"
           icon={DollarSign}
           variant="revenue"
@@ -242,7 +359,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={weeklyBookings}>
+              <BarChart data={chartData.weeklyBookings}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="day" />
                 <YAxis />
@@ -262,7 +379,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={monthlyRevenue}>
+              <LineChart data={chartData.monthlyRevenue}>
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" />
                 <XAxis dataKey="month" />
                 <YAxis />
@@ -312,7 +429,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {todaySchedule.map((item, index) => (
+            {todaySchedule.length > 0 ? todaySchedule.map((item, index) => (
               <div key={index} className="flex items-center gap-3 p-3 rounded-lg bg-muted/30">
                 <div className="text-center min-w-[60px]">
                   <p className="text-xs font-medium text-primary">{item.time}</p>
@@ -325,7 +442,9 @@ export default function Dashboard() {
                   {item.action}
                 </Badge>
               </div>
-            ))}
+            )) : (
+              <p className="text-sm text-muted-foreground">No events today</p>
+            )}
           </CardContent>
         </Card>
 
@@ -338,7 +457,7 @@ export default function Dashboard() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {topCars.map((car, index) => (
+            {topCars.length > 0 ? topCars.map((car, index) => (
               <div key={index} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                 <div>
                   <p className="text-sm font-medium">{car.name}</p>
@@ -348,7 +467,9 @@ export default function Dashboard() {
                   <p className="text-sm font-medium text-revenue">{car.revenue}</p>
                 </div>
               </div>
-            ))}
+            )) : (
+              <p className="text-sm text-muted-foreground">No booking data</p>
+            )}
           </CardContent>
         </Card>
       </div>

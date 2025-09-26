@@ -1,6 +1,6 @@
 // Types for cars
 export interface Car {
-  id: number;
+  id: string; // Изменено с number на string для UUID
   name: string;
   model: string;
   year: string;
@@ -22,7 +22,7 @@ export interface Car {
 
 // Types for clients
 export interface Client {
-  id: number;
+  id: string; // Изменено с number на string для UUID
   name: string;
   email: string;
   phone: string;
@@ -38,14 +38,14 @@ export interface Client {
 
 // Types for bookings
 export interface Booking {
-  id: number;
-  clientId: number;
+  id: string; // Изменено с number на string для UUID
+  clientId: string; // Изменено с number на string для UUID
   client: {
     name: string;
     phone: string;
     email: string;
   };
-  carId: number;
+  carId: string; // Изменено с number на string для UUID
   car: string;
   startDate: string;
   endDate: string;
@@ -59,7 +59,7 @@ export interface Booking {
 
 // Types for finances
 export interface FinancialRecord {
-  id: number;
+  id: string; // Изменено с number на string для UUID
   type: 'income' | 'expense';
   category: string;
   amount: number;
@@ -88,7 +88,7 @@ export interface Settings {
 export type UserRole = 'admin' | 'manager';
 
 export interface User {
-  id: number;
+  id: string; // Изменено с number на string для UUID
   email: string;
   role: UserRole;
   name: string;

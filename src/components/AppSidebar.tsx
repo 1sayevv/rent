@@ -5,7 +5,6 @@ import {
   Users, 
   DollarSign, 
   Settings,
-  Plus,
   Database
 } from "lucide-react";
 import { NavLink, useLocation } from "react-router-dom";
@@ -41,14 +40,6 @@ const managerItems = [
   { title: "Clients", url: "/clients", icon: Users },
 ];
 
-const adminQuickActions = [
-  { title: "Add Car", url: "/cars/add", icon: Plus },
-];
-
-const managerQuickActions = [
-  { title: "Add Car", url: "/cars/add", icon: Plus },
-];
-
 export function AppSidebar() {
   const { state } = useSidebar();
   const location = useLocation();
@@ -68,7 +59,6 @@ export function AppSidebar() {
 
   // Select menu items based on role
   const mainItems = userRole === 'admin' ? adminItems : managerItems;
-  const quickActions = userRole === 'admin' ? adminQuickActions : managerQuickActions;
 
   return (
     <Sidebar collapsible="icon">
@@ -105,26 +95,6 @@ export function AppSidebar() {
                       end={item.url === "/"}
                       className={getNavCls}
                     >
-                      <item.icon className="h-4 w-4" />
-                      {!isCollapsed && <span>{item.title}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70">
-            {!isCollapsed && "Quick Actions"}
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {quickActions.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavCls}>
                       <item.icon className="h-4 w-4" />
                       {!isCollapsed && <span>{item.title}</span>}
                     </NavLink>
