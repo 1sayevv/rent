@@ -118,16 +118,6 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-
-        {/* Additional Info Section */}
-        {!isCollapsed && (
-          <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
-            <div className="text-xs text-gray-500 text-center">
-              <p className="font-medium">Auto Management Suite</p>
-              <p className="text-gray-400">v2.0.0</p>
-            </div>
-          </div>
-        )}
       </SidebarContent>
     </Sidebar>
   );
