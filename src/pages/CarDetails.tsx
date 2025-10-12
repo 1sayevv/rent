@@ -188,10 +188,6 @@ export default function CarDetails() {
                     <span className="text-black">Number of Seats: {car.seats}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Car className="h-4 w-4 text-muted-foreground" />
-                    <span className="text-black">Mileage: {car.mileage.toLocaleString()} km</span>
-                  </div>
-                  <div className="flex items-center gap-2">
                     <Calendar className="h-4 w-4 text-muted-foreground" />
                     <span className="text-black">Added: {new Date(car.createdAt).toLocaleDateString('ru-RU')}</span>
                   </div>
@@ -213,32 +209,14 @@ export default function CarDetails() {
                 <DollarSign className="h-5 w-5 text-revenue" />
                 Rates
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div className="p-4 border rounded-lg">
                   <div className="flex items-center gap-2 mb-2">
                     <DollarSign className="h-4 w-4 text-primary" />
-                    <span className="font-medium text-black">Per Day</span>
+                    <span className="font-medium text-black">Price Per Day</span>
                   </div>
                   <p className="text-2xl font-bold text-primary">{car.pricePerDay}₼</p>
                 </div>
-                {car.weeklyPrice && (
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-black">Per Week</span>
-                    </div>
-                    <p className="text-2xl font-bold text-primary">{car.weeklyPrice}₼</p>
-                  </div>
-                )}
-                {car.monthlyPrice && (
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <span className="font-medium text-black">Per Month</span>
-                    </div>
-                    <p className="text-2xl font-bold text-primary">{car.monthlyPrice}₼</p>
-                  </div>
-                )}
               </div>
             </div>
           </CardContent>

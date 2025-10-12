@@ -17,9 +17,6 @@ export const carsApi = {
       year: car.year,
       category: car.category,
       pricePerDay: car.price_per_day,
-      weeklyPrice: car.weekly_price,
-      monthlyPrice: car.monthly_price,
-      mileage: car.mileage,
       fuelType: car.fuel_type,
       transmission: car.transmission,
       seats: car.seats,
@@ -48,9 +45,6 @@ export const carsApi = {
       year: data.year,
       category: data.category,
       pricePerDay: data.price_per_day,
-      weeklyPrice: data.weekly_price,
-      monthlyPrice: data.monthly_price,
-      mileage: data.mileage,
       fuelType: data.fuel_type,
       transmission: data.transmission,
       seats: data.seats,
@@ -72,9 +66,6 @@ export const carsApi = {
         year: car.year,
         category: car.category,
         price_per_day: car.pricePerDay,
-        weekly_price: car.weeklyPrice,
-        monthly_price: car.monthlyPrice,
-        mileage: car.mileage,
         fuel_type: car.fuelType,
         transmission: car.transmission,
         seats: car.seats,
@@ -95,9 +86,6 @@ export const carsApi = {
       year: data.year,
       category: data.category,
       pricePerDay: data.price_per_day,
-      weeklyPrice: data.weekly_price,
-      monthlyPrice: data.monthly_price,
-      mileage: data.mileage,
       fuelType: data.fuel_type,
       transmission: data.transmission,
       seats: data.seats,
@@ -118,9 +106,6 @@ export const carsApi = {
     if (car.year !== undefined) updateData.year = car.year
     if (car.category !== undefined) updateData.category = car.category
     if (car.pricePerDay !== undefined) updateData.price_per_day = car.pricePerDay
-    if (car.weeklyPrice !== undefined) updateData.weekly_price = car.weeklyPrice
-    if (car.monthlyPrice !== undefined) updateData.monthly_price = car.monthlyPrice
-    if (car.mileage !== undefined) updateData.mileage = car.mileage
     if (car.fuelType !== undefined) updateData.fuel_type = car.fuelType
     if (car.transmission !== undefined) updateData.transmission = car.transmission
     if (car.seats !== undefined) updateData.seats = car.seats
@@ -145,9 +130,6 @@ export const carsApi = {
       year: data.year,
       category: data.category,
       pricePerDay: data.price_per_day,
-      weeklyPrice: data.weekly_price,
-      monthlyPrice: data.monthly_price,
-      mileage: data.mileage,
       fuelType: data.fuel_type,
       transmission: data.transmission,
       seats: data.seats,

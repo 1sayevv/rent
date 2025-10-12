@@ -9,18 +9,22 @@ import {
   MapPin,
   Clock,
   DollarSign,
-  Phone,
-  Mail,
   Calendar,
   Edit,
   Trash2,
   Check,
   X,
-  AlertTriangle
+  AlertTriangle,
+  Plane,
+  Building2,
+  Shield,
+  Globe,
+  Phone
 } from 'lucide-react';
 import { format } from 'date-fns';
 import { ru } from 'date-fns/locale';
-import { Booking, Car as CarType, Client } from '@/types';
+import { Booking, Car as CarType } from '@/types';
+import { useNavigate } from 'react-router-dom';
 
 interface BookingDetailsModalProps {
   booking: Booking | null;
@@ -30,7 +34,6 @@ interface BookingDetailsModalProps {
   onDelete: (bookingId: number) => void;
   onStatusChange: (bookingId: number, status: string) => void;
   car?: CarType;
-  client?: Client;
 }
 
 export function BookingDetailsModal({
@@ -40,10 +43,16 @@ export function BookingDetailsModal({
   onEdit,
   onDelete,
   onStatusChange,
-  car,
-  client
+  car
 }: BookingDetailsModalProps) {
+  const navigate = useNavigate();
+  
   if (!booking) return null;
+  
+  const handleEdit = () => {
+    navigate(`/bookings/edit/${booking.id}`);
+    onClose();
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -113,13 +122,6 @@ export function BookingDetailsModal({
     }
   };
 
-  const calculateDuration = () => {
-    const start = new Date(booking.startDate);
-    const end = new Date(booking.endDate);
-    const diffTime = Math.abs(end.getTime() - start.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
-  };
 
   const isOverdue = () => {
     const endDate = new Date(booking.endDate);
@@ -156,7 +158,7 @@ export function BookingDetailsModal({
                   <Button 
                     variant="outline" 
                     size="sm"
-                    onClick={() => onEdit(booking)}
+                    onClick={handleEdit}
                   >
                     <Edit className="h-4 w-4 mr-1" />
                     Edit
@@ -192,7 +194,7 @@ export function BookingDetailsModal({
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg">{booking.car}</h3>
+                  <h3 className="font-semibold text-lg">{booking.carName}</h3>
                   {car && (
                     <div className="space-y-2 mt-2">
                       <p className="text-sm text-muted-foreground">
@@ -213,32 +215,26 @@ export function BookingDetailsModal({
               </CardContent>
             </Card>
 
-            {/* Client Information */}
+            {/* Customer Information */}
             <Card className="shadow-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <User className="h-5 w-5 text-primary" />
-                  Client Information
+                  Customer Information
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <h3 className="font-semibold text-lg">{booking.client.name}</h3>
+                  <h3 className="font-semibold text-lg">{booking.customerName}</h3>
                   <div className="space-y-2 mt-2">
                     <div className="flex items-center gap-2 text-sm">
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{booking.client.phone}</span>
+                      <Globe className="h-4 w-4 text-muted-foreground" />
+                      <span>{booking.customerCountry}</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{booking.client.email}</span>
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{booking.customerPhone}</span>
                     </div>
-                    {client && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span>Client since {format(new Date(client.joinDate), 'dd.MM.yyyy', { locale: ru })}</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </CardContent>
@@ -264,7 +260,7 @@ export function BookingDetailsModal({
                         {format(new Date(booking.startDate), 'dd MMMM yyyy', { locale: ru })} - {format(new Date(booking.endDate), 'dd MMMM yyyy', { locale: ru })}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        Duration: {calculateDuration()} days
+                        Duration: {booking.rentalDays} days
                       </p>
                     </div>
                   </div>
@@ -281,17 +277,60 @@ export function BookingDetailsModal({
                       </p>
                     </div>
                   </div>
+
+                  <div>
+                    <p className="font-medium mb-2">Services</p>
+                    <div className="space-y-2">
+                      {booking.deliveryToAirport && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Plane className="h-4 w-4 text-primary" />
+                          <span>Airport Delivery</span>
+                        </div>
+                      )}
+                      {booking.deliveryToHotel && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Building2 className="h-4 w-4 text-primary" />
+                          <span>Hotel Delivery</span>
+                        </div>
+                      )}
+                      {booking.fullInsurance && (
+                        <div className="flex items-center gap-2 text-sm">
+                          <Shield className="h-4 w-4 text-primary" />
+                          <span>Full Insurance</span>
+                        </div>
+                      )}
+                      {!booking.deliveryToAirport && !booking.deliveryToHotel && !booking.fullInsurance && (
+                        <p className="text-sm text-muted-foreground">No additional services</p>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="flex items-center gap-3">
                     <DollarSign className="h-5 w-5 text-muted-foreground" />
-                    <div>
-                      <p className="font-medium">Cost</p>
-                      <p className="text-2xl font-bold text-revenue">{booking.totalPrice}₼</p>
-                      <p className="text-xs text-muted-foreground">
-                        {car && `${car.pricePerDay}₼ per day × ${calculateDuration()} days`}
-                      </p>
+                    <div className="w-full">
+                      <p className="font-medium mb-2">Financial Details</p>
+                      <div className="space-y-2">
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Daily Rate:</span>
+                          <span className="text-sm font-medium">{booking.dailyRate}₼</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-sm text-muted-foreground">Total Amount:</span>
+                          <span className="text-sm font-bold text-revenue">{booking.totalAmount}₼</span>
+                        </div>
+                        <div className="border-t pt-2 mt-2">
+                          <div className="flex justify-between">
+                            <span className="text-sm text-muted-foreground">Owner Amount:</span>
+                            <span className="text-sm font-medium">{booking.ownerAmount}₼</span>
+                          </div>
+                          <div className="flex justify-between">
+                            <span className="text-sm text-success">My Income:</span>
+                            <span className="text-sm font-bold text-success">{booking.myIncome}₼</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -308,6 +347,21 @@ export function BookingDetailsModal({
               </div>
             </CardContent>
           </Card>
+
+          {/* Notes */}
+          {booking.notes && (
+            <Card className="shadow-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-primary" />
+                  Notes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm">{booking.notes}</p>
+              </CardContent>
+            </Card>
+          )}
 
           {/* History */}
           <Card className="shadow-sm">
@@ -342,4 +396,4 @@ export function BookingDetailsModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}

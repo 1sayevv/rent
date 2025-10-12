@@ -16,7 +16,9 @@ import {
   Phone,
   Mail,
   MapPin,
-  Clock
+  Clock,
+  Edit,
+  Trash2
 } from "lucide-react";
 import { useData } from "@/context/SupabaseDataContext";
 import { BookingCalendar } from "@/components/BookingCalendar";
@@ -27,7 +29,7 @@ import { Booking } from "@/types";
 
 
 export default function Bookings() {
-  const { bookings, updateBooking, deleteBooking, cars, clients } = useData();
+  const { bookings, updateBooking, deleteBooking, cars } = useData();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -52,8 +54,10 @@ export default function Bookings() {
   };
 
   const filteredBookings = bookings.filter((booking) => {
-    const matchesSearch = booking.client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         booking.car.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = booking.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         booking.carName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         booking.customerCountry.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         booking.customerPhone.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || booking.status === statusFilter;
     
     return matchesSearch && matchesStatus;
@@ -70,12 +74,10 @@ export default function Bookings() {
   };
 
   const handleEditBooking = (booking: Booking) => {
-    // Here you can add navigation to edit page
-    console.log('Edit booking:', booking);
+    navigate(`/bookings/edit/${booking.id}`);
   };
 
   const handleDeleteBooking = (bookingId: number) => {
-    // Delete booking
     if (confirm('Are you sure you want to delete this booking?')) {
       deleteBooking(bookingId);
     }
@@ -104,9 +106,12 @@ export default function Bookings() {
           </h1>
           <p className="text-muted-foreground">Order and reservation management</p>
         </div>
-        <Button className="bg-gradient-primary hover:bg-primary-hover">
+        <Button 
+          className="bg-gradient-primary hover:bg-primary-hover"
+          onClick={() => navigate('/bookings/add')}
+        >
           <Calendar className="h-4 w-4 mr-2" />
-          Calendar
+          New Booking
         </Button>
       </div>
 
@@ -180,7 +185,7 @@ export default function Bookings() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input 
-                    placeholder="Search by client or car..." 
+                    placeholder="Search by name, phone, country or car..." 
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -216,14 +221,15 @@ export default function Bookings() {
                     <div>
                       <h3 className="font-semibold text-lg">Booking #{booking.id}</h3>
                       <p className="text-sm text-muted-foreground">
-                        Created: {new Date(booking.createdAt).toLocaleDateString('en-US')}
+                        {booking.customerName} • {booking.customerCountry} • {booking.customerPhone}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {getStatusBadge(booking.status)}
                     <div className="text-right">
-                      <p className="font-bold text-xl text-revenue">{booking.totalPrice}₼</p>
+                      <p className="font-bold text-xl text-revenue">{booking.totalAmount}₼</p>
+                      <p className="text-xs text-muted-foreground">{booking.rentalDays} days</p>
                     </div>
                   </div>
                 </div>
@@ -231,40 +237,26 @@ export default function Bookings() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <User className="h-4 w-4" />
-                      Client
-                    </div>
-                    <div>
-                      <p className="font-medium">{booking.client.name}</p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Phone className="h-3 w-3" />
-                        {booking.client.phone}
-                      </p>
-                      <p className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Mail className="h-3 w-3" />
-                        {booking.client.email}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Car className="h-4 w-4" />
-                      Car
+                      Car & Duration
                     </div>
                     <div>
-                      <p className="font-medium">{booking.car}</p>
+                      <p className="font-medium">{booking.carName}</p>
+                      <p className="text-sm text-muted-foreground">{booking.dailyRate}₼/day</p>
                     </div>
                   </div>
 
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Calendar className="h-4 w-4" />
-                      Rental Dates
+                      Rental Period
                     </div>
                     <div>
-                      <p className="font-medium">
-                        {new Date(booking.startDate).toLocaleDateString('en-US')} - {new Date(booking.endDate).toLocaleDateString('en-US')}
+                      <p className="text-sm">
+                        {new Date(booking.startDate).toLocaleDateString('en-US')}
+                      </p>
+                      <p className="text-sm">
+                        {new Date(booking.endDate).toLocaleDateString('en-US')}
                       </p>
                     </div>
                   </div>
@@ -272,11 +264,32 @@ export default function Bookings() {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4" />
-                      Locations
+                      Delivery & Services
                     </div>
                     <div>
-                      <p className="text-sm">Pickup: {booking.pickupLocation}</p>
-                      <p className="text-sm">Return: {booking.returnLocation}</p>
+                      {booking.deliveryToAirport && (
+                        <p className="text-sm">✈️ Airport Delivery</p>
+                      )}
+                      {booking.deliveryToHotel && (
+                        <p className="text-sm">🏨 Hotel Delivery</p>
+                      )}
+                      {booking.fullInsurance && (
+                        <p className="text-sm">🛡️ Full Insurance</p>
+                      )}
+                      {!booking.deliveryToAirport && !booking.deliveryToHotel && !booking.fullInsurance && (
+                        <p className="text-sm text-muted-foreground">No extras</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <DollarSign className="h-4 w-4" />
+                      Profit Split
+                    </div>
+                    <div>
+                      <p className="text-sm">Owner: {booking.ownerAmount}₼</p>
+                      <p className="text-sm text-success">My Income: {booking.myIncome}₼</p>
                     </div>
                   </div>
                 </div>
@@ -289,6 +302,14 @@ export default function Bookings() {
                   >
                     <Eye className="h-4 w-4 mr-1" />
                     View
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleEditBooking(booking)}
+                  >
+                    <Edit className="h-4 w-4 mr-1" />
+                    Edit
                   </Button>
                   {booking.status === "pending" && (
                     <>
@@ -321,6 +342,15 @@ export default function Bookings() {
                       Complete
                     </Button>
                   )}
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    className="text-destructive hover:bg-destructive/10"
+                    onClick={() => handleDeleteBooking(booking.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-1" />
+                    Delete
+                  </Button>
                 </div>
               </CardContent>
             </Card>
@@ -357,8 +387,7 @@ export default function Bookings() {
         onEdit={handleEditBooking}
         onDelete={handleDeleteBooking}
         onStatusChange={handleStatusChange}
-        car={selectedBooking ? cars.find(c => c.name === selectedBooking.car) : undefined}
-        client={selectedBooking ? clients.find(c => c.id === selectedBooking.clientId) : undefined}
+        car={selectedBooking ? cars.find(c => c.id === selectedBooking.carId) : undefined}
       />
     </div>
   );

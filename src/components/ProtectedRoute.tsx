@@ -6,9 +6,9 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // Проверяем аутентификацию через localStorage
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userData = localStorage.getItem('userData');
+  // SessionStorage kullan - tarayıcı kapanana kadar kalır
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
+  const userData = sessionStorage.getItem('userData');
 
   // Если не авторизован или нет данных пользователя, перенаправляем на логин
   if (!isAuthenticated || !userData) {

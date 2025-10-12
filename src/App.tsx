@@ -13,26 +13,18 @@ import AddCar from "./pages/AddCar";
 import EditCar from "./pages/EditCar";
 import CarDetails from "./pages/CarDetails";
 import Bookings from "./pages/Bookings";
-import Clients from "./pages/Clients";
-import AddClient from "./pages/AddClient";
-import EditClient from "./pages/EditClient";
-import ClientDetails from "./pages/ClientDetails";
+import AddBooking from "./pages/AddBooking";
+import EditBooking from "./pages/EditBooking";
 import Finances from "./pages/Finances";
-import Settings from "./pages/Settings";
-import DataManager from "./components/DataManager";
+import AddExpense from "./pages/AddExpense";
 import GoogleDriveTest from "./pages/GoogleDriveTest";
 import NotFound from "./pages/NotFound";
-import { useEffect } from "react";
 
 const queryClient = new QueryClient();
 
 const App = () => {
-  // Force clear localStorage when app loads
-  useEffect(() => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('loginTime');
-  }, []);
+  // App başlangıcında localStorage temizleme kaldırıldı
+  // Artık sessionStorage kullanıyoruz - tarayıcı kapanana kadar kalır
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -56,14 +48,11 @@ const App = () => {
                       <Route path="/cars/edit/:id" element={<EditCar />} />
                       <Route path="/cars/:id" element={<CarDetails />} />
                       <Route path="/bookings" element={<Bookings />} />
+                      <Route path="/bookings/add" element={<AddBooking />} />
+                      <Route path="/bookings/edit/:id" element={<EditBooking />} />
                       <Route path="/bookings/calendar" element={<Bookings />} />
-                      <Route path="/clients" element={<Clients />} />
-                      <Route path="/clients/add" element={<AddClient />} />
-                      <Route path="/clients/edit/:id" element={<EditClient />} />
-                      <Route path="/clients/:id" element={<ClientDetails />} />
                       <Route path="/finances" element={<Finances />} />
-                      <Route path="/settings" element={<Settings />} />
-                      <Route path="/data" element={<DataManager />} />
+                      <Route path="/finances/add" element={<AddExpense />} />
                       <Route path="/google-drive-test" element={<GoogleDriveTest />} />
                       
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

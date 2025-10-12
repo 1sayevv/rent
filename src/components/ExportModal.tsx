@@ -273,11 +273,11 @@ export function ExportModal({ isOpen, onClose, report }: ExportModalProps) {
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Total Revenue:</span>
-                  <span className="font-medium text-revenue">{report.totalRevenue.toLocaleString()}₼</span>
+                  <span className="font-medium text-revenue">{report.totalRevenue?.toLocaleString() || '0'}₼</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span>Net Profit:</span>
-                  <span className="font-medium text-success">{report.totalProfit.toLocaleString()}₼</span>
+                  <span className="font-medium text-success">{report.totalProfit?.toLocaleString() || '0'}₼</span>
                 </div>
               </div>
             </CardContent>

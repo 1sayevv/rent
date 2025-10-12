@@ -14,6 +14,11 @@ import {
   isSignedIn,
   getDirectImageUrl,
 } from '@/lib/googleDrive';
+import { 
+  compressImages, 
+  formatFileSize,
+  DEFAULT_COMPRESSION_OPTIONS 
+} from '@/lib/imageCompression';
 
 interface UploadedFile {
   id: string;
@@ -100,18 +105,32 @@ const GoogleDriveTest = () => {
 
     setUploading(true);
     try {
-      const result = await uploadFileToGoogleDrive(selectedFile);
+      // Önce fotoğrafı sıkıştır
+      toast.loading('Fotoğraf sıkıştırılıyor...', { id: 'compression' });
+      
+      const compressedFiles = await compressImages([selectedFile], DEFAULT_COMPRESSION_OPTIONS);
+      const compressedFile = compressedFiles[0];
+      
+      toast.dismiss('compression');
+      
+      const originalSize = formatFileSize(selectedFile.size);
+      const compressedSize = formatFileSize(compressedFile.size);
+      
+      toast.success(`Fotoğraf sıkıştırıldı! (${originalSize} → ${compressedSize})`);
+      
+      // Sıkıştırılmış dosyayı yükle
+      const result = await uploadFileToGoogleDrive(compressedFile);
       
       const uploadedFile: UploadedFile = {
         id: result.id,
-        name: selectedFile.name,
+        name: compressedFile.name,
         url: result.webViewLink,
         directUrl: getDirectImageUrl(result.id),
         uploadTime: new Date().toLocaleString('tr-TR'),
       };
 
       setUploadedFiles([uploadedFile, ...uploadedFiles]);
-      toast.success('Dosya başarıyla yüklendi!');
+      toast.success(`Dosya başarıyla yüklendi! (${compressedSize})`);
       
       // Reset
       setSelectedFile(null);

@@ -1,5 +1,35 @@
-﻿import { supabase } from '@/lib/supabase'
-import { FinancialRecord } from '@/types'
+import { supabase } from '@/lib/supabase'
+import { FinancialRecord, Booking } from '@/types'
+
+export interface DashboardStats {
+  totalRevenue: number
+  myIncome: number
+  ownerIncome: number
+  totalBookings: number
+  activeBookings: number
+  completedBookings: number
+  totalRentalDays: number
+  averageBookingValue: number
+}
+
+export interface CarPerformance {
+  carId: number
+  carName: string
+  totalDays: number
+  bookingCount: number
+  totalRevenue: number
+  myIncome: number
+  ownerIncome: number
+  averageDailyRate: number
+}
+
+export interface PeriodRevenue {
+  period: string
+  totalRevenue: number
+  myIncome: number
+  ownerIncome: number
+  bookingCount: number
+}
 
 export const financialApi = {
   async getAll(): Promise<FinancialRecord[]> {
@@ -83,5 +113,153 @@ export const financialApi = {
       .eq('id', id)
     
     if (error) throw error
+  },
+
+  // Dashboard Analytics
+  async getDashboardStats(startDate: string, endDate: string): Promise<DashboardStats> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .gte('start_date', startDate)
+      .lte('end_date', endDate)
+    
+    if (error) throw error
+
+    const bookings = data || []
+    
+    const stats: DashboardStats = {
+      totalRevenue: bookings.reduce((sum, b) => sum + (b.total_amount || 0), 0),
+      myIncome: bookings.reduce((sum, b) => sum + (b.my_income || 0), 0),
+      ownerIncome: bookings.reduce((sum, b) => sum + (b.owner_amount || 0), 0),
+      totalBookings: bookings.length,
+      activeBookings: bookings.filter(b => b.status === 'active').length,
+      completedBookings: bookings.filter(b => b.status === 'completed').length,
+      totalRentalDays: bookings.reduce((sum, b) => sum + (b.rental_days || 0), 0),
+      averageBookingValue: bookings.length > 0 
+        ? bookings.reduce((sum, b) => sum + (b.total_amount || 0), 0) / bookings.length 
+        : 0
+    }
+
+    return stats
+  },
+
+  async getCarPerformance(startDate: string, endDate: string): Promise<CarPerformance[]> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .gte('start_date', startDate)
+      .lte('end_date', endDate)
+    
+    if (error) throw error
+
+    const bookings = data || []
+    
+    // Group by car
+    const carMap = new Map<number, CarPerformance>()
+    
+    bookings.forEach(booking => {
+      const carId = booking.car_id
+      if (!carMap.has(carId)) {
+        carMap.set(carId, {
+          carId,
+          carName: booking.car_name,
+          totalDays: 0,
+          bookingCount: 0,
+          totalRevenue: 0,
+          myIncome: 0,
+          ownerIncome: 0,
+          averageDailyRate: 0
+        })
+      }
+      
+      const carPerf = carMap.get(carId)!
+      carPerf.totalDays += booking.rental_days || 0
+      carPerf.bookingCount += 1
+      carPerf.totalRevenue += booking.total_amount || 0
+      carPerf.myIncome += booking.my_income || 0
+      carPerf.ownerIncome += booking.owner_amount || 0
+    })
+    
+    // Calculate averages
+    const performances = Array.from(carMap.values())
+    performances.forEach(perf => {
+      perf.averageDailyRate = perf.totalDays > 0 ? perf.totalRevenue / perf.totalDays : 0
+    })
+    
+    // Sort by revenue
+    return performances.sort((a, b) => b.totalRevenue - a.totalRevenue)
+  },
+
+  async getMonthlyRevenue(year: number): Promise<PeriodRevenue[]> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .gte('start_date', `${year}-01-01`)
+      .lte('end_date', `${year}-12-31`)
+    
+    if (error) throw error
+
+    const bookings = data || []
+    
+    // Group by month
+    const monthMap = new Map<string, PeriodRevenue>()
+    
+    bookings.forEach(booking => {
+      const month = booking.start_date.substring(0, 7) // YYYY-MM
+      if (!monthMap.has(month)) {
+        monthMap.set(month, {
+          period: month,
+          totalRevenue: 0,
+          myIncome: 0,
+          ownerIncome: 0,
+          bookingCount: 0
+        })
+      }
+      
+      const monthData = monthMap.get(month)!
+      monthData.totalRevenue += booking.total_amount || 0
+      monthData.myIncome += booking.my_income || 0
+      monthData.ownerIncome += booking.owner_amount || 0
+      monthData.bookingCount += 1
+    })
+    
+    return Array.from(monthMap.values()).sort((a, b) => a.period.localeCompare(b.period))
+  },
+
+  async getDailyRevenue(startDate: string, endDate: string): Promise<PeriodRevenue[]> {
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('*')
+      .gte('start_date', startDate)
+      .lte('end_date', endDate)
+    
+    if (error) throw error
+
+    const bookings = data || []
+    
+    // Group by day
+    const dayMap = new Map<string, PeriodRevenue>()
+    
+    bookings.forEach(booking => {
+      const day = booking.start_date.substring(0, 10) // YYYY-MM-DD
+      if (!dayMap.has(day)) {
+        dayMap.set(day, {
+          period: day,
+          totalRevenue: 0,
+          myIncome: 0,
+          ownerIncome: 0,
+          bookingCount: 0
+        })
+      }
+      
+      const dayData = dayMap.get(day)!
+      dayData.totalRevenue += booking.total_amount || 0
+      dayData.myIncome += booking.my_income || 0
+      dayData.ownerIncome += booking.owner_amount || 0
+      dayData.bookingCount += 1
+    })
+    
+    return Array.from(dayMap.values()).sort((a, b) => a.period.localeCompare(b.period))
   }
 }
+

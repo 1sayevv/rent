@@ -19,9 +19,9 @@ export function useAuth() {
 
   useEffect(() => {
     const checkAuth = () => {
-      const auth = localStorage.getItem('isAuthenticated') === 'true';
-      const userData = localStorage.getItem('userData');
-      const time = localStorage.getItem('loginTime') || "";
+      const auth = sessionStorage.getItem('isAuthenticated') === 'true';
+      const userData = sessionStorage.getItem('userData');
+      const time = sessionStorage.getItem('loginTime') || "";
       
       setIsAuthenticated(auth);
       setUser(userData ? JSON.parse(userData) : null);
@@ -30,9 +30,11 @@ export function useAuth() {
 
     checkAuth();
 
-    // Listen for changes in localStorage
-    const handleStorageChange = () => {
-      checkAuth();
+    // Listen for changes in sessionStorage
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.storageArea === sessionStorage) {
+        checkAuth();
+      }
     };
 
     window.addEventListener('storage', handleStorageChange);
@@ -51,9 +53,9 @@ export function useAuth() {
       createdAt: new Date().toISOString()
     };
 
-    localStorage.setItem('isAuthenticated', 'true');
-    localStorage.setItem('userData', JSON.stringify(userData));
-    localStorage.setItem('loginTime', new Date().toISOString());
+    sessionStorage.setItem('isAuthenticated', 'true');
+    sessionStorage.setItem('userData', JSON.stringify(userData));
+    sessionStorage.setItem('loginTime', new Date().toISOString());
     
     setIsAuthenticated(true);
     setUser(userData);
@@ -61,9 +63,9 @@ export function useAuth() {
   };
 
   const logout = () => {
-    localStorage.removeItem('isAuthenticated');
-    localStorage.removeItem('userData');
-    localStorage.removeItem('loginTime');
+    sessionStorage.removeItem('isAuthenticated');
+    sessionStorage.removeItem('userData');
+    sessionStorage.removeItem('loginTime');
     
     setIsAuthenticated(false);
     setUser(null);

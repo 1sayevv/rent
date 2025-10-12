@@ -1,15 +1,15 @@
-﻿import { supabase } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import { Settings } from '@/types'
 
 export const settingsApi = {
-  async get(): Promise<Settings | null> {
+  async get(): Promise<Settings> {
     const { data, error } = await supabase
       .from('settings')
       .select('*')
       .eq('id', 1)
       .single()
     
-    if (error) return null
+    if (error) throw error
     
     return {
       companyName: data.company_name,
@@ -56,3 +56,4 @@ export const settingsApi = {
     }
   }
 }
+

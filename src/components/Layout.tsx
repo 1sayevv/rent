@@ -18,14 +18,14 @@ export function Layout({ children }: LayoutProps) {
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
-          <header className="h-16 border-b bg-card px-6 flex items-center justify-between shadow-card">
+          <header className="h-16 border-b bg-white/50 backdrop-blur-sm px-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-sidebar-foreground bg-sidebar-accent hover:bg-sidebar-accent/80" />
+              <SidebarTrigger className="text-foreground hover:bg-sidebar-accent hover:text-primary transition-all duration-200" />
               <div className="relative max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input 
-                  placeholder="Search cars, clients..." 
-                  className="pl-10 w-80"
+                  placeholder="Araç, müşteri ara..." 
+                  className="pl-10 w-80 bg-background border-border focus:border-primary transition-colors"
                 />
               </div>
             </div>

@@ -6,9 +6,6 @@ export interface Car {
   year: string;
   category: string;
   pricePerDay: number;
-  weeklyPrice?: number;
-  monthlyPrice?: number;
-  mileage: number;
   fuelType: string;
   transmission: string;
   seats: number;
@@ -20,38 +17,42 @@ export interface Car {
   updatedAt: string;
 }
 
-// Types for clients
-export interface Client {
-  id: number;
-  name: string;
-  email: string;
-  phone: string;
-  totalBookings: number;
-  totalSpent: number;
-  status: 'vip' | 'regular' | 'new';
-  joinDate: string;
-  lastBooking: string;
-  avatar: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
 // Types for bookings
 export interface Booking {
   id: number;
-  clientId: number;
-  client: {
-    name: string;
-    phone: string;
-    email: string;
-  };
+  // Customer Information
+  customerName: string;
+  customerCountry: string;
+  customerPhone: string;
+  
+  // Car Information
   carId: number;
-  car: string;
+  carName: string;
+  
+  // Rental Dates
   startDate: string;
   endDate: string;
+  rentalDays: number;
+  
+  // Delivery Options
+  deliveryToAirport: boolean;
+  deliveryToHotel: boolean;
+  deliveryLocation?: string;
+  
+  // Insurance
+  fullInsurance: boolean;
+  
+  // Financial Details
+  totalAmount: number;
+  dailyRate: number;
+  ownerAmount: number;
+  myIncome: number;
+  
+  // Additional Details
   pickupLocation: string;
   returnLocation: string;
-  totalPrice: number;
+  notes?: string;
+  
   status: 'confirmed' | 'pending' | 'active' | 'completed' | 'cancelled';
   createdAt: string;
   updatedAt: string;

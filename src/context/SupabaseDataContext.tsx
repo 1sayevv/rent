@@ -1,8 +1,7 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Car, Client, Booking, FinancialRecord, Settings } from "@/types"
+import { Car, Booking, FinancialRecord, Settings } from "@/types"
 import { carsApi } from "@/lib/api/cars"
-import { clientsApi } from "@/lib/api/clients"
 import { bookingsApi } from "@/lib/api/bookings"
 import { financialApi } from "@/lib/api/financial"
 import { settingsApi } from "@/lib/api/settings"
@@ -14,13 +13,6 @@ interface DataContextType {
   addCar: (car: Omit<Car, "id" | "createdAt" | "updatedAt">) => void
   updateCar: (id: number, car: Partial<Car>) => void
   deleteCar: (id: number) => void
-
-  // Clients
-  clients: Client[]
-  setClients: (clients: Client[] | ((prev: Client[]) => Client[])) => void
-  addClient: (client: Omit<Client, "id" | "createdAt" | "updatedAt">) => void
-  updateClient: (id: number, client: Partial<Client>) => void
-  deleteClient: (id: number) => void
 
   // Bookings
   bookings: Booking[]
@@ -93,33 +85,6 @@ export const SupabaseDataProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   })
 
-  // Clients
-  const { data: clients = [], isLoading: clientsLoading, error: clientsError } = useQuery({
-    queryKey: ["clients"],
-    queryFn: clientsApi.getAll
-  })
-  
-  const addClientMutation = useMutation({
-    mutationFn: clientsApi.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] })
-    }
-  })
-  
-  const updateClientMutation = useMutation({
-    mutationFn: ({ id, client }: { id: number; client: Partial<Client> }) => clientsApi.update(id, client),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] })
-    }
-  })
-  
-  const deleteClientMutation = useMutation({
-    mutationFn: clientsApi.delete,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["clients"] })
-    }
-  })
-
   // Bookings
   const { data: bookings = [], isLoading: bookingsLoading, error: bookingsError } = useQuery({
     queryKey: ["bookings"],
@@ -188,8 +153,8 @@ export const SupabaseDataProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   })
 
-  const isLoading = carsLoading || clientsLoading || bookingsLoading || financialLoading || settingsLoading
-  const error = carsError || clientsError || bookingsError || financialError || settingsError
+  const isLoading = carsLoading || bookingsLoading || financialLoading || settingsLoading
+  const error = carsError || bookingsError || financialError || settingsError
 
   const value: DataContextType = {
     // Cars
@@ -198,13 +163,6 @@ export const SupabaseDataProvider: React.FC<{ children: ReactNode }> = ({ childr
     addCar: (car) => addCarMutation.mutate(car),
     updateCar: (id, car) => updateCarMutation.mutate({ id, car }),
     deleteCar: (id) => deleteCarMutation.mutate(id),
-
-    // Clients
-    clients,
-    setClients: () => {}, // Not used with Supabase
-    addClient: (client) => addClientMutation.mutate(client),
-    updateClient: (id, client) => updateClientMutation.mutate({ id, client }),
-    deleteClient: (id) => deleteClientMutation.mutate(id),
 
     // Bookings
     bookings,

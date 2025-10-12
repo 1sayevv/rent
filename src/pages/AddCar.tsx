@@ -27,6 +27,12 @@ import {
   getDirectImageUrl,
   isSignedIn 
 } from "@/lib/googleDrive";
+import { 
+  compressImages, 
+  processImageFile, 
+  formatFileSize,
+  DEFAULT_COMPRESSION_OPTIONS 
+} from "@/lib/imageCompression";
 import { toast as sonnerToast } from "sonner";
 
 export default function AddCar() {
@@ -46,9 +52,6 @@ export default function AddCar() {
     transmission: "",
     seats: "",
     dailyPrice: "",
-    weeklyPrice: "",
-    monthlyPrice: "",
-    mileage: "",
     status: "available",
     description: ""
   });
@@ -92,17 +95,29 @@ export default function AddCar() {
     const uploadedUrls: string[] = [];
 
     try {
-      // Her dosyayı Google Drive'a yükle
-      for (const file of Array.from(files)) {
-        sonnerToast.loading(`${file.name} yükleniyor...`, { id: file.name });
+      // Önce fotoğrafları sıkıştır
+      sonnerToast.loading('Fotoğraflar sıkıştırılıyor...', { id: 'compression' });
+      
+      const compressedFiles = await compressImages(Array.from(files), DEFAULT_COMPRESSION_OPTIONS);
+      
+      sonnerToast.dismiss('compression');
+      sonnerToast.success(`${compressedFiles.length} fotoğraf sıkıştırıldı!`);
+      
+      // Her sıkıştırılmış dosyayı Google Drive'a yükle
+      for (const file of compressedFiles) {
+        const originalFile = Array.from(files).find(f => f.name.replace(/\.[^/.]+$/, '') === file.name.replace(/\.[^/.]+$/, ''));
+        const originalSize = originalFile ? formatFileSize(originalFile.size) : 'unknown';
+        const compressedSize = formatFileSize(file.size);
+        
+        sonnerToast.loading(`${file.name} yükleniyor... (${originalSize} → ${compressedSize})`, { id: file.name });
         
         try {
           const result = await uploadFileToGoogleDrive(file);
           // Alternatif URL'yi kullan (CORS sorunu için)
-          const imageUrl = result.directImageUrl || getDirectImageUrl(result.id);
+          const imageUrl = (result as any).directImageUrl || getDirectImageUrl(result.id);
           uploadedUrls.push(imageUrl);
           
-          sonnerToast.success(`${file.name} yüklendi!`, { id: file.name });
+          sonnerToast.success(`${file.name} yüklendi! (${compressedSize})`, { id: file.name });
         } catch (error) {
           console.error(`Error uploading ${file.name}:`, error);
           sonnerToast.error(`${file.name} yüklenemedi`, { id: file.name });
@@ -152,9 +167,6 @@ export default function AddCar() {
       year: formData.year,
       category: formData.category,
       pricePerDay: parseFloat(formData.dailyPrice),
-      weeklyPrice: formData.weeklyPrice ? parseFloat(formData.weeklyPrice) : undefined,
-      monthlyPrice: formData.monthlyPrice ? parseFloat(formData.monthlyPrice) : undefined,
-      mileage: parseInt(formData.mileage) || 0,
       fuelType: formData.fuelType,
       transmission: formData.transmission,
       seats: parseInt(formData.seats) || 5,
@@ -234,16 +246,6 @@ export default function AddCar() {
                     onChange={(e) => handleInputChange("year", e.target.value)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="mileage">Mileage (km)</Label>
-                  <Input 
-                    id="mileage"
-                    type="number"
-                    placeholder="15000"
-                    value={formData.mileage}
-                    onChange={(e) => handleInputChange("mileage", e.target.value)}
-                  />
-                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -310,7 +312,7 @@ export default function AddCar() {
               <CardTitle className="text-revenue">Pricing</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-1 gap-4">
                 <div>
                   <Label htmlFor="dailyPrice">Price per day (₼)</Label>
                   <Input 
@@ -319,26 +321,6 @@ export default function AddCar() {
                     placeholder="45"
                     value={formData.dailyPrice}
                     onChange={(e) => handleInputChange("dailyPrice", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="weeklyPrice">Price per week (₼)</Label>
-                  <Input 
-                    id="weeklyPrice"
-                    type="number"
-                    placeholder="280"
-                    value={formData.weeklyPrice}
-                    onChange={(e) => handleInputChange("weeklyPrice", e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="monthlyPrice">Price per month (₼)</Label>
-                  <Input 
-                    id="monthlyPrice"
-                    type="number"
-                    placeholder="1100"
-                    value={formData.monthlyPrice}
-                    onChange={(e) => handleInputChange("monthlyPrice", e.target.value)}
                   />
                 </div>
               </div>
@@ -379,38 +361,6 @@ export default function AddCar() {
             </CardContent>
           </Card>
 
-          {/* Documents */}
-          <Card className="shadow-card">
-            <CardHeader>
-              <CardTitle>Documents</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="outline" className="w-full justify-start">
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Insurance
-              </Button>
-              <Button variant="outline" className="w-full justify-start">
-                <Upload className="h-4 w-4 mr-2" />
-                Upload Registration
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card className="shadow-card">
-            <CardContent className="pt-6 space-y-3">
-              <Button 
-                className="w-full bg-gradient-primary hover:bg-primary-hover"
-                onClick={handleSaveCar}
-              >
-                <Save className="h-4 w-4 mr-2" />
-                Save Car
-              </Button>
-              <Button variant="outline" className="w-full">
-                Save as Draft
-              </Button>
-            </CardContent>
-          </Card>
         </div>
 
           {/* Images Upload */}
@@ -481,7 +431,10 @@ export default function AddCar() {
                       Fotoğraf yüklemek için tıklayın
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG - Google Drive'a otomatik yüklenecek
+                      PNG, JPG - Otomatik sıkıştırılıp Google Drive'a yüklenecek
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      📦 Maksimum boyut: 200KB (otomatik sıkıştırma)
                     </p>
                   </>
                 )}
@@ -500,6 +453,19 @@ export default function AddCar() {
                 />
               </>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Save Button */}
+        <Card className="shadow-card">
+          <CardContent className="pt-6">
+            <Button 
+              className="w-full bg-gradient-primary hover:bg-primary-hover"
+              onClick={handleSaveCar}
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Car
+            </Button>
           </CardContent>
         </Card>
       </div>

@@ -38,9 +38,9 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Simple authentication check via localStorage
-  const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
-  const userData = localStorage.getItem('userData');
+  // SessionStorage kullan - tarayıcı kapanana kadar kalır
+  const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
+  const userData = sessionStorage.getItem('userData');
 
   // If user is already authenticated and has user data, redirect to home
   if (isAuthenticated && userData) {
@@ -76,9 +76,9 @@ export default function Login() {
         createdAt: new Date().toISOString()
       };
 
-      localStorage.setItem('isAuthenticated', 'true');
-      localStorage.setItem('userData', JSON.stringify(userData));
-      localStorage.setItem('loginTime', new Date().toISOString());
+      sessionStorage.setItem('isAuthenticated', 'true');
+      sessionStorage.setItem('userData', JSON.stringify(userData));
+      sessionStorage.setItem('loginTime', new Date().toISOString());
 
       const roleText = userRole === 'admin' ? 'administrator' : 'manager';
 
