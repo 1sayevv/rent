@@ -208,7 +208,11 @@ export const uploadFileToGoogleDrive = async (
     // Güncellenmiş bilgileri al
     const fileInfo = await getFileInfo(data.id);
     
-    return fileInfo;
+    // Alternatif görüntüleme URL'i de ekle
+    return {
+      ...fileInfo,
+      directImageUrl: getAlternativeImageUrl(data.id)
+    };
   } catch (error) {
     console.error('Upload error:', error);
     throw error;
@@ -300,6 +304,33 @@ export const isSignedIn = (): boolean => {
  * Public dosya URL'ini direkt görüntülenebilir hale getir
  */
 export const getDirectImageUrl = (fileId: string): string => {
+  // CORS sorununu çözmek için farklı URL formatları dene
   return `https://drive.google.com/uc?export=view&id=${fileId}`;
+};
+
+/**
+ * Alternatif Google Drive görüntüleme URL'i
+ */
+export const getAlternativeImageUrl = (fileId: string): string => {
+  return `https://lh3.googleusercontent.com/d/${fileId}`;
+};
+
+/**
+ * Google Drive URL'ini temizle ve file ID'yi çıkar
+ */
+export const extractFileIdFromUrl = (url: string): string | null => {
+  // https://drive.google.com/uc?export=view&id=FILE_ID formatından
+  const ucMatch = url.match(/[?&]id=([^&]+)/);
+  if (ucMatch) return ucMatch[1];
+  
+  // https://drive.google.com/file/d/FILE_ID/view formatından
+  const fileMatch = url.match(/\/file\/d\/([^\/]+)/);
+  if (fileMatch) return fileMatch[1];
+  
+  // https://lh3.googleusercontent.com/d/FILE_ID formatından
+  const lhMatch = url.match(/\/d\/([^\/]+)/);
+  if (lhMatch) return lhMatch[1];
+  
+  return null;
 };
 

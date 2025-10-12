@@ -12,12 +12,22 @@ import {
   Car,
   Save,
   ArrowLeft,
-  ImagePlus
+  ImagePlus,
+  LogIn,
+  Loader2
 } from "lucide-react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 import DraggableImageGallery from "@/components/DraggableImageGallery";
+import { 
+  initializeGoogleDrive, 
+  signInToGoogle, 
+  uploadFileToGoogleDrive, 
+  getDirectImageUrl,
+  isSignedIn 
+} from "@/lib/googleDrive";
+import { toast as sonnerToast } from "sonner";
 
 export default function EditCar() {
   const { id } = useParams();
@@ -25,6 +35,9 @@ export default function EditCar() {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [images, setImages] = useState<string[]>([]);
+  const [isGoogleDriveReady, setIsGoogleDriveReady] = useState(false);
+  const [isLoggedInToGoogle, setIsLoggedInToGoogle] = useState(false);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     model: "",
@@ -43,6 +56,20 @@ export default function EditCar() {
 
   // Find car by ID
   const car = cars.find(c => c.id === Number(id));
+
+  // Google Drive'ı başlat
+  useEffect(() => {
+    const init = async () => {
+      try {
+        await initializeGoogleDrive();
+        setIsGoogleDriveReady(true);
+        setIsLoggedInToGoogle(isSignedIn());
+      } catch (error) {
+        console.error('Google Drive initialization error:', error);
+      }
+    };
+    init();
+  }, []);
 
   // Load car data when component loads
   useEffect(() => {
@@ -72,18 +99,60 @@ export default function EditCar() {
     }
   }, [car]);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleGoogleSignIn = async () => {
+    try {
+      await signInToGoogle();
+      setIsLoggedInToGoogle(true);
+      sonnerToast.success('Google hesabına giriş yapıldı!');
+    } catch (error) {
+      console.error('Google sign in error:', error);
+      sonnerToast.error('Google girişi başarısız');
+    }
+  };
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
-    if (files) {
-      Array.from(files).forEach((file) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          if (e.target?.result) {
-            setImages(prev => [...prev, e.target.result as string]);
-          }
-        };
-        reader.readAsDataURL(file);
-      });
+    if (!files || files.length === 0) return;
+
+    // Google Drive'a giriş kontrolü
+    if (!isLoggedInToGoogle) {
+      sonnerToast.error('Lütfen önce Google hesabınıza giriş yapın');
+      return;
+    }
+
+    setUploadingImages(true);
+    const uploadedUrls: string[] = [];
+
+    try {
+      // Her dosyayı Google Drive'a yükle
+      for (const file of Array.from(files)) {
+        sonnerToast.loading(`${file.name} yükleniyor...`, { id: file.name });
+        
+        try {
+          const result = await uploadFileToGoogleDrive(file);
+          // Alternatif URL'yi kullan (CORS sorunu için)
+          const imageUrl = result.directImageUrl || getDirectImageUrl(result.id);
+          uploadedUrls.push(imageUrl);
+          
+          sonnerToast.success(`${file.name} yüklendi!`, { id: file.name });
+        } catch (error) {
+          console.error(`Error uploading ${file.name}:`, error);
+          sonnerToast.error(`${file.name} yüklenemedi`, { id: file.name });
+        }
+      }
+
+      // Yüklenen URL'leri state'e ekle
+      if (uploadedUrls.length > 0) {
+        setImages(prev => [...prev, ...uploadedUrls]);
+        sonnerToast.success(`${uploadedUrls.length} fotoğraf Google Drive'a yüklendi!`);
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      sonnerToast.error('Fotoğraf yükleme hatası');
+    } finally {
+      setUploadingImages(false);
+      // Input'u temizle
+      event.target.value = '';
     }
   };
 
@@ -424,11 +493,42 @@ export default function EditCar() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImagePlus className="h-5 w-5 text-primary" />
-              Photos
+              Fotoğraflar (Google Drive)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth">
+            {/* Google Drive Login Status */}
+            {isGoogleDriveReady && !isLoggedInToGoogle && (
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <LogIn className="h-5 w-5 text-yellow-600" />
+                  <div>
+                    <p className="text-sm font-medium text-yellow-800">
+                      Google Drive'a giriş yapın
+                    </p>
+                    <p className="text-xs text-yellow-600">
+                      Fotoğraflar otomatik olarak Google Drive'a yüklenecek
+                    </p>
+                  </div>
+                </div>
+                <Button onClick={handleGoogleSignIn} size="sm">
+                  Giriş Yap
+                </Button>
+              </div>
+            )}
+
+            {isLoggedInToGoogle && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-green-600 animate-pulse"></div>
+                <p className="text-sm text-green-800">
+                  Google Drive'a bağlı - Fotoğraflar otomatik yüklenecek
+                </p>
+              </div>
+            )}
+
+            <div className={`border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-primary transition-smooth ${
+              uploadingImages ? 'opacity-50 pointer-events-none' : ''
+            }`}>
               <input
                 type="file"
                 multiple
@@ -436,24 +536,44 @@ export default function EditCar() {
                 onChange={handleImageUpload}
                 className="hidden"
                 id="image-upload"
+                disabled={!isLoggedInToGoogle || uploadingImages}
               />
-              <label htmlFor="image-upload" className="cursor-pointer">
-                <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
-                <p className="text-sm text-muted-foreground">
-                  Click to upload photos
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  PNG, JPG up to 10MB
-                </p>
+              <label 
+                htmlFor="image-upload" 
+                className={`cursor-pointer ${!isLoggedInToGoogle ? 'opacity-50' : ''}`}
+              >
+                {uploadingImages ? (
+                  <>
+                    <Loader2 className="h-8 w-8 mx-auto text-primary mb-2 animate-spin" />
+                    <p className="text-sm text-primary font-medium">
+                      Google Drive'a yükleniyor...
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">
+                      Fotoğraf yüklemek için tıklayın
+                    </p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      PNG, JPG - Google Drive'a otomatik yüklenecek
+                    </p>
+                  </>
+                )}
               </label>
             </div>
 
             {images.length > 0 && (
-              <DraggableImageGallery
-                images={images}
-                onImagesChange={handleImagesChange}
-                onRemoveImage={removeImage}
-              />
+              <>
+                <div className="text-sm text-muted-foreground">
+                  {images.length} fotoğraf yüklendi (Google Drive'da)
+                </div>
+                <DraggableImageGallery
+                  images={images}
+                  onImagesChange={handleImagesChange}
+                  onRemoveImage={removeImage}
+                />
+              </>
             )}
           </CardContent>
         </Card>

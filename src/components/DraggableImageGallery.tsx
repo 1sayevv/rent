@@ -308,6 +308,21 @@ export default function DraggableImageGallery({
                               src={isLegacyMode ? image as string : (image as ImageFile).preview}
                               alt={`Preview ${index + 1}`}
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                console.log('Image load error in gallery:', isLegacyMode ? image as string : (image as ImageFile).preview);
+                                // Google Drive URL'si için alternatif dene
+                                const imageUrl = isLegacyMode ? image as string : (image as ImageFile).preview;
+                                const fileId = imageUrl.match(/[?&]id=([^&]+)/)?.[1];
+                                if (fileId) {
+                                  e.currentTarget.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+                                } else {
+                                  // Diğer URL'ler için placeholder
+                                  e.currentTarget.src = "/placeholder.svg";
+                                }
+                              }}
+                              onLoad={() => {
+                                console.log('Image loaded successfully in gallery:', isLegacyMode ? image as string : (image as ImageFile).preview);
+                              }}
                             />
                             
                             <div

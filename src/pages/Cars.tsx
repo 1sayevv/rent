@@ -188,11 +188,30 @@ export default function Cars() {
         {filteredCars.map((car) => (
           <Card key={car.id} className="shadow-card hover:shadow-elevated transition-smooth overflow-hidden">
             <div className="aspect-video bg-muted relative">
-              <img 
-                src={car.image} 
-                alt={car.name}
-                className="w-full h-full object-cover"
-              />
+              {car.image && car.image !== "/placeholder.svg" ? (
+                <img 
+                  src={car.image} 
+                  alt={car.name}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    console.log('Image load error for:', car.image);
+                    // Alternatif URL dene
+                    const fileId = car.image.match(/[?&]id=([^&]+)/)?.[1];
+                    if (fileId) {
+                      e.currentTarget.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+                    } else {
+                      e.currentTarget.src = "/placeholder.svg";
+                    }
+                  }}
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                  <div className="text-center text-gray-500">
+                    <Car className="h-8 w-8 mx-auto mb-1" />
+                    <p className="text-xs">Fotoğraf yok</p>
+                  </div>
+                </div>
+              )}
               <div className="absolute top-3 right-3">
                 {getStatusBadge(car.status)}
               </div>

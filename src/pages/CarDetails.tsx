@@ -121,11 +121,33 @@ export default function CarDetails() {
             <CardContent className="p-6">
               <div className="space-y-4">
                 <div className="aspect-video bg-muted rounded-lg overflow-hidden">
-                  <img 
-                    src={car.image} 
-                    alt={car.name}
-                    className="w-full h-full object-cover"
-                  />
+                  {car.image && car.image !== "/placeholder.svg" ? (
+                    <img 
+                      src={car.image} 
+                      alt={car.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.log('Image load error for:', car.image);
+                        // Alternatif URL dene
+                        const fileId = car.image.match(/[?&]id=([^&]+)/)?.[1];
+                        if (fileId) {
+                          e.currentTarget.src = `https://lh3.googleusercontent.com/d/${fileId}`;
+                        } else {
+                          e.currentTarget.src = "/placeholder.svg";
+                        }
+                      }}
+                      onLoad={() => {
+                        console.log('Image loaded successfully:', car.image);
+                      }}
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <div className="text-center text-gray-500">
+                        <Car className="h-12 w-12 mx-auto mb-2" />
+                        <p className="text-sm">Fotoğraf yok</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div className="flex gap-2">
                   {getStatusBadge(car.status)}
@@ -239,6 +261,26 @@ export default function CarDetails() {
           </Card>
         )}
 
+        {/* Debug Panel - Remove in production */}
+        <Card className="shadow-card border-yellow-200 bg-yellow-50">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-semibold text-yellow-800 mb-4">🐛 Debug Bilgileri</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-medium text-yellow-800">Ana Fotoğraf:</p>
+                <p className="text-yellow-700 break-all">{car.image || "YOK"}</p>
+              </div>
+              <div>
+                <p className="font-medium text-yellow-800">Ek Fotoğraflar:</p>
+                <p className="text-yellow-700">{car.images ? car.images.length : 0} adet</p>
+                {car.images && car.images.map((img, i) => (
+                  <p key={i} className="text-xs text-yellow-600 break-all">{i+1}: {img}</p>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Additional Images */}
         {car.images && car.images.length > 0 && (
           <Card className="shadow-card">
@@ -252,6 +294,10 @@ export default function CarDetails() {
                         src={image} 
                         alt={`${car.name} - photo ${index + 1}`}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          // Fotoğraf yüklenemezse placeholder göster
+                          e.currentTarget.src = "/placeholder.svg";
+                        }}
                       />
                     </div>
                   ))}
