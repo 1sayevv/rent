@@ -17,16 +17,18 @@ import {
   Mail,
   MapPin,
   Clock,
+<<<<<<< HEAD
   Edit,
   Trash2
+=======
+  Plus
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
 } from "lucide-react";
 import { useData } from "@/context/SupabaseDataContext";
 import { BookingCalendar } from "@/components/BookingCalendar";
 import { BookingDetailsModal } from "@/components/BookingDetailsModal";
 import { useNavigate } from "react-router-dom";
 import { Booking } from "@/types";
-
-
 
 export default function Bookings() {
   const { bookings, updateBooking, deleteBooking, cars } = useData();
@@ -88,8 +90,8 @@ export default function Bookings() {
   };
 
   const handleAddBooking = () => {
-    // Here you can add navigation to add booking page
-    console.log('Add booking');
+    // Navigate to add booking page
+    navigate('/bookings/add');
   };
 
   const handleCloseBookingModal = () => {
@@ -106,6 +108,7 @@ export default function Bookings() {
           </h1>
           <p className="text-muted-foreground">Order and reservation management</p>
         </div>
+<<<<<<< HEAD
         <Button 
           className="bg-gradient-primary hover:bg-primary-hover"
           onClick={() => navigate('/bookings/add')}
@@ -113,6 +116,24 @@ export default function Bookings() {
           <Calendar className="h-4 w-4 mr-2" />
           New Booking
         </Button>
+=======
+        <div className="flex gap-2">
+          <Button 
+            variant="outline"
+            onClick={() => navigate('/bookings/calendar')}
+          >
+            <Calendar className="h-4 w-4 mr-2" />
+            Calendar
+          </Button>
+          <Button 
+            className="bg-gradient-primary hover:bg-primary-hover"
+            onClick={handleAddBooking}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Booking
+          </Button>
+        </div>
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
       </div>
 
       {/* Statistics */}

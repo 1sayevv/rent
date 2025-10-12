@@ -341,6 +341,8 @@ export const prepareFinancialData = (
     revenue: totalRevenue,
     expenses: totalExpenses,
     profit: totalProfit,
+    totalRevenue: totalRevenue,  // Добавляем для совместимости
+    totalProfit: totalProfit,    // Добавляем для совместимости
     bookings: totalDebts,
     cars: cars.length,
     monthlyData,

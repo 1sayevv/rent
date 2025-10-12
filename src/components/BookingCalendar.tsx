@@ -14,7 +14,6 @@ import {
   Eye,
   Edit,
   Trash2,
-  Plus,
   Filter,
   ChevronLeft,
   ChevronRight
@@ -40,104 +39,75 @@ export function BookingCalendar({
   onDeleteBooking,
   onAddBooking
 }: BookingCalendarProps) {
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [carFilter, setCarFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [isDayModalOpen, setIsDayModalOpen] = useState(false);
+  const [carFilter, setCarFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
 
-  // Фильтрация бронирований
+  // Filter bookings based on selected filters
   const filteredBookings = useMemo(() => {
     return bookings.filter(booking => {
-      const matchesCar = carFilter === 'all' || booking.car === carFilter;
-      const matchesStatus = statusFilter === 'all' || booking.status === statusFilter;
-      return matchesCar && matchesStatus;
+      const car = cars.find(c => c.id === booking.carId);
+      const carMatch = carFilter === 'all' || car?.name === carFilter;
+      const statusMatch = statusFilter === 'all' || booking.status === statusFilter;
+      return carMatch && statusMatch;
     });
-  }, [bookings, carFilter, statusFilter]);
+  }, [bookings, cars, carFilter, statusFilter]);
 
-  // Получение дней месяца
-  const monthDays = useMemo(() => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
-    return eachDayOfInterval({ start, end });
-  }, [currentMonth]);
-
-  // Получение бронирований для конкретного дня
-  const getBookingsForDay = (date: Date) => {
+  // Get bookings for a specific date
+  const getBookingsForDate = (date: Date) => {
     return filteredBookings.filter(booking => {
-      const bookingStart = new Date(booking.startDate);
-      const bookingEnd = new Date(booking.endDate);
-      return isWithinInterval(date, {
-        start: startOfDay(bookingStart),
-        end: endOfDay(bookingEnd)
-      });
+      const startDate = new Date(booking.startDate);
+      const endDate = new Date(booking.endDate);
+      return isWithinInterval(date, { start: startOfDay(startDate), end: endOfDay(endDate) });
     });
   };
 
-  // Получение цвета для статуса
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'confirmed':
-        return 'bg-success text-success-foreground';
-      case 'pending':
-        return 'bg-warning text-warning-foreground';
-      case 'active':
-        return 'bg-primary text-primary-foreground';
-      case 'completed':
-        return 'bg-muted text-muted-foreground';
-      case 'cancelled':
-        return 'bg-destructive text-destructive-foreground';
-      default:
-        return 'bg-muted text-muted-foreground';
+  // Handle date click
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date);
+    const dayBookings = getBookingsForDate(date);
+    if (dayBookings.length > 0) {
+      setSelectedBooking(dayBookings[0]);
+      setIsBookingModalOpen(true);
     }
   };
 
-  // Обработчик клика по дню
-  const handleDayClick = (date: Date) => {
-    setSelectedDate(date);
-    setIsDayModalOpen(true);
+  // Handle booking click
+  const handleBookingClick = (booking: Booking) => {
+    setSelectedBooking(booking);
+    setIsBookingModalOpen(true);
   };
 
-  // Навигация по месяцам
+  // Navigation functions
   const goToPreviousMonth = () => {
-    setCurrentMonth(prev => {
-      const newMonth = new Date(prev);
-      newMonth.setMonth(newMonth.getMonth() - 1);
-      return newMonth;
-    });
+    setCurrentDate(prev => subDays(startOfMonth(prev), 1));
   };
 
   const goToNextMonth = () => {
-    setCurrentMonth(prev => {
-      const newMonth = new Date(prev);
-      newMonth.setMonth(newMonth.getMonth() + 1);
-      return newMonth;
-    });
+    setCurrentDate(prev => addDays(endOfMonth(prev), 1));
   };
 
-  // Получение дней недели для отображения пустых ячеек
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+
+  // Get calendar days
   const getCalendarDays = () => {
-    const start = startOfMonth(currentMonth);
-    const end = endOfMonth(currentMonth);
+    const start = startOfMonth(currentDate);
+    const end = endOfMonth(currentDate);
+    const startDate = startOfDay(start);
+    const endDate = endOfDay(end);
+    
+    const days = eachDayOfInterval({ start: startDate, end: endDate });
+    
+    // Add empty cells for days before the month starts
     const startDay = start.getDay();
-    
-    const days = [];
-    
-    // Добавляем пустые ячейки в начале (воскресенье = 0, понедельник = 1)
-    const daysToAdd = startDay === 0 ? 6 : startDay - 1;
-    for (let i = 0; i < daysToAdd; i++) {
-      days.push(null);
-    }
-    
-    // Добавляем дни месяца
-    eachDayOfInterval({ start, end }).forEach(day => {
-      days.push(day);
-    });
-    
-    // Добавляем пустые ячейки в конце до полной сетки 6 недель
-    const remainingDays = 42 - days.length; // 6 недель * 7 дней = 42
-    for (let i = 0; i < remainingDays; i++) {
-      days.push(null);
+    const emptyDays = startDay === 0 ? 6 : startDay - 1;
+    for (let i = 0; i < emptyDays; i++) {
+      days.unshift(subDays(startDate, i + 1));
     }
     
     return days;
@@ -147,21 +117,21 @@ export function BookingCalendar({
 
   return (
     <div className="space-y-6">
-      {/* Фильтры */}
+      {/* Filters */}
       <Card className="shadow-card">
         <CardContent className="p-4">
           <div className="flex flex-col sm:flex-row gap-4 items-center">
             <div className="flex items-center gap-2">
               <Filter className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm font-medium">Фильтры:</span>
+              <span className="text-sm font-medium">Filters:</span>
             </div>
             
             <Select value={carFilter} onValueChange={setCarFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Все машины" />
+                <SelectValue placeholder="All cars" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все машины</SelectItem>
+                <SelectItem value="all">All cars</SelectItem>
                 {cars.map(car => (
                   <SelectItem key={car.id} value={car.name}>
                     {car.name}
@@ -172,41 +142,36 @@ export function BookingCalendar({
 
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Все статусы" />
+                <SelectValue placeholder="All statuses" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Все статусы</SelectItem>
-                <SelectItem value="confirmed">Подтвержден</SelectItem>
-                <SelectItem value="pending">Ожидает</SelectItem>
-                <SelectItem value="active">Активен</SelectItem>
-                <SelectItem value="completed">Завершен</SelectItem>
-                <SelectItem value="cancelled">Отменен</SelectItem>
+                <SelectItem value="all">All statuses</SelectItem>
+                <SelectItem value="confirmed">Confirmed</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
+                <SelectItem value="cancelled">Cancelled</SelectItem>
               </SelectContent>
             </Select>
-
-            <Button onClick={onAddBooking} className="ml-auto">
-              <Plus className="h-4 w-4 mr-2" />
-              Добавить бронирование
-            </Button>
           </div>
         </CardContent>
       </Card>
 
-      {/* Календарь */}
+      {/* Calendar */}
       <Card className="shadow-card">
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle className="flex items-center gap-2">
               <CalendarIcon className="h-5 w-5 text-primary" />
-              Календарь бронирований
+              Booking Calendar
             </CardTitle>
             <div className="flex items-center gap-2">
               <Button variant="outline" size="sm" onClick={goToPreviousMonth}>
                 <ChevronLeft className="h-4 w-4" />
               </Button>
-              <span className="text-lg font-semibold">
-                {format(currentMonth, 'MMMM yyyy', { locale: ru })}
-              </span>
+              <Button variant="outline" size="sm" onClick={goToToday}>
+                Today
+              </Button>
               <Button variant="outline" size="sm" onClick={goToNextMonth}>
                 <ChevronRight className="h-4 w-4" />
               </Button>
@@ -214,56 +179,72 @@ export function BookingCalendar({
           </div>
         </CardHeader>
         <CardContent>
-          {/* Заголовки дней недели */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
-            {['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(day => (
-              <div key={day} className="text-center text-sm font-medium text-muted-foreground py-2">
+          <div className="grid grid-cols-7 gap-1 mb-4">
+            {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(day => (
+              <div key={day} className="p-2 text-center text-sm font-medium text-muted-foreground">
                 {day}
               </div>
             ))}
           </div>
           
-          {/* Дни календаря */}
           <div className="grid grid-cols-7 gap-1">
-            {calendarDays.map((date, index) => {
-              if (!date) {
-                return <div key={index} className="h-24 border border-border rounded-lg bg-muted/20" />;
-              }
-
-              const dayBookings = getBookingsForDay(date);
-              const isToday = isSameDay(date, new Date());
-              const isSelected = selectedDate && isSameDay(date, selectedDate);
-
+            {calendarDays.map((day, index) => {
+              const isCurrentMonth = isSameMonth(day, currentDate);
+              const isToday = isSameDay(day, new Date());
+              const dayBookings = getBookingsForDate(day);
+              
               return (
-                <div 
+                <div
                   key={index}
-                  className={`h-24 border border-border rounded-lg p-1 cursor-pointer hover:bg-accent/50 transition-colors ${
-                    isToday ? 'bg-accent ring-2 ring-primary' : ''
-                  } ${isSelected ? 'ring-2 ring-primary' : ''}`}
-                  onClick={() => handleDayClick(date)}
+                  className={`
+                    min-h-[100px] p-2 border border-border rounded-lg cursor-pointer transition-colors
+                    ${isCurrentMonth ? 'bg-background' : 'bg-muted/30'}
+                    ${isToday ? 'ring-2 ring-primary' : ''}
+                    ${selectedDate && isSameDay(day, selectedDate) ? 'bg-primary/10' : ''}
+                    hover:bg-muted/50
+                  `}
+                  onClick={() => handleDateClick(day)}
                 >
-                  <div className="text-sm font-medium mb-1">
-                    {format(date, 'd')}
+                  <div className="flex items-center justify-between mb-1">
+                    <span className={`
+                      text-sm font-medium
+                      ${isCurrentMonth ? 'text-foreground' : 'text-muted-foreground'}
+                      ${isToday ? 'text-primary font-bold' : ''}
+                    `}>
+                      {format(day, 'd')}
+                    </span>
+                    {dayBookings.length > 0 && (
+                      <Badge variant="secondary" className="text-xs">
+                        {dayBookings.length}
+                      </Badge>
+                    )}
                   </div>
                   
-                  {dayBookings.length > 0 && (
-                    <div className="space-y-1">
-                      {dayBookings.slice(0, 2).map((booking) => (
+                  <div className="space-y-1">
+                    {dayBookings.slice(0, 2).map(booking => {
+                      const car = cars.find(c => c.id === booking.carId);
+                      return (
                         <div
                           key={booking.id}
-                          className={`text-xs px-1 py-0.5 rounded truncate ${getStatusColor(booking.status)}`}
-                          title={`${booking.client.name} - ${booking.car}`}
+                          className="text-xs p-1 bg-primary/10 text-primary rounded cursor-pointer hover:bg-primary/20"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleBookingClick(booking);
+                          }}
                         >
-                          {booking.client.name}
+                          <div className="flex items-center gap-1">
+                            <Car className="h-3 w-3" />
+                            <span className="truncate">{car?.name || 'Unknown Car'}</span>
+                          </div>
                         </div>
-                      ))}
-                      {dayBookings.length > 2 && (
-                        <div className="text-xs text-muted-foreground px-1">
-                          +{dayBookings.length - 2} еще
-                        </div>
-                      )}
-                    </div>
-                  )}
+                      );
+                    })}
+                    {dayBookings.length > 2 && (
+                      <div className="text-xs text-muted-foreground">
+                        +{dayBookings.length - 2} more
+                      </div>
+                    )}
+                  </div>
                 </div>
               );
             })}
@@ -271,132 +252,105 @@ export function BookingCalendar({
         </CardContent>
       </Card>
 
-      {/* Легенда */}
-      <Card className="shadow-card">
-        <CardHeader>
-          <CardTitle className="text-lg">Легенда</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-            <div className="flex items-center gap-2">
-              <Badge className="bg-success text-success-foreground">Подтвержден</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-warning text-warning-foreground">Ожидает</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-primary text-primary-foreground">Активен</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-muted text-muted-foreground">Завершен</Badge>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className="bg-destructive text-destructive-foreground">Отменен</Badge>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Модальное окно с бронированиями дня */}
-      <Dialog open={isDayModalOpen} onOpenChange={setIsDayModalOpen}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      {/* Booking Details Modal */}
+      <Dialog open={isBookingModalOpen} onOpenChange={setIsBookingModalOpen}>
+        <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>
-              Бронирования на {selectedDate && format(selectedDate, 'dd MMMM yyyy', { locale: ru })}
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarIcon className="h-5 w-5 text-primary" />
+              Booking Details
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
-            {selectedDate && getBookingsForDay(selectedDate).length === 0 ? (
-              <div className="text-center py-8 text-muted-foreground">
-                <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>На этот день нет бронирований</p>
+          {selectedBooking && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Car className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Car:</span>
+                    <span>{cars.find(c => c.id === selectedBooking.carId)?.name || 'Unknown Car'}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <User className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Client:</span>
+                    <span>Client #{selectedBooking.clientId}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Duration:</span>
+                    <span>
+                      {format(new Date(selectedBooking.startDate), 'MMM dd, yyyy')} - 
+                      {format(new Date(selectedBooking.endDate), 'MMM dd, yyyy')}
+                    </span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Total:</span>
+                    <span className="font-bold text-primary">{selectedBooking.totalAmount}₼</span>
+                  </div>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">Status:</span>
+                    <Badge 
+                      className={
+                        selectedBooking.status === 'confirmed' ? 'bg-success text-success-foreground' :
+                        selectedBooking.status === 'active' ? 'bg-primary text-primary-foreground' :
+                        selectedBooking.status === 'completed' ? 'bg-muted text-muted-foreground' :
+                        'bg-destructive text-destructive-foreground'
+                      }
+                    >
+                      {selectedBooking.status}
+                    </Badge>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Pickup Location:</span>
+                    <span>{selectedBooking.pickupLocation || 'Not specified'}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4 text-muted-foreground" />
+                    <span className="font-medium">Return Location:</span>
+                    <span>{selectedBooking.returnLocation || 'Not specified'}</span>
+                  </div>
+                </div>
               </div>
-            ) : (
-              selectedDate && getBookingsForDay(selectedDate).map(booking => (
-                <Card key={booking.id} className="shadow-sm">
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                          <Car className="h-5 w-5 text-primary" />
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">{booking.car}</h4>
-                          <p className="text-sm text-muted-foreground">{booking.client.name}</p>
-                        </div>
-                      </div>
-                      <Badge className={getStatusColor(booking.status)}>
-                        {booking.status === 'confirmed' && 'Подтвержден'}
-                        {booking.status === 'pending' && 'Ожидает'}
-                        {booking.status === 'active' && 'Активен'}
-                        {booking.status === 'completed' && 'Завершен'}
-                        {booking.status === 'cancelled' && 'Отменен'}
-                      </Badge>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4 mb-3">
-                      <div className="flex items-center gap-2 text-sm">
-                        <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span>
-                          {format(new Date(booking.startDate), 'dd.MM.yyyy')} - {format(new Date(booking.endDate), 'dd.MM.yyyy')}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <DollarSign className="h-4 w-4 text-muted-foreground" />
-                        <span>{booking.totalPrice}₼</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span>{booking.pickupLocation}</span>
-                      </div>
-                      <div className="flex items-center gap-2 text-sm">
-                        <User className="h-4 w-4 text-muted-foreground" />
-                        <span>{booking.client.phone}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          onViewBooking(booking);
-                          setIsDayModalOpen(false);
-                        }}
-                      >
-                        <Eye className="h-4 w-4 mr-1" />
-                        Просмотр
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => {
-                          onEditBooking(booking);
-                          setIsDayModalOpen(false);
-                        }}
-                      >
-                        <Edit className="h-4 w-4 mr-1" />
-                        Изменить
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        className="text-destructive hover:bg-destructive/10"
-                        onClick={() => {
-                          onDeleteBooking(booking.id);
-                          setIsDayModalOpen(false);
-                        }}
-                      >
-                        <Trash2 className="h-4 w-4 mr-1" />
-                        Удалить
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
+              
+              <div className="flex gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  onClick={() => onViewBooking(selectedBooking)}
+                  className="flex-1"
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => onEditBooking(selectedBooking)}
+                  className="flex-1"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  Edit
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={() => onDeleteBooking(selectedBooking.id)}
+                  className="flex-1"
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
     </div>

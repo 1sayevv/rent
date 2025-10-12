@@ -20,6 +20,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { useData } from "@/context/SupabaseDataContext";
 import { useToast } from "@/hooks/use-toast";
 import DraggableImageGallery from "@/components/DraggableImageGallery";
+<<<<<<< HEAD
 import { 
   initializeGoogleDrive, 
   signInToGoogle, 
@@ -34,16 +35,25 @@ import {
   DEFAULT_COMPRESSION_OPTIONS 
 } from "@/lib/imageCompression";
 import { toast as sonnerToast } from "sonner";
+=======
+import { carsApi } from "@/lib/api/cars";
+import { Car as CarType } from "@/types";
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
 
 export default function EditCar() {
   const { id } = useParams();
-  const { cars, updateCar } = useData();
+  const { updateCar } = useData();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [images, setImages] = useState<string[]>([]);
+<<<<<<< HEAD
   const [isGoogleDriveReady, setIsGoogleDriveReady] = useState(false);
   const [isLoggedInToGoogle, setIsLoggedInToGoogle] = useState(false);
   const [uploadingImages, setUploadingImages] = useState(false);
+=======
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
   const [formData, setFormData] = useState({
     name: "",
     model: "",
@@ -57,6 +67,7 @@ export default function EditCar() {
     description: ""
   });
 
+<<<<<<< HEAD
   // Find car by ID
   const car = cars.find(c => c.id === Number(id));
 
@@ -89,15 +100,76 @@ export default function EditCar() {
         status: car.status,
         description: car.description || ""
       });
+=======
+  // Load car data from API
+  useEffect(() => {
+    const loadCar = async () => {
+      console.log('EditCar useEffect - Raw ID from params:', id);
+      console.log('EditCar useEffect - ID type:', typeof id);
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
       
-      // Load images
-      if (car.images && car.images.length > 0) {
-        setImages(car.images);
-      } else if (car.image) {
-        setImages([car.image]);
+      if (!id) {
+        console.log('No ID provided');
+        setLoading(false);
+        return;
       }
-    }
-  }, [car]);
+
+      // ID is now UUID (string), no need to parse to number
+      console.log('Car ID (UUID):', id);
+
+      try {
+        console.log('Loading car with ID:', id);
+        const car = await carsApi.getById(id);
+        if (car) {
+          console.log('Loaded car data:', car);
+          setFormData({
+            name: car.name,
+            model: car.model,
+            year: car.year,
+            category: car.category,
+            fuelType: car.fuelType,
+            transmission: car.transmission,
+            seats: car.seats.toString(),
+            dailyPrice: car.pricePerDay.toString(),
+            weeklyPrice: car.weeklyPrice?.toString() || "",
+            monthlyPrice: car.monthlyPrice?.toString() || "",
+            mileage: car.mileage.toString(),
+            status: car.status,
+            description: car.description || ""
+          });
+          setImages(car.images || []);
+        } else {
+          toast({
+            title: "Error",
+            description: "Car not found",
+            variant: "destructive"
+          });
+        }
+      } catch (error) {
+        console.error('Error loading car:', error);
+        toast({
+          title: "Error",
+          description: `Failed to load car data: ${error instanceof Error ? error.message : 'Unknown error'}`,
+          variant: "destructive"
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadCar();
+  }, [id, toast]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading car...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleGoogleSignIn = async () => {
     try {
@@ -180,7 +252,7 @@ export default function EditCar() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleUpdateCar = () => {
+  const handleUpdateCar = async () => {
     if (!formData.name || !formData.model || !formData.category || !formData.dailyPrice) {
       toast({
         title: "Error",
@@ -190,15 +262,16 @@ export default function EditCar() {
       return;
     }
 
-    if (!car) {
+    if (!id) {
       toast({
         title: "Error",
-        description: "Car not found",
+        description: "Car ID not found",
         variant: "destructive"
       });
       return;
     }
 
+<<<<<<< HEAD
     const updatedCarData = {
       ...car,
       name: formData.name,
@@ -215,19 +288,62 @@ export default function EditCar() {
       images: images.length > 0 ? images : undefined,
       updatedAt: new Date().toISOString()
     };
+=======
+    setSaving(true);
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
 
-    updateCar(car.id, updatedCarData);
-    
-    toast({
-      title: "Success",
-      description: "Car information updated"
-    });
+    try {
+      console.log('Starting car update process for ID:', id);
+      
+      // Prepare data for update
+      const updateData = {
+        name: formData.name,
+        model: formData.model,
+        year: formData.year,
+        category: formData.category,
+        pricePerDay: parseFloat(formData.dailyPrice),
+        weeklyPrice: formData.weeklyPrice ? parseFloat(formData.weeklyPrice) : undefined,
+        monthlyPrice: formData.monthlyPrice ? parseFloat(formData.monthlyPrice) : undefined,
+        mileage: parseInt(formData.mileage) || 0,
+        fuelType: formData.fuelType,
+        transmission: formData.transmission,
+        seats: parseInt(formData.seats) || 5,
+        status: formData.status as 'available' | 'rented' | 'maintenance' | 'unavailable',
+        description: formData.description,
+        image: images[0] || "/placeholder.svg",
+        images: images.length > 0 ? images : undefined
+      };
 
-    navigate("/cars");
+      console.log('Update data prepared:', updateData);
+
+      // Update through API (pass UUID as string)
+      const updatedCar = await carsApi.update(id, updateData);
+      console.log('Car updated successfully:', updatedCar);
+      
+      // Also update through context for synchronization
+      updateCar(id, updateData);
+      
+      toast({
+        title: "Success",
+        description: "Car information updated successfully"
+      });
+
+      navigate("/cars");
+    } catch (error) {
+      console.error('Error updating car:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast({
+        title: "Error",
+        description: `Failed to update car information: ${errorMessage}`,
+        variant: "destructive"
+      });
+    } finally {
+      setSaving(false);
+    }
   };
 
   // If car is not found, show message
-  if (!car) {
+  if (!id) {
     return (
       <div className="space-y-6">
         <div className="flex items-center gap-4">
@@ -244,12 +360,12 @@ export default function EditCar() {
         <Card className="shadow-card">
           <CardContent className="p-8 text-center">
             <Car className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-lg font-semibold mb-2">Car not found</h3>
+            <h3 className="text-lg font-semibold mb-2">Car Not Found</h3>
             <p className="text-muted-foreground mb-4">
               The requested car does not exist or has been deleted
             </p>
             <Link to="/cars">
-              <Button>Return to car list</Button>
+              <Button>Back to Cars List</Button>
             </Link>
           </CardContent>
         </Card>
@@ -287,7 +403,7 @@ export default function EditCar() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="name">Car Name</Label>
+                  <Label htmlFor="name">Car Brand</Label>
                   <Input 
                     id="name"
                     placeholder="Toyota"
@@ -308,7 +424,7 @@ export default function EditCar() {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="year">Year of Manufacture</Label>
+                  <Label htmlFor="year">Year</Label>
                   <Input 
                     id="year"
                     type="number"
@@ -433,6 +549,42 @@ export default function EditCar() {
             </CardContent>
           </Card>
 
+<<<<<<< HEAD
+=======
+          {/* Documents */}
+          <Card className="shadow-card">
+            <CardHeader>
+              <CardTitle>Documents</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <Button variant="outline" className="w-full justify-start">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Insurance
+              </Button>
+              <Button variant="outline" className="w-full justify-start">
+                <Upload className="h-4 w-4 mr-2" />
+                Upload Registration
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Actions */}
+          <Card className="shadow-card">
+            <CardContent className="pt-6 space-y-3">
+              <Button 
+                className="w-full bg-gradient-primary hover:bg-primary-hover"
+                onClick={handleUpdateCar}
+                disabled={saving}
+              >
+                <Save className="h-4 w-4 mr-2" />
+                {saving ? "Saving..." : "Update Car"}
+              </Button>
+              <Button variant="outline" className="w-full">
+                Save as Draft
+              </Button>
+            </CardContent>
+          </Card>
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
         </div>
 
         {/* Images Upload */}

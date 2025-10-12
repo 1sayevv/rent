@@ -11,22 +11,32 @@ interface DataContextType {
   cars: Car[]
   setCars: (cars: Car[] | ((prev: Car[]) => Car[])) => void
   addCar: (car: Omit<Car, "id" | "createdAt" | "updatedAt">) => void
-  updateCar: (id: number, car: Partial<Car>) => void
-  deleteCar: (id: number) => void
+  updateCar: (id: string, car: Partial<Car>) => void
+  deleteCar: (id: string) => void
 
+<<<<<<< HEAD
+=======
+  // Clients
+  clients: Client[]
+  setClients: (clients: Client[] | ((prev: Client[]) => Client[])) => void
+  addClient: (client: Omit<Client, "id" | "createdAt" | "updatedAt">) => void
+  updateClient: (id: string, client: Partial<Client>) => void
+  deleteClient: (id: string) => void
+
+>>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
   // Bookings
   bookings: Booking[]
   setBookings: (bookings: Booking[] | ((prev: Booking[]) => Booking[])) => void
   addBooking: (booking: Omit<Booking, "id" | "createdAt" | "updatedAt">) => void
-  updateBooking: (id: number, booking: Partial<Booking>) => void
-  deleteBooking: (id: number) => void
+  updateBooking: (id: string, booking: Partial<Booking>) => void
+  deleteBooking: (id: string) => void
 
   // Financial Records
   financialRecords: FinancialRecord[]
   setFinancialRecords: (records: FinancialRecord[] | ((prev: FinancialRecord[]) => FinancialRecord[])) => void
   addFinancialRecord: (record: Omit<FinancialRecord, "id" | "createdAt">) => void
-  updateFinancialRecord: (id: number, record: Partial<FinancialRecord>) => void
-  deleteFinancialRecord: (id: number) => void
+  updateFinancialRecord: (id: string, record: Partial<FinancialRecord>) => void
+  deleteFinancialRecord: (id: string) => void
 
   // Settings
   settings: Settings
