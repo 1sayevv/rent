@@ -20,6 +20,7 @@ import ClientDetails from "./pages/ClientDetails";
 import Finances from "./pages/Finances";
 import Settings from "./pages/Settings";
 import DataManager from "./components/DataManager";
+import GoogleDriveTest from "./pages/GoogleDriveTest";
 import NotFound from "./pages/NotFound";
 import { useEffect } from "react";
 
@@ -63,6 +64,7 @@ const App = () => {
                       <Route path="/finances" element={<Finances />} />
                       <Route path="/settings" element={<Settings />} />
                       <Route path="/data" element={<DataManager />} />
+                      <Route path="/google-drive-test" element={<GoogleDriveTest />} />
                       
                       {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                       <Route path="*" element={<NotFound />} />
