@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { FinancialRecord, Booking } from '@/types'
+import { MonthlyExpense, Booking } from '@/types'
 
 export interface DashboardStats {
   totalRevenue: number
@@ -32,34 +32,35 @@ export interface PeriodRevenue {
 }
 
 export const financialApi = {
-  async getAll(): Promise<FinancialRecord[]> {
+  // Monthly Expenses Management
+  async getAllExpenses(): Promise<MonthlyExpense[]> {
     const { data, error } = await supabase
-      .from('financial_records')
+      .from('monthly_expenses')
       .select('*')
       .order('date', { ascending: false })
     
     if (error) throw error
     
-    return data.map(record => ({
-      id: record.id,
-      type: record.type,
-      category: record.category,
-      amount: record.amount,
-      description: record.description,
-      date: record.date,
-      createdAt: record.created_at
+    return data.map(expense => ({
+      id: expense.id,
+      name: expense.name,
+      amount: expense.amount,
+      date: expense.date,
+      description: expense.description,
+      isRecurring: expense.is_recurring,
+      createdAt: expense.created_at
     }))
   },
 
-  async create(record: Omit<FinancialRecord, 'id' | 'createdAt'>): Promise<FinancialRecord> {
+  async createExpense(expense: Omit<MonthlyExpense, 'id' | 'createdAt'>): Promise<MonthlyExpense> {
     const { data, error } = await supabase
-      .from('financial_records')
+      .from('monthly_expenses')
       .insert({
-        type: record.type,
-        category: record.category,
-        amount: record.amount,
-        description: record.description,
-        date: record.date
+        name: expense.name,
+        amount: expense.amount,
+        date: expense.date,
+        description: expense.description,
+        is_recurring: expense.isRecurring
       })
       .select()
       .single()
@@ -68,26 +69,26 @@ export const financialApi = {
     
     return {
       id: data.id,
-      type: data.type,
-      category: data.category,
+      name: data.name,
       amount: data.amount,
-      description: data.description,
       date: data.date,
+      description: data.description,
+      isRecurring: data.is_recurring,
       createdAt: data.created_at
     }
   },
 
-  async update(id: number, record: Partial<FinancialRecord>): Promise<FinancialRecord> {
+  async updateExpense(id: number, expense: Partial<MonthlyExpense>): Promise<MonthlyExpense> {
     const updateData: any = {}
     
-    if (record.type !== undefined) updateData.type = record.type
-    if (record.category !== undefined) updateData.category = record.category
-    if (record.amount !== undefined) updateData.amount = record.amount
-    if (record.description !== undefined) updateData.description = record.description
-    if (record.date !== undefined) updateData.date = record.date
+    if (expense.name !== undefined) updateData.name = expense.name
+    if (expense.amount !== undefined) updateData.amount = expense.amount
+    if (expense.date !== undefined) updateData.date = expense.date
+    if (expense.description !== undefined) updateData.description = expense.description
+    if (expense.isRecurring !== undefined) updateData.is_recurring = expense.isRecurring
     
     const { data, error } = await supabase
-      .from('financial_records')
+      .from('monthly_expenses')
       .update(updateData)
       .eq('id', id)
       .select()
@@ -97,22 +98,61 @@ export const financialApi = {
     
     return {
       id: data.id,
-      type: data.type,
-      category: data.category,
+      name: data.name,
       amount: data.amount,
-      description: data.description,
       date: data.date,
+      description: data.description,
+      isRecurring: data.is_recurring,
       createdAt: data.created_at
     }
   },
 
-  async delete(id: number): Promise<void> {
+  async deleteExpense(id: number): Promise<void> {
     const { error } = await supabase
-      .from('financial_records')
+      .from('monthly_expenses')
       .delete()
       .eq('id', id)
     
     if (error) throw error
+  },
+
+  async getExpensesByMonth(year: number, month: number): Promise<MonthlyExpense[]> {
+    const startDate = `${year}-${month.toString().padStart(2, '0')}-01`
+    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`
+    
+    const { data, error } = await supabase
+      .from('monthly_expenses')
+      .select('*')
+      .gte('date', startDate)
+      .lte('date', endDate)
+      .order('date', { ascending: false })
+    
+    if (error) throw error
+    
+    return data.map(expense => ({
+      id: expense.id,
+      name: expense.name,
+      amount: expense.amount,
+      date: expense.date,
+      description: expense.description,
+      isRecurring: expense.is_recurring,
+      createdAt: expense.created_at
+    }))
+  },
+
+  async getTotalExpensesByMonth(year: number, month: number): Promise<number> {
+    const startDate = `${year}-${month.toString().padStart(2, '0')}-01`
+    const endDate = `${year}-${month.toString().padStart(2, '0')}-31`
+    
+    const { data, error } = await supabase
+      .from('monthly_expenses')
+      .select('amount')
+      .gte('date', startDate)
+      .lte('date', endDate)
+    
+    if (error) throw error
+    
+    return data.reduce((sum, expense) => sum + expense.amount, 0)
   },
 
   // Dashboard Analytics
@@ -144,25 +184,40 @@ export const financialApi = {
   },
 
   async getCarPerformance(startDate: string, endDate: string): Promise<CarPerformance[]> {
-    const { data, error } = await supabase
+    const { data: bookings, error: bookingsError } = await supabase
       .from('bookings')
       .select('*')
       .gte('start_date', startDate)
       .lte('end_date', endDate)
     
-    if (error) throw error
+    if (bookingsError) throw bookingsError
 
-    const bookings = data || []
+    // Get cars data to map car names
+    const { data: cars, error: carsError } = await supabase
+      .from('cars')
+      .select('id, brand, model')
+    
+    if (carsError) throw carsError
+
+    const carsMap = new Map<number, {brand: string, model: string}>()
+    cars?.forEach(car => {
+      carsMap.set(car.id, { brand: car.brand, model: car.model })
+    })
+
+    const bookingsData = bookings || []
     
     // Group by car
     const carMap = new Map<number, CarPerformance>()
     
-    bookings.forEach(booking => {
+    bookingsData.forEach(booking => {
       const carId = booking.car_id
+      const carInfo = carsMap.get(carId)
+      const carName = carInfo ? `${carInfo.brand} ${carInfo.model}` : 'Unknown Car'
+      
       if (!carMap.has(carId)) {
         carMap.set(carId, {
           carId,
-          carName: booking.car_name,
+          carName,
           totalDays: 0,
           bookingCount: 0,
           totalRevenue: 0,
@@ -262,4 +317,3 @@ export const financialApi = {
     return Array.from(dayMap.values()).sort((a, b) => a.period.localeCompare(b.period))
   }
 }
-

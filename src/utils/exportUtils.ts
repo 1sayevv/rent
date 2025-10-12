@@ -306,7 +306,7 @@ export const prepareFinancialData = (
     return {
       id: booking.id,
       client: client?.name || 'Unknown Client',
-      car: car?.name || 'Unknown Car',
+      car: car ? `${car.brand} ${car.model}` : 'Unknown Car',
       amount: booking.totalPrice,
       date: new Date(booking.createdAt).toLocaleDateString('en-US'),
       method: 'Card', // Can add field to Booking type
@@ -327,7 +327,7 @@ export const prepareFinancialData = (
       return {
         id: booking.id,
         client: client?.name || 'Unknown Client',
-        car: car?.name || 'Unknown Car',
+        car: car ? `${car.brand} ${car.model}` : 'Unknown Car',
         amount: booking.totalPrice,
         dueDate: dueDate.toLocaleDateString('en-US'),
         daysOverdue: Math.max(0, daysOverdue)

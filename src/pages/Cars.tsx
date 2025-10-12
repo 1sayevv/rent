@@ -25,7 +25,6 @@ export default function Cars() {
   const { cars, deleteCar } = useData();
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
   const getStatusBadge = (status: string) => {
@@ -41,33 +40,21 @@ export default function Cars() {
     }
   };
 
-  const getCategoryBadge = (category: string) => {
-    switch (category) {
-      case "Economy":
-        return <Badge variant="outline" className="text-muted-foreground">Economy</Badge>;
-      case "Business":
-        return <Badge variant="outline" className="text-primary border-primary">Business</Badge>;
-      case "Premium":
-        return <Badge variant="outline" className="text-revenue border-revenue">Premium</Badge>;
-      case "SUV":
-        return <Badge variant="outline" className="text-success border-success">SUV</Badge>;
-      default:
-        return <Badge variant="outline">{category}</Badge>;
-    }
-  };
 
   const filteredCars = cars.filter((car) => {
-    const matchesSearch = car.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         car.model.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = categoryFilter === "all" || car.category === categoryFilter;
-    const matchesStatus = statusFilter === "all" || car.status === statusFilter;
+    const matchesSearch = car.brand?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         car.model?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         car.plateNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || 
+                         (statusFilter === "available" && car.isAvailable) ||
+                         (statusFilter === "rented" && !car.isAvailable);
     
-    return matchesSearch && matchesCategory && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
-  const availableCars = cars.filter(car => car.status === "available").length;
-  const rentedCars = cars.filter(car => car.status === "rented").length;
-  const maintenanceCars = cars.filter(car => car.status === "maintenance").length;
+  const availableCars = cars.filter(car => car.isAvailable).length;
+  const rentedCars = cars.filter(car => !car.isAvailable).length;
+  const maintenanceCars = 0; // Not tracked in new schema
 
   return (
     <div className="space-y-6">
@@ -156,18 +143,6 @@ export default function Cars() {
                 className="pl-10"
               />
             </div>
-            <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Categories</SelectItem>
-                <SelectItem value="Economy">Economy</SelectItem>
-                <SelectItem value="Business">Business</SelectItem>
-                <SelectItem value="Premium">Premium</SelectItem>
-                <SelectItem value="SUV">SUV</SelectItem>
-              </SelectContent>
-            </Select>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="Status" />
@@ -176,7 +151,6 @@ export default function Cars() {
                 <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="available">Available</SelectItem>
                 <SelectItem value="rented">Rented</SelectItem>
-                <SelectItem value="maintenance">Maintenance</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -188,63 +162,52 @@ export default function Cars() {
         {filteredCars.map((car) => (
           <Card key={car.id} className="shadow-card hover:shadow-elevated transition-smooth overflow-hidden">
             <div className="aspect-video bg-muted relative">
-              {car.image && car.image !== "/placeholder.svg" ? (
+              {car.imageUrl && car.imageUrl !== "/placeholder.svg" ? (
                 <img 
-                  src={car.image} 
-                  alt={car.name}
+                  src={car.imageUrl} 
+                  alt={`${car.brand} ${car.model}`}
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    console.log('Image load error for:', car.image);
-                    // Alternatif URL dene
-                    const fileId = car.image.match(/[?&]id=([^&]+)/)?.[1];
-                    if (fileId) {
-                      e.currentTarget.src = `https://lh3.googleusercontent.com/d/${fileId}`;
-                    } else {
-                      e.currentTarget.src = "/placeholder.svg";
-                    }
+                    e.currentTarget.src = "/placeholder.svg";
                   }}
                 />
               ) : (
                 <div className="w-full h-full flex items-center justify-center bg-gray-100">
                   <div className="text-center text-gray-500">
                     <Car className="h-8 w-8 mx-auto mb-1" />
-                    <p className="text-xs">Fotoğraf yok</p>
+                    <p className="text-xs">No image</p>
                   </div>
                 </div>
               )}
               <div className="absolute top-3 right-3">
-                {getStatusBadge(car.status)}
-              </div>
-              <div className="absolute top-3 left-3">
-                {getCategoryBadge(car.category)}
+                {getStatusBadge(car.isAvailable ? "available" : "rented")}
               </div>
             </div>
             
             <CardContent className="p-4">
               <div className="space-y-3">
                 <div>
-                  <h3 className="font-semibold text-lg">{car.name}</h3>
-                  <p className="text-sm text-muted-foreground">{car.model} {car.year}</p>
+                  <h3 className="font-semibold text-lg">{car.brand}</h3>
+                  <p className="text-sm text-muted-foreground">{car.model} • {car.year}</p>
                 </div>
 
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Fuel className="h-4 w-4" />
-                    {car.fuelType}
+                    <Car className="h-4 w-4" />
+                    {car.plateNumber || 'N/A'}
                   </div>
                   <div className="flex items-center gap-1">
-                    <Users className="h-4 w-4" />
-                    {car.seats} seats
+                    {car.color || 'N/A'}
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-lg font-bold text-primary">{car.pricePerDay}₼</p>
+                    <p className="text-lg font-bold text-primary">{car.dailyRate}₼</p>
                     <p className="text-xs text-muted-foreground">per day</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm text-muted-foreground">{car.mileage.toLocaleString()} km</p>
+                    <p className="text-sm text-muted-foreground">Owner: {car.ownerRate}₼</p>
                   </div>
                 </div>
 

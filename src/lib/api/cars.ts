@@ -3,27 +3,38 @@ import { Car } from '@/types'
 
 export const carsApi = {
   async getAll(): Promise<Car[]> {
+    // Check auth
+    const { data: { session } } = await supabase.auth.getSession()
+    console.log('Current session:', session ? 'Logged in' : 'Not logged in', session?.user?.email)
+    
     const { data, error } = await supabase
       .from('cars')
       .select('*')
       .order('created_at', { ascending: false })
     
-    if (error) throw error
+    if (error) {
+      console.error('Supabase cars error:', error)
+      console.error('Error details:', JSON.stringify(error, null, 2))
+      throw error
+    }
+    
+    console.log('Cars data from Supabase:', data ? `${data.length} cars found` : 'No data')
+    
+    if (!data) return []
     
     return data.map(car => ({
       id: car.id,
-      name: car.name,
+      brand: car.brand,
       model: car.model,
       year: car.year,
-      category: car.category,
-      pricePerDay: car.price_per_day,
-      fuelType: car.fuel_type,
-      transmission: car.transmission,
-      seats: car.seats,
-      status: car.status,
+      color: car.color,
+      plateNumber: car.plate_number,
+      dailyRate: car.daily_rate,
+      ownerRate: car.owner_rate,
+      insurancePrice: car.insurance_price,
+      isAvailable: car.is_available,
       description: car.description,
-      image: car.image,
-      images: car.images,
+      imageUrl: car.image_url,
       createdAt: car.created_at,
       updatedAt: car.updated_at
     }))
@@ -40,18 +51,17 @@ export const carsApi = {
     
     return {
       id: data.id,
-      name: data.name,
+      brand: data.brand,
       model: data.model,
       year: data.year,
-      category: data.category,
-      pricePerDay: data.price_per_day,
-      fuelType: data.fuel_type,
-      transmission: data.transmission,
-      seats: data.seats,
-      status: data.status,
+      color: data.color,
+      plateNumber: data.plate_number,
+      dailyRate: data.daily_rate,
+      ownerRate: data.owner_rate,
+      insurancePrice: data.insurance_price,
+      isAvailable: data.is_available,
       description: data.description,
-      image: data.image,
-      images: data.images,
+      imageUrl: data.image_url,
       createdAt: data.created_at,
       updatedAt: data.updated_at
     }
@@ -61,18 +71,17 @@ export const carsApi = {
     const { data, error } = await supabase
       .from('cars')
       .insert({
-        name: car.name,
+        brand: car.brand,
         model: car.model,
         year: car.year,
-        category: car.category,
-        price_per_day: car.pricePerDay,
-        fuel_type: car.fuelType,
-        transmission: car.transmission,
-        seats: car.seats,
-        status: car.status,
+        color: car.color,
+        plate_number: car.plateNumber,
+        daily_rate: car.dailyRate,
+        owner_rate: car.ownerRate,
+        insurance_price: car.insurancePrice,
+        is_available: car.isAvailable,
         description: car.description,
-        image: car.image,
-        images: car.images
+        image_url: car.imageUrl
       })
       .select()
       .single()
@@ -81,18 +90,17 @@ export const carsApi = {
     
     return {
       id: data.id,
-      name: data.name,
+      brand: data.brand,
       model: data.model,
       year: data.year,
-      category: data.category,
-      pricePerDay: data.price_per_day,
-      fuelType: data.fuel_type,
-      transmission: data.transmission,
-      seats: data.seats,
-      status: data.status,
+      color: data.color,
+      plateNumber: data.plate_number,
+      dailyRate: data.daily_rate,
+      ownerRate: data.owner_rate,
+      insurancePrice: data.insurance_price,
+      isAvailable: data.is_available,
       description: data.description,
-      image: data.image,
-      images: data.images,
+      imageUrl: data.image_url,
       createdAt: data.created_at,
       updatedAt: data.updated_at
     }
@@ -101,18 +109,17 @@ export const carsApi = {
   async update(id: number, car: Partial<Car>): Promise<Car> {
     const updateData: any = {}
     
-    if (car.name !== undefined) updateData.name = car.name
+    if (car.brand !== undefined) updateData.brand = car.brand
     if (car.model !== undefined) updateData.model = car.model
     if (car.year !== undefined) updateData.year = car.year
-    if (car.category !== undefined) updateData.category = car.category
-    if (car.pricePerDay !== undefined) updateData.price_per_day = car.pricePerDay
-    if (car.fuelType !== undefined) updateData.fuel_type = car.fuelType
-    if (car.transmission !== undefined) updateData.transmission = car.transmission
-    if (car.seats !== undefined) updateData.seats = car.seats
-    if (car.status !== undefined) updateData.status = car.status
+    if (car.color !== undefined) updateData.color = car.color
+    if (car.plateNumber !== undefined) updateData.plate_number = car.plateNumber
+    if (car.dailyRate !== undefined) updateData.daily_rate = car.dailyRate
+    if (car.ownerRate !== undefined) updateData.owner_rate = car.ownerRate
+    if (car.insurancePrice !== undefined) updateData.insurance_price = car.insurancePrice
+    if (car.isAvailable !== undefined) updateData.is_available = car.isAvailable
     if (car.description !== undefined) updateData.description = car.description
-    if (car.image !== undefined) updateData.image = car.image
-    if (car.images !== undefined) updateData.images = car.images
+    if (car.imageUrl !== undefined) updateData.image_url = car.imageUrl
     
     const { data, error } = await supabase
       .from('cars')
@@ -125,18 +132,17 @@ export const carsApi = {
     
     return {
       id: data.id,
-      name: data.name,
+      brand: data.brand,
       model: data.model,
       year: data.year,
-      category: data.category,
-      pricePerDay: data.price_per_day,
-      fuelType: data.fuel_type,
-      transmission: data.transmission,
-      seats: data.seats,
-      status: data.status,
+      color: data.color,
+      plateNumber: data.plate_number,
+      dailyRate: data.daily_rate,
+      ownerRate: data.owner_rate,
+      insurancePrice: data.insurance_price,
+      isAvailable: data.is_available,
       description: data.description,
-      image: data.image,
-      images: data.images,
+      imageUrl: data.image_url,
       createdAt: data.created_at,
       updatedAt: data.updated_at
     }

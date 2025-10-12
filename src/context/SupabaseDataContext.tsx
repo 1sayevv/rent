@@ -1,47 +1,31 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from "react"
+import React, { createContext, useContext, ReactNode } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Car, Booking, FinancialRecord, Settings } from "@/types"
+import { Car, Booking, MonthlyExpense } from "@/types"
 import { carsApi } from "@/lib/api/cars"
 import { bookingsApi } from "@/lib/api/bookings"
 import { financialApi } from "@/lib/api/financial"
-import { settingsApi } from "@/lib/api/settings"
 
 interface DataContextType {
   // Cars
   cars: Car[]
   setCars: (cars: Car[] | ((prev: Car[]) => Car[])) => void
   addCar: (car: Omit<Car, "id" | "createdAt" | "updatedAt">) => void
-  updateCar: (id: string, car: Partial<Car>) => void
-  deleteCar: (id: string) => void
+  updateCar: (id: number, car: Partial<Car>) => void
+  deleteCar: (id: number) => void
 
-<<<<<<< HEAD
-=======
-  // Clients
-  clients: Client[]
-  setClients: (clients: Client[] | ((prev: Client[]) => Client[])) => void
-  addClient: (client: Omit<Client, "id" | "createdAt" | "updatedAt">) => void
-  updateClient: (id: string, client: Partial<Client>) => void
-  deleteClient: (id: string) => void
-
->>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
   // Bookings
   bookings: Booking[]
   setBookings: (bookings: Booking[] | ((prev: Booking[]) => Booking[])) => void
   addBooking: (booking: Omit<Booking, "id" | "createdAt" | "updatedAt">) => void
-  updateBooking: (id: string, booking: Partial<Booking>) => void
-  deleteBooking: (id: string) => void
+  updateBooking: (id: number, booking: Partial<Booking>) => void
+  deleteBooking: (id: number) => void
 
-  // Financial Records
-  financialRecords: FinancialRecord[]
-  setFinancialRecords: (records: FinancialRecord[] | ((prev: FinancialRecord[]) => FinancialRecord[])) => void
-  addFinancialRecord: (record: Omit<FinancialRecord, "id" | "createdAt">) => void
-  updateFinancialRecord: (id: string, record: Partial<FinancialRecord>) => void
-  deleteFinancialRecord: (id: string) => void
-
-  // Settings
-  settings: Settings
-  setSettings: (settings: Settings | ((prev: Settings) => Settings)) => void
-  updateSettings: (settings: Partial<Settings>) => void
+  // Monthly Expenses
+  monthlyExpenses: MonthlyExpense[]
+  setMonthlyExpenses: (expenses: MonthlyExpense[] | ((prev: MonthlyExpense[]) => MonthlyExpense[])) => void
+  addMonthlyExpense: (expense: Omit<MonthlyExpense, "id" | "createdAt">) => void
+  updateMonthlyExpense: (id: number, expense: Partial<MonthlyExpense>) => void
+  deleteMonthlyExpense: (id: number) => void
 
   // Loading states
   isLoading: boolean
@@ -49,21 +33,6 @@ interface DataContextType {
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined)
-
-const defaultSettings: Settings = {
-  companyName: "Auto Manage Suite",
-  companyEmail: "info@automanage.az",
-  companyPhone: "+994 12 345 67 89",
-  companyAddress: "Baku, Azerbaijan",
-  currency: "?",
-  timezone: "Asia/Baku",
-  language: "ru",
-  notifications: {
-    email: true,
-    sms: false,
-    push: true
-  }
-}
 
 export const SupabaseDataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const queryClient = useQueryClient()
@@ -122,76 +91,81 @@ export const SupabaseDataProvider: React.FC<{ children: ReactNode }> = ({ childr
     }
   })
 
-  // Financial Records
-  const { data: financialRecords = [], isLoading: financialLoading, error: financialError } = useQuery({
-    queryKey: ["financial"],
-    queryFn: financialApi.getAll
+  // Monthly Expenses
+  const { data: monthlyExpenses = [], isLoading: expensesLoading, error: expensesError } = useQuery({
+    queryKey: ["monthlyExpenses"],
+    queryFn: financialApi.getAllExpenses
   })
   
-  const addFinancialMutation = useMutation({
-    mutationFn: financialApi.create,
+  const addMonthlyExpenseMutation = useMutation({
+    mutationFn: financialApi.createExpense,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial"] })
+      queryClient.invalidateQueries({ queryKey: ["monthlyExpenses"] })
     }
   })
   
-  const updateFinancialMutation = useMutation({
-    mutationFn: ({ id, record }: { id: number; record: Partial<FinancialRecord> }) => financialApi.update(id, record),
+  const updateMonthlyExpenseMutation = useMutation({
+    mutationFn: ({ id, expense }: { id: number; expense: Partial<MonthlyExpense> }) => financialApi.updateExpense(id, expense),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial"] })
+      queryClient.invalidateQueries({ queryKey: ["monthlyExpenses"] })
     }
   })
   
-  const deleteFinancialMutation = useMutation({
-    mutationFn: financialApi.delete,
+  const deleteMonthlyExpenseMutation = useMutation({
+    mutationFn: financialApi.deleteExpense,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["financial"] })
-    }
-  })
-
-  // Settings
-  const { data: settings = defaultSettings, isLoading: settingsLoading, error: settingsError } = useQuery({
-    queryKey: ["settings"],
-    queryFn: settingsApi.get,
-    retry: false
-  })
-  
-  const updateSettingsMutation = useMutation({
-    mutationFn: settingsApi.update,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["settings"] })
+      queryClient.invalidateQueries({ queryKey: ["monthlyExpenses"] })
     }
   })
 
-  const isLoading = carsLoading || bookingsLoading || financialLoading || settingsLoading
-  const error = carsError || bookingsError || financialError || settingsError
+  const isLoading = carsLoading || bookingsLoading || expensesLoading
+  const error = carsError || bookingsError || expensesError
 
   const value: DataContextType = {
     // Cars
     cars,
-    setCars: () => {}, // Not used with Supabase
-    addCar: (car) => addCarMutation.mutate(car),
-    updateCar: (id, car) => updateCarMutation.mutate({ id, car }),
-    deleteCar: (id) => deleteCarMutation.mutate(id),
+    setCars: () => {
+      // Not used with Supabase - read only from backend
+    },
+    addCar: (car: Omit<Car, "id" | "createdAt" | "updatedAt">) => {
+      addCarMutation.mutate(car)
+    },
+    updateCar: (id: number, car: Partial<Car>) => {
+      updateCarMutation.mutate({ id, car })
+    },
+    deleteCar: (id: number) => {
+      deleteCarMutation.mutate(id)
+    },
 
     // Bookings
     bookings,
-    setBookings: () => {}, // Not used with Supabase
-    addBooking: (booking) => addBookingMutation.mutate(booking),
-    updateBooking: (id, booking) => updateBookingMutation.mutate({ id, booking }),
-    deleteBooking: (id) => deleteBookingMutation.mutate(id),
+    setBookings: () => {
+      // Not used with Supabase - read only from backend
+    },
+    addBooking: (booking: Omit<Booking, "id" | "createdAt" | "updatedAt">) => {
+      addBookingMutation.mutate(booking)
+    },
+    updateBooking: (id: number, booking: Partial<Booking>) => {
+      updateBookingMutation.mutate({ id, booking })
+    },
+    deleteBooking: (id: number) => {
+      deleteBookingMutation.mutate(id)
+    },
 
-    // Financial Records
-    financialRecords,
-    setFinancialRecords: () => {}, // Not used with Supabase
-    addFinancialRecord: (record) => addFinancialMutation.mutate(record),
-    updateFinancialRecord: (id, record) => updateFinancialMutation.mutate({ id, record }),
-    deleteFinancialRecord: (id) => deleteFinancialMutation.mutate(id),
-
-    // Settings
-    settings,
-    setSettings: () => {}, // Not used with Supabase
-    updateSettings: (settings) => updateSettingsMutation.mutate(settings),
+    // Monthly Expenses
+    monthlyExpenses,
+    setMonthlyExpenses: () => {
+      // Not used with Supabase - read only from backend
+    },
+    addMonthlyExpense: (expense: Omit<MonthlyExpense, "id" | "createdAt">) => {
+      addMonthlyExpenseMutation.mutate(expense)
+    },
+    updateMonthlyExpense: (id: number, expense: Partial<MonthlyExpense>) => {
+      updateMonthlyExpenseMutation.mutate({ id, expense })
+    },
+    deleteMonthlyExpense: (id: number) => {
+      deleteMonthlyExpenseMutation.mutate(id)
+    },
 
     // Loading states
     isLoading,

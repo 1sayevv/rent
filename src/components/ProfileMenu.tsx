@@ -13,7 +13,6 @@ import {
 import { 
   User, 
   LogOut, 
-  Settings, 
   Clock,
   ChevronDown,
   Shield
@@ -116,15 +115,6 @@ export default function ProfileMenu() {
             )}
           </div>
         </DropdownMenuLabel>
-        
-        <DropdownMenuSeparator />
-        
-        {hasPermission('settings', 'view') && (
-          <DropdownMenuItem onClick={() => navigate('/settings')}>
-            <Settings className="mr-2 h-4 w-4" />
-            <span>Settings</span>
-          </DropdownMenuItem>
-        )}
         
         <DropdownMenuSeparator />
         

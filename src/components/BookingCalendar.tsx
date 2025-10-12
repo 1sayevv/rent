@@ -234,7 +234,7 @@ export function BookingCalendar({
                         >
                           <div className="flex items-center gap-1">
                             <Car className="h-3 w-3" />
-                            <span className="truncate">{car?.name || 'Unknown Car'}</span>
+                            <span className="truncate">{car ? `${car.brand} ${car.model}` : 'Unknown Car'}</span>
                           </div>
                         </div>
                       );
@@ -269,7 +269,10 @@ export function BookingCalendar({
                   <div className="flex items-center gap-2">
                     <Car className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">Car:</span>
-                    <span>{cars.find(c => c.id === selectedBooking.carId)?.name || 'Unknown Car'}</span>
+                    <span>{(() => {
+                      const car = cars.find(c => c.id === selectedBooking.carId);
+                      return car ? `${car.brand} ${car.model}` : 'Unknown Car';
+                    })()}</span>
                   </div>
                   
                   <div className="flex items-center gap-2">

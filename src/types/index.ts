@@ -1,23 +1,21 @@
 // Types for cars
 export interface Car {
-  id: string; // Изменено с number на string для UUID
-  name: string;
+  id: number;
+  brand: string;
   model: string;
-  year: string;
-  category: string;
-  pricePerDay: number;
-  fuelType: string;
-  transmission: string;
-  seats: number;
-  status: 'available' | 'rented' | 'maintenance' | 'unavailable';
+  year: number;
+  color: string;
+  plateNumber: string;
+  dailyRate: number;
+  ownerRate: number;
+  insurancePrice: number;
+  isAvailable: boolean;
   description?: string;
-  image: string;
-  images?: string[];
+  imageUrl?: string;
   createdAt: string;
   updatedAt: string;
 }
 
-<<<<<<< HEAD
 // Types for bookings
 export interface Booking {
   id: number;
@@ -31,35 +29,6 @@ export interface Booking {
   carName: string;
   
   // Rental Dates
-=======
-// Types for clients
-export interface Client {
-  id: string; // Изменено с number на string для UUID
-  name: string;
-  email: string;
-  phone: string;
-  totalBookings: number;
-  totalSpent: number;
-  status: 'vip' | 'regular' | 'new';
-  joinDate: string;
-  lastBooking: string;
-  avatar: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-// Types for bookings
-export interface Booking {
-  id: string; // Изменено с number на string для UUID
-  clientId: string; // Изменено с number на string для UUID
-  client: {
-    name: string;
-    phone: string;
-    email: string;
-  };
-  carId: string; // Изменено с number на string для UUID
-  car: string;
->>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
   startDate: string;
   endDate: string;
   rentalDays: number;
@@ -88,38 +57,22 @@ export interface Booking {
   updatedAt: string;
 }
 
-// Types for finances
-export interface FinancialRecord {
-  id: string; // Изменено с number на string для UUID
-  type: 'income' | 'expense';
-  category: string;
+// Types for monthly expenses
+export interface MonthlyExpense {
+  id: number;
+  name: string;
   amount: number;
-  description: string;
   date: string;
+  description?: string;
+  isRecurring: boolean;
   createdAt: string;
-}
-
-// Types for settings
-export interface Settings {
-  companyName: string;
-  companyEmail: string;
-  companyPhone: string;
-  companyAddress: string;
-  currency: string;
-  timezone: string;
-  language: string;
-  notifications: {
-    email: boolean;
-    sms: boolean;
-    push: boolean;
-  };
 }
 
 // Types for users and roles
 export type UserRole = 'admin' | 'manager';
 
 export interface User {
-  id: string; // Изменено с number на string для UUID
+  id: string;
   email: string;
   role: UserRole;
   name: string;
@@ -135,4 +88,4 @@ export interface Permission {
 export interface RolePermissions {
   admin: Permission[];
   manager: Permission[];
-} 
+}

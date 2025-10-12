@@ -3,36 +3,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
   ArrowLeft,
   Save,
   DollarSign,
   Calendar,
-  FileText,
-  Building,
-  Car,
-  Phone,
-  Zap,
-  TrendingUp
+  FileText
 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
-
-const expenseCategories = [
-  { value: "office_rent", label: "Office Rent", icon: Building },
-  { value: "utilities", label: "Utilities (Electricity, Water)", icon: Zap },
-  { value: "internet", label: "Internet & Phone", icon: Phone },
-  { value: "car_maintenance", label: "Car Maintenance", icon: Car },
-  { value: "insurance", label: "Insurance", icon: FileText },
-  { value: "marketing", label: "Marketing & Advertising", icon: TrendingUp },
-  { value: "other", label: "Other", icon: FileText },
-];
+import { useData } from "@/context/SupabaseDataContext";
 
 export default function AddExpense() {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { addMonthlyExpense } = useData();
   
   const [formData, setFormData] = useState({
     name: "",
@@ -46,7 +32,7 @@ export default function AddExpense() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSaveExpense = () => {
+  const handleSaveExpense = async () => {
     if (!formData.name || !formData.amount || !formData.date) {
       toast({
         title: "Error",
@@ -56,21 +42,28 @@ export default function AddExpense() {
       return;
     }
 
-    // Here you would normally save to database
-    // For now, we'll just show success and navigate back
-    console.log('Expense data:', formData);
-    
-    toast({
-      title: "Success",
-      description: "Expense created successfully"
-    });
+    try {
+      await addMonthlyExpense({
+        name: formData.name,
+        amount: parseFloat(formData.amount),
+        date: formData.date,
+        description: formData.description,
+        isRecurring: formData.isRecurring
+      });
+      
+      toast({
+        title: "Success",
+        description: "Expense created successfully"
+      });
 
-    navigate("/finances");
-  };
-
-  const getCategoryIcon = (categoryValue: string) => {
-    const category = expenseCategories.find(cat => cat.value === categoryValue);
-    return category ? category.icon : FileText;
+      navigate("/finances");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to create expense",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
@@ -110,7 +103,6 @@ export default function AddExpense() {
                   onChange={(e) => handleInputChange("name", e.target.value)}
                 />
               </div>
-
 
               <div>
                 <Label htmlFor="amount">Amount (₼) *</Label>
@@ -183,15 +175,12 @@ export default function AddExpense() {
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-                  {formData.category && (() => {
-                    const Icon = getCategoryIcon(formData.category);
-                    return <Icon className="h-5 w-5 text-primary" />;
-                  })()}
+                  <FileText className="h-5 w-5 text-primary" />
                 </div>
                 <div className="flex-1">
                   <p className="font-medium">{formData.name || "Expense Name"}</p>
                   <p className="text-sm text-muted-foreground">
-                    {formData.category ? expenseCategories.find(cat => cat.value === formData.category)?.label : "Category"}
+                    Monthly Expense
                     {formData.isRecurring && (
                       <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded">Recurring</span>
                     )}

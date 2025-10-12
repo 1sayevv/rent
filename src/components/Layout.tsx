@@ -20,17 +20,6 @@ export function Layout({ children }: LayoutProps) {
         
         <div className="flex-1 flex flex-col">
           {/* Header */}
-<<<<<<< HEAD
-          <header className="h-16 border-b bg-white/50 backdrop-blur-sm px-6 flex items-center justify-between shadow-sm">
-            <div className="flex items-center space-x-4">
-              <SidebarTrigger className="text-foreground hover:bg-sidebar-accent hover:text-primary transition-all duration-200" />
-              <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Araç, müşteri ara..." 
-                  className="pl-10 w-80 bg-background border-border focus:border-primary transition-colors"
-                />
-=======
           <header className="h-14 sm:h-16 border-b border-gray-200 bg-white px-4 sm:px-6 flex items-center justify-between shadow-sm">
             <div className="flex items-center space-x-2 sm:space-x-4">
               {/* Mobile menu trigger */}
@@ -55,7 +44,6 @@ export function Layout({ children }: LayoutProps) {
               {/* Search bar */}
               <div className="flex-1 max-w-md">
                 <SearchBar />
->>>>>>> 48d795e0adec41c2ce40d0d904987dab7adb8a3d
               </div>
             </div>
             

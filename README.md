@@ -1,124 +1,252 @@
-# Auto Manage Suite
+# RentLease - Car Rental Management System
 
-Car rental management system with all data stored in browser localStorage.
+A modern, full-stack car rental management application built with React, TypeScript, and Supabase.
 
-## Features
+## 🚀 Features
 
-- **Authentication System**: Secure login for administrators with separate login page
-- **Complete localStorage Storage**: All data (cars, clients, bookings, finances, settings) automatically saved in browser localStorage
-- **Data Export/Import**: Ability to export all data to JSON file and import from backup
-- **Car Management**: Add, edit, delete cars
-- **Client Management**: Client database with booking history
-- **Booking System**: Create and manage bookings with various statuses
-- **Financial Accounting**: Track income and expenses
-- **System Settings**: Company configuration and system parameters
+### Core Functionality
+- **Car Management**: Add, edit, and manage your fleet of rental cars
+- **Booking System**: Complete booking management with customer details
+- **Financial Tracking**: Track revenue, expenses, and calculate net profit
+- **Dashboard Analytics**: Comprehensive financial and performance analytics
+- **User Management**: Role-based access (Admin/Manager)
 
-## Data Structure
+### Key Components
+- **Modern UI**: Beautiful, responsive design with Tailwind CSS
+- **Real-time Data**: Supabase integration for live data updates
+- **Financial Analytics**: Detailed revenue and expense tracking
+- **Booking Management**: Complete customer and rental information
+- **Image Management**: Google Drive integration for car photos
 
-### Cars
-- Basic information (name, model, year)
-- Technical specifications (fuel, transmission, mileage)
-- Pricing (daily, weekly, monthly rates)
-- Status (available, rented, under maintenance)
-- Images
+## 🛠️ Tech Stack
 
-### Clients
-- Contact information (name, email, phone)
-- Statistics (number of bookings, total amount)
-- Status (VIP, regular, new)
-- Activity history
+- **Frontend**: React 18, TypeScript, Tailwind CSS
+- **Backend**: Supabase (PostgreSQL, Auth, Storage)
+- **State Management**: React Query (TanStack Query)
+- **UI Components**: Radix UI, Lucide React Icons
+- **Charts**: Recharts
+- **Date Handling**: date-fns
 
-### Bookings
-- Connection with client and car
-- Rental dates (start and end)
-- Pickup and return locations
-- Status (confirmed, pending, active, completed, cancelled)
-- Total cost
+## 📊 Database Schema
 
-### Financial Records
-- Type (income/expense)
-- Category
-- Amount
-- Description
-- Date
+### Cars Table
+```sql
+- id (SERIAL PRIMARY KEY)
+- brand (VARCHAR)
+- model (VARCHAR)
+- year (INTEGER)
+- color (VARCHAR)
+- plate_number (VARCHAR UNIQUE)
+- daily_rate (DECIMAL)
+- owner_rate (DECIMAL)
+- insurance_price (DECIMAL)
+- is_available (BOOLEAN)
+- description (TEXT)
+- image_url (TEXT)
+```
 
-### Settings
-- Company information
-- Currency and timezone
-- Interface language
-- Notification settings
+### Bookings Table
+```sql
+- id (SERIAL PRIMARY KEY)
+- customer_name (VARCHAR)
+- customer_country (VARCHAR)
+- customer_phone (VARCHAR)
+- car_id (INTEGER REFERENCES cars)
+- car_name (VARCHAR)
+- start_date (DATE)
+- end_date (DATE)
+- rental_days (INTEGER)
+- delivery_to_airport (BOOLEAN)
+- delivery_to_hotel (BOOLEAN)
+- delivery_location (VARCHAR)
+- full_insurance (BOOLEAN)
+- total_amount (DECIMAL)
+- daily_rate (DECIMAL)
+- owner_amount (DECIMAL)
+- my_income (DECIMAL)
+- pickup_location (VARCHAR)
+- return_location (VARCHAR)
+- notes (TEXT)
+- status (VARCHAR)
+```
 
-## localStorage Functions
+### Monthly Expenses Table
+```sql
+- id (SERIAL PRIMARY KEY)
+- name (VARCHAR)
+- amount (DECIMAL)
+- date (DATE)
+- description (TEXT)
+- is_recurring (BOOLEAN)
+```
 
-### Automatic Saving
-All data changes are automatically saved in browser localStorage:
-- `cars` - car data
-- `clients` - client data  
-- `bookings` - booking data
-- `financialRecords` - financial records
-- `settings` - system settings
+### Settings Table
+```sql
+- id (INTEGER PRIMARY KEY)
+- company_name (VARCHAR)
+- currency (VARCHAR)
+- timezone (VARCHAR)
+```
 
-### Data Export
-- Download all data to JSON file
-- Includes metadata (export date, version)
-- Used for backup
+## 🚀 Getting Started
 
-### Data Import
-- Load data from JSON file
-- Complete replacement of existing data
-- Restore from backup
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
+- Supabase account
 
-### Data Cleanup
-- Delete all data from localStorage
-- Action confirmation to prevent accidental loss
+### Installation
 
-## Installation and Setup
+1. **Clone the repository**
+   ```bash
+   git clone <repository-url>
+   cd rent
+   ```
 
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Environment Setup**
+   Create a `.env.local` file in the root directory:
+   ```env
+   VITE_SUPABASE_URL=your_supabase_url
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+
+4. **Database Setup**
+   - Run the SQL commands from `supabase-schema.sql` in your Supabase SQL editor
+   - This will create all necessary tables, indexes, and sample data
+
+5. **Start the development server**
+   ```bash
+   npm run dev
+   ```
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # Base UI components (Radix UI)
+│   ├── StatCard.tsx    # Dashboard statistics cards
+│   └── ...
+├── pages/              # Main application pages
+│   ├── Dashboard.tsx   # Analytics dashboard
+│   ├── Cars.tsx        # Car management
+│   ├── Bookings.tsx    # Booking management
+│   ├── Finances.tsx    # Financial overview
+│   └── ...
+├── lib/                # Utility libraries
+│   ├── api/            # API integration layers
+│   ├── supabase.ts     # Supabase client
+│   └── ...
+├── context/            # React contexts
+│   └── SupabaseDataContext.tsx
+├── hooks/              # Custom React hooks
+├── types/              # TypeScript type definitions
+└── ...
+```
+
+## 🔧 API Integration
+
+The application uses a clean API layer pattern:
+
+- **`carsApi`**: Car CRUD operations
+- **`bookingsApi`**: Booking management
+- **`financialApi`**: Expense management and analytics
+- **`settingsApi`**: Application settings
+
+## 📊 Financial Features
+
+### Revenue Tracking
+- Total revenue from bookings
+- My income vs owner income breakdown
+- Daily, monthly, and yearly analytics
+
+### Expense Management
+- Monthly expense tracking
+- Recurring expense support
+- Category-based expense organization
+
+### Profit Analysis
+- Net profit calculations
+- Profit margin analysis
+- Performance metrics by car
+
+## 🎨 UI/UX Features
+
+### Modern Design
+- Gradient color schemes
+- Smooth animations and transitions
+- Responsive layout for all devices
+- Dark/light theme support
+
+### Dashboard Analytics
+- Interactive charts (Line, Bar, Pie)
+- Real-time statistics
+- Performance metrics
+- Financial summaries
+
+## 🔐 Authentication & Security
+
+- Supabase Auth integration
+- Row Level Security (RLS) policies
+- Role-based access control
+- Secure API endpoints
+
+## 📱 Responsive Design
+
+- Mobile-first approach
+- Tablet and desktop optimized
+- Touch-friendly interfaces
+- Adaptive layouts
+
+## 🚀 Deployment
+
+### Build for Production
 ```bash
-# Install dependencies
-npm install
-
-# Run in development mode
-npm run dev
-
-# Build for production
 npm run build
 ```
 
-## Usage
+### Deploy to Vercel
+```bash
+npm install -g vercel
+vercel
+```
 
-1. **System Login**: Go to `/login` and enter administrator credentials
-2. **Add Car**: Go to "Cars" section → "Add Car"
-3. **Client Management**: "Clients" section for working with client database
-4. **Create Booking**: "Bookings" section for managing orders
-5. **Settings**: "Settings" section for system configuration
-6. **Data Management**: "Data" section for export/import
+### Deploy to Netlify
+```bash
+npm run build
+# Upload dist folder to Netlify
+```
 
-## Login Credentials
+## 🤝 Contributing
 
-- **Email**: admin@mail.com
-- **Password**: 1234
+1. Fork the repository
+2. Create a feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a Pull Request
 
-## Technical Details
+## 📄 License
 
-- **React 18** with TypeScript
-- **Vite** for building
-- **Tailwind CSS** for styling
-- **React Router** for navigation
-- **Context API** for state management
-- **localStorage API** for data storage
+This project is licensed under the MIT License.
 
-## Security
+## 🆘 Support
 
-⚠️ **Important**: Data is stored locally in the user's browser. Data may be lost when clearing cache or changing browsers. Regular data export is recommended for backup.
+For support and questions:
+- Create an issue in the repository
+- Check the documentation
+- Review the code comments
 
-## Browser Support
+## 🔄 Version History
 
-The system works in all modern browsers that support:
-- localStorage API
-- ES6+ syntax
-- CSS Grid and Flexbox
+- **v1.0.0**: Initial release with core functionality
+- **v1.1.0**: Added financial analytics and expense tracking
+- **v1.2.0**: Enhanced UI/UX and dashboard improvements
 
-## License
+---
 
-MIT License
+**Built with ❤️ using React, TypeScript, and Supabase**
