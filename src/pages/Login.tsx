@@ -12,12 +12,15 @@ import {
   Eye, 
   EyeOff, 
   Lock, 
-  Mail,
-  Shield,
-  User
+  Mail
 } from "lucide-react";
 
 const USER_CREDENTIALS = {
+  superadmin: {
+    email: "superadmin",
+    password: "super123",
+    name: "Super Administrator"
+  },
   admin: {
     email: "admin@mail.com",
     password: "1234",
@@ -38,7 +41,7 @@ export default function Login() {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // SessionStorage kullan - tarayıcı kapanana kadar kalır
+  // Use sessionStorage - persists until browser is closed
   const isAuthenticated = sessionStorage.getItem('isAuthenticated') === 'true';
   const userData = sessionStorage.getItem('userData');
 
@@ -54,11 +57,14 @@ export default function Login() {
     // Simulate delay for better UX
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Check credentials for both roles
+    // Check credentials for all roles
     let userRole: UserRole | null = null;
     let userName = "";
 
-    if (email === USER_CREDENTIALS.admin.email && password === USER_CREDENTIALS.admin.password) {
+    if (email === USER_CREDENTIALS.superadmin.email && password === USER_CREDENTIALS.superadmin.password) {
+      userRole = 'admin';
+      userName = USER_CREDENTIALS.superadmin.name;
+    } else if (email === USER_CREDENTIALS.admin.email && password === USER_CREDENTIALS.admin.password) {
       userRole = 'admin';
       userName = USER_CREDENTIALS.admin.name;
     } else if (email === USER_CREDENTIALS.manager.email && password === USER_CREDENTIALS.manager.password) {
@@ -129,14 +135,14 @@ export default function Login() {
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-sm font-medium">
-                  Email
+                  Username or Email
                 </Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     id="email"
-                    type="email"
-                    placeholder="admin@mail.com or manager@mail.com"
+                    type="text"
+                    placeholder="Enter your username or email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
@@ -184,26 +190,6 @@ export default function Login() {
                 {isLoading ? "Signing in..." : "Sign In"}
               </Button>
             </form>
-
-            {/* Test account information */}
-            <div className="mt-6 p-4 bg-muted/30 rounded-lg">
-              <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
-                <Shield className="h-4 w-4" />
-                Test Accounts:
-              </h4>
-              <div className="space-y-2 text-xs">
-                <div className="flex items-center gap-2">
-                  <User className="h-3 w-3 text-primary" />
-                  <span className="font-medium">Administrator:</span>
-                  <span className="text-muted-foreground">admin@mail.com / 1234</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <User className="h-3 w-3 text-primary" />
-                  <span className="font-medium">Manager:</span>
-                  <span className="text-muted-foreground">manager@mail.com / 1234</span>
-                </div>
-              </div>
-            </div>
           </CardContent>
         </Card>
 

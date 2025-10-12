@@ -128,7 +128,7 @@ export default function Dashboard() {
       setRecentBookings(allBookings.slice(0, 5));
 
     } catch (error) {
-      console.error('Veri yüklenirken hata:', error);
+      console.error('Error loading data:', error);
     } finally {
       setLoading(false);
     }
@@ -172,7 +172,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-lg">Yükleniyor...</div>
+        <div className="text-lg">Loading...</div>
       </div>
     );
   }
@@ -186,10 +186,10 @@ export default function Dashboard() {
             <h1 className="text-3xl font-bold text-black">
               Dashboard
             </h1>
-            <p className="text-black">Filo ve rezervasyonlara genel bakış</p>
+            <p className="text-black">Fleet and booking overview</p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Bugün</p>
+            <p className="text-sm text-muted-foreground">Today</p>
             <p className="text-lg font-semibold">{format(new Date(), 'dd.MM.yyyy')}</p>
           </div>
         </div>
@@ -197,33 +197,33 @@ export default function Dashboard() {
         {/* Stats Cards for manager */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
-            title="Aktif Rezervasyonlar"
+            title="Active Bookings"
             value={stats?.activeBookings || 0}
-            change={`${stats?.totalBookings || 0} toplam rezervasyon`}
+            change={`${stats?.totalBookings || 0} total bookings`}
             changeType="positive"
             icon={Calendar}
             variant="info"
           />
           <StatCard
-            title="Benim Kazancım"
+            title="My Income"
             value={`${(stats?.myIncome || 0).toFixed(2)}₼`}
-            change={`Ort: ${(stats?.averageBookingValue || 0).toFixed(2)}₼`}
+            change={`Avg: ${(stats?.averageBookingValue || 0).toFixed(2)}₼`}
             changeType="positive"
             icon={Wallet}
             variant="success"
           />
           <StatCard
-            title="Toplam Harcama"
+            title="Total Expenses"
             value={`${totalExpenses.toFixed(2)}₼`}
-            change={`${filteredExpenses.length} masraf`}
+            change={`${filteredExpenses.length} expenses`}
             changeType="negative"
             icon={TrendingDown}
             variant="destructive"
           />
           <StatCard
-            title="Net Kar"
+            title="Net Profit"
             value={`${netProfit.toFixed(2)}₼`}
-            change={netProfit >= 0 ? "Pozitif" : "Negatif"}
+            change={netProfit >= 0 ? "Positive" : "Negative"}
             changeType={netProfit >= 0 ? "positive" : "negative"}
             icon={netProfit >= 0 ? TrendingUp : Minus}
             variant={netProfit >= 0 ? "success" : "destructive"}
@@ -236,7 +236,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-black">
                 <CheckCircle className="h-5 w-5 text-success" />
-                Son Rezervasyonlar
+                Recent Bookings
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -260,7 +260,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-black">
                 <TrendingDown className="h-5 w-5 text-destructive" />
-                Aylık Harcamalar
+                Monthly Expenses
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -271,7 +271,7 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground">
                       {format(new Date(expense.date), 'dd.MM.yyyy')}
                       {expense.isRecurring && (
-                        <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded">Tekrarlanan</span>
+                        <span className="ml-2 text-xs bg-primary/10 text-primary px-2 py-1 rounded">Recurring</span>
                       )}
                     </p>
                   </div>
@@ -285,7 +285,7 @@ export default function Dashboard() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-black">
                 <Car className="h-5 w-5 text-primary" />
-                En İyi Performans Gösteren Araçlar
+                Top Performing Cars
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -293,7 +293,7 @@ export default function Dashboard() {
                 <div key={car.carId} className="flex items-center justify-between p-3 rounded-lg bg-muted/30">
                   <div>
                     <p className="text-sm font-medium">{car.carName}</p>
-                    <p className="text-xs text-muted-foreground">{car.totalDays} gün • {car.bookingCount} rezervasyon</p>
+                    <p className="text-xs text-muted-foreground">{car.totalDays} days • {car.bookingCount} bookings</p>
                   </div>
                   <div className="text-right">
                     <p className="text-sm font-medium text-revenue">{car.totalRevenue.toFixed(2)}₼</p>
@@ -313,25 +313,25 @@ export default function Dashboard() {
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-bold text-black">
-            Finansal Dashboard
+            Financial Dashboard
           </h1>
-          <p className="text-black">Detaylı gelir ve araç performans analizi</p>
+          <p className="text-black">Detailed revenue and car performance analysis</p>
         </div>
         <div className="flex items-center gap-4">
           <Select value={period} onValueChange={(value) => setPeriod(value as PeriodType)}>
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Periyot seç" />
+              <SelectValue placeholder="Select period" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="today">Bugün</SelectItem>
-              <SelectItem value="week">Son 7 Gün</SelectItem>
-              <SelectItem value="month">Bu Ay</SelectItem>
-              <SelectItem value="year">Bu Yıl</SelectItem>
-              <SelectItem value="all">Tüm Zamanlar</SelectItem>
+              <SelectItem value="today">Today</SelectItem>
+              <SelectItem value="week">Last 7 Days</SelectItem>
+              <SelectItem value="month">This Month</SelectItem>
+              <SelectItem value="year">This Year</SelectItem>
+              <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
           <div className="text-right">
-            <p className="text-sm text-muted-foreground">Bugün</p>
+            <p className="text-sm text-muted-foreground">Today</p>
             <p className="text-lg font-semibold">{format(new Date(), 'dd.MM.yyyy')}</p>
           </div>
         </div>
@@ -340,15 +340,15 @@ export default function Dashboard() {
       {/* Main Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         <StatCard
-          title="Toplam Gelir"
+          title="Total Revenue"
           value={`${(stats?.totalRevenue || 0).toFixed(2)}₼`}
-          change={`${stats?.totalBookings || 0} rezervasyon`}
+          change={`${stats?.totalBookings || 0} bookings`}
           changeType="positive"
           icon={DollarSign}
           variant="revenue"
         />
         <StatCard
-          title="Benim Kazancım"
+          title="My Income"
           value={`${(stats?.myIncome || 0).toFixed(2)}₼`}
           change={`%${stats?.totalRevenue ? ((stats.myIncome / stats.totalRevenue) * 100).toFixed(1) : 0}`}
           changeType="positive"
@@ -356,23 +356,23 @@ export default function Dashboard() {
           variant="success"
         />
         <StatCard
-          title="Toplam Harcama"
+          title="Total Expenses"
           value={`${totalExpenses.toFixed(2)}₼`}
-          change={`${filteredExpenses.length} masraf`}
+          change={`${filteredExpenses.length} expenses`}
           changeType="negative"
           icon={TrendingDown}
           variant="destructive"
         />
         <StatCard
-          title="Net Kar"
+          title="Net Profit"
           value={`${netProfit.toFixed(2)}₼`}
-          change={netProfit >= 0 ? "Pozitif" : "Negatif"}
+          change={netProfit >= 0 ? "Positive" : "Negative"}
           changeType={netProfit >= 0 ? "positive" : "negative"}
           icon={netProfit >= 0 ? TrendingUp : Minus}
           variant={netProfit >= 0 ? "success" : "destructive"}
         />
         <StatCard
-          title="Sahip Kazancı"
+          title="Owner Income"
           value={`${(stats?.ownerIncome || 0).toFixed(2)}₼`}
           change={`%${stats?.totalRevenue ? ((stats.ownerIncome / stats.totalRevenue) * 100).toFixed(1) : 0}`}
           changeType="positive"
@@ -387,7 +387,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <TrendingUp className="h-5 w-5 text-revenue" />
-              Gelir Trendi
+              Revenue Trend
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -406,7 +406,7 @@ export default function Dashboard() {
                 <YAxis />
                 <Tooltip 
                   formatter={(value: number) => `${value.toFixed(2)}₼`}
-                  labelFormatter={(label) => `Tarih: ${label}`}
+                  labelFormatter={(label) => `Date: ${label}`}
                 />
                 <Legend />
                 <Line 
@@ -414,7 +414,7 @@ export default function Dashboard() {
                   dataKey="totalRevenue" 
                   stroke="#10b981" 
                   strokeWidth={3}
-                  name="Toplam Gelir"
+                  name="Total Revenue"
                   dot={{ fill: "#10b981", strokeWidth: 2 }}
                 />
                 <Line 
@@ -422,14 +422,14 @@ export default function Dashboard() {
                   dataKey="myIncome" 
                   stroke="#3b82f6" 
                   strokeWidth={2}
-                  name="Benim Kazancım"
+                  name="My Income"
                 />
                 <Line 
                   type="monotone" 
                   dataKey="ownerIncome" 
                   stroke="#f59e0b" 
                   strokeWidth={2}
-                  name="Sahip Kazancı"
+                  name="Owner Income"
                 />
               </LineChart>
             </ResponsiveContainer>
@@ -440,7 +440,7 @@ export default function Dashboard() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-black">
               <DollarSign className="h-5 w-5 text-primary" />
-              Gelir Dağılımı
+              Revenue Distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -448,9 +448,9 @@ export default function Dashboard() {
               <PieChart>
                 <Pie
                   data={[
-                    { name: 'Benim Kazancım', value: stats?.myIncome || 0 },
-                    { name: 'Sahip Kazancı', value: stats?.ownerIncome || 0 },
-                    { name: 'Harcamalar', value: totalExpenses }
+                    { name: 'My Income', value: stats?.myIncome || 0 },
+                    { name: 'Owner Income', value: stats?.ownerIncome || 0 },
+                    { name: 'Expenses', value: totalExpenses }
                   ]}
                   cx="50%"
                   cy="50%"
@@ -474,16 +474,16 @@ export default function Dashboard() {
       {/* Car Performance Details */}
       <Card className="shadow-card">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-black">
-            <Car className="h-5 w-5 text-primary" />
-            Araç Performans Detayları
-          </CardTitle>
+            <CardTitle className="flex items-center gap-2 text-black">
+              <Car className="h-5 w-5 text-primary" />
+              Car Performance Details
+            </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="table" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="table">Tablo Görünümü</TabsTrigger>
-              <TabsTrigger value="chart">Grafik Görünümü</TabsTrigger>
+              <TabsTrigger value="table">Table View</TabsTrigger>
+              <TabsTrigger value="chart">Chart View</TabsTrigger>
             </TabsList>
             
             <TabsContent value="table" className="space-y-4 mt-4">
@@ -492,13 +492,13 @@ export default function Dashboard() {
                   <table className="w-full text-sm">
                     <thead className="bg-muted/50">
                       <tr>
-                        <th className="px-4 py-3 text-left font-semibold">Araç</th>
-                        <th className="px-4 py-3 text-center font-semibold">Rezervasyon</th>
-                        <th className="px-4 py-3 text-center font-semibold">Toplam Gün</th>
-                        <th className="px-4 py-3 text-right font-semibold">Toplam Gelir</th>
-                        <th className="px-4 py-3 text-right font-semibold">Benim Kazancım</th>
-                        <th className="px-4 py-3 text-right font-semibold">Sahip Kazancı</th>
-                        <th className="px-4 py-3 text-right font-semibold">Ort. Günlük</th>
+                        <th className="px-4 py-3 text-left font-semibold">Car</th>
+                        <th className="px-4 py-3 text-center font-semibold">Bookings</th>
+                        <th className="px-4 py-3 text-center font-semibold">Total Days</th>
+                        <th className="px-4 py-3 text-right font-semibold">Total Revenue</th>
+                        <th className="px-4 py-3 text-right font-semibold">My Income</th>
+                        <th className="px-4 py-3 text-right font-semibold">Owner Income</th>
+                        <th className="px-4 py-3 text-right font-semibold">Avg Daily</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y">
@@ -541,9 +541,9 @@ export default function Dashboard() {
                   <YAxis />
                   <Tooltip formatter={(value: number) => `${value.toFixed(2)}₼`} />
                   <Legend />
-                  <Bar dataKey="totalRevenue" fill="#10b981" name="Toplam Gelir" />
-                  <Bar dataKey="myIncome" fill="#3b82f6" name="Benim Kazancım" />
-                  <Bar dataKey="ownerIncome" fill="#f59e0b" name="Sahip Kazancı" />
+                  <Bar dataKey="totalRevenue" fill="#10b981" name="Total Revenue" />
+                  <Bar dataKey="myIncome" fill="#3b82f6" name="My Income" />
+                  <Bar dataKey="ownerIncome" fill="#f59e0b" name="Owner Income" />
                 </BarChart>
               </ResponsiveContainer>
             </TabsContent>
@@ -556,7 +556,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-black">
             <CheckCircle className="h-5 w-5 text-success" />
-            Son Rezervasyonlar
+            Recent Bookings
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -571,7 +571,7 @@ export default function Dashboard() {
                     {carName} • {format(new Date(booking.startDate), 'dd.MM.yyyy')} - {format(new Date(booking.endDate), 'dd.MM.yyyy')}
                   </p>
                   <p className="text-xs text-muted-foreground mt-1">
-                    Toplam: {booking.totalAmount.toFixed(2)}₼ • Benim: {booking.myIncome.toFixed(2)}₼ • Sahip: {booking.ownerAmount.toFixed(2)}₼
+                    Total: {booking.totalAmount.toFixed(2)}₼ • Mine: {booking.myIncome.toFixed(2)}₼ • Owner: {booking.ownerAmount.toFixed(2)}₼
                   </p>
                 </div>
                 {getStatusBadge(booking.status)}

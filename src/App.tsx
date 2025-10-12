@@ -23,8 +23,8 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const App = () => {
-  // App başlangıcında localStorage temizleme kaldırıldı
-  // Artık sessionStorage kullanıyoruz - tarayıcı kapanana kadar kalır
+  // localStorage cleanup removed from app startup
+  // Now using sessionStorage - persists until browser is closed
 
   return (
     <QueryClientProvider client={queryClient}>

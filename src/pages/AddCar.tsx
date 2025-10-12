@@ -56,7 +56,7 @@ export default function AddCar() {
     description: ""
   });
 
-  // Google Drive'ı başlat
+  // Initialize Google Drive
   useEffect(() => {
     const init = async () => {
       try {
@@ -74,10 +74,10 @@ export default function AddCar() {
     try {
       await signInToGoogle();
       setIsLoggedInToGoogle(true);
-      sonnerToast.success('Google hesabına giriş yapıldı!');
+      sonnerToast.success('Successfully signed in to Google!');
     } catch (error) {
       console.error('Google sign in error:', error);
-      sonnerToast.error('Google girişi başarısız');
+      sonnerToast.error('Google sign in failed');
     }
   };
 
@@ -85,9 +85,9 @@ export default function AddCar() {
     const files = event.target.files;
     if (!files || files.length === 0) return;
 
-    // Google Drive'a giriş kontrolü
+    // Check Google Drive login
     if (!isLoggedInToGoogle) {
-      sonnerToast.error('Lütfen önce Google hesabınıza giriş yapın');
+      sonnerToast.error('Please sign in to your Google account first');
       return;
     }
 
@@ -95,46 +95,46 @@ export default function AddCar() {
     const uploadedUrls: string[] = [];
 
     try {
-      // Önce fotoğrafları sıkıştır
-      sonnerToast.loading('Fotoğraflar sıkıştırılıyor...', { id: 'compression' });
+      // First compress the images
+      sonnerToast.loading('Compressing images...', { id: 'compression' });
       
       const compressedFiles = await compressImages(Array.from(files), DEFAULT_COMPRESSION_OPTIONS);
       
       sonnerToast.dismiss('compression');
-      sonnerToast.success(`${compressedFiles.length} fotoğraf sıkıştırıldı!`);
+      sonnerToast.success(`${compressedFiles.length} images compressed!`);
       
-      // Her sıkıştırılmış dosyayı Google Drive'a yükle
+      // Upload each compressed file to Google Drive
       for (const file of compressedFiles) {
         const originalFile = Array.from(files).find(f => f.name.replace(/\.[^/.]+$/, '') === file.name.replace(/\.[^/.]+$/, ''));
         const originalSize = originalFile ? formatFileSize(originalFile.size) : 'unknown';
         const compressedSize = formatFileSize(file.size);
         
-        sonnerToast.loading(`${file.name} yükleniyor... (${originalSize} → ${compressedSize})`, { id: file.name });
+        sonnerToast.loading(`Uploading ${file.name}... (${originalSize} → ${compressedSize})`, { id: file.name });
         
         try {
           const result = await uploadFileToGoogleDrive(file);
-          // Alternatif URL'yi kullan (CORS sorunu için)
+          // Use alternative URL (for CORS issue)
           const imageUrl = (result as any).directImageUrl || getDirectImageUrl(result.id);
           uploadedUrls.push(imageUrl);
           
-          sonnerToast.success(`${file.name} yüklendi! (${compressedSize})`, { id: file.name });
+          sonnerToast.success(`${file.name} uploaded! (${compressedSize})`, { id: file.name });
         } catch (error) {
           console.error(`Error uploading ${file.name}:`, error);
-          sonnerToast.error(`${file.name} yüklenemedi`, { id: file.name });
+          sonnerToast.error(`Failed to upload ${file.name}`, { id: file.name });
         }
       }
 
-      // Yüklenen URL'leri state'e ekle
+      // Add uploaded URLs to state
       if (uploadedUrls.length > 0) {
         setImages(prev => [...prev, ...uploadedUrls]);
-        sonnerToast.success(`${uploadedUrls.length} fotoğraf Google Drive'a yüklendi!`);
+        sonnerToast.success(`${uploadedUrls.length} images uploaded to Google Drive!`);
       }
     } catch (error) {
       console.error('Upload error:', error);
-      sonnerToast.error('Fotoğraf yükleme hatası');
+      sonnerToast.error('Image upload error');
     } finally {
       setUploadingImages(false);
-      // Input'u temizle
+      // Clear input
       event.target.value = '';
     }
   };
@@ -257,10 +257,13 @@ export default function AddCar() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="economy">Economy</SelectItem>
-                      <SelectItem value="business">Business</SelectItem>
-                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="sedan">Sedan</SelectItem>
                       <SelectItem value="suv">SUV</SelectItem>
-                      <SelectItem value="sport">Sport</SelectItem>
+                      <SelectItem value="business">Business</SelectItem>
+                      <SelectItem value="luxury">Luxury</SelectItem>
+                      <SelectItem value="premium">Premium</SelectItem>
+                      <SelectItem value="van">Van</SelectItem>
+                      <SelectItem value="truck">Truck</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -368,7 +371,7 @@ export default function AddCar() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ImagePlus className="h-5 w-5 text-primary" />
-              Fotoğraflar (Google Drive)
+              Images (Google Drive)
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -379,15 +382,15 @@ export default function AddCar() {
                   <LogIn className="h-5 w-5 text-yellow-600" />
                   <div>
                     <p className="text-sm font-medium text-yellow-800">
-                      Google Drive'a giriş yapın
+                      Sign in to Google Drive
                     </p>
                     <p className="text-xs text-yellow-600">
-                      Fotoğraflar otomatik olarak Google Drive'a yüklenecek
+                      Images will be automatically uploaded to Google Drive
                     </p>
                   </div>
                 </div>
                 <Button onClick={handleGoogleSignIn} size="sm">
-                  Giriş Yap
+                  Sign In
                 </Button>
               </div>
             )}
@@ -396,7 +399,7 @@ export default function AddCar() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-3 flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-600 animate-pulse"></div>
                 <p className="text-sm text-green-800">
-                  Google Drive'a bağlı - Fotoğraflar otomatik yüklenecek
+                  Connected to Google Drive - Images will be uploaded automatically
                 </p>
               </div>
             )}
@@ -421,20 +424,20 @@ export default function AddCar() {
                   <>
                     <Loader2 className="h-8 w-8 mx-auto text-primary mb-2 animate-spin" />
                     <p className="text-sm text-primary font-medium">
-                      Google Drive'a yükleniyor...
+                      Uploading to Google Drive...
                     </p>
                   </>
                 ) : (
                   <>
                     <Upload className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
                     <p className="text-sm text-muted-foreground">
-                      Fotoğraf yüklemek için tıklayın
+                      Click to upload images
                     </p>
                     <p className="text-xs text-muted-foreground mt-1">
-                      PNG, JPG - Otomatik sıkıştırılıp Google Drive'a yüklenecek
+                      PNG, JPG - Automatically compressed and uploaded to Google Drive
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      📦 Maksimum boyut: 200KB (otomatik sıkıştırma)
+                      📦 Maximum size: 200KB (automatic compression)
                     </p>
                   </>
                 )}
@@ -444,7 +447,7 @@ export default function AddCar() {
             {images.length > 0 && (
               <>
                 <div className="text-sm text-muted-foreground">
-                  {images.length} fotoğraf yüklendi (Google Drive'da)
+                  {images.length} images uploaded (on Google Drive)
                 </div>
                 <DraggableImageGallery
                   images={images}

@@ -1,11 +1,11 @@
 /**
- * Google Drive API servis dosyası
- * Tarayıcı üzerinden Google Drive'a dosya yükleme ve yönetme
+ * Google Drive API service file
+ * Upload and manage files to Google Drive from browser
  */
 
-// Google API ayarları
+// Google API settings
 const CLIENT_ID = '463634324331-18i8t5ffqn2908abe041fmcv7g7b9qmp.apps.googleusercontent.com';
-const API_KEY = 'AIzaSyAZHMOYwvVrgvlEWCEOtLnQWsTKPa_e8ic'; // Google Cloud Console'dan API Key gerekli
+const API_KEY = 'AIzaSyAZHMOYwvVrgvlEWCEOtLnQWsTKPa_e8ic'; // API Key required from Google Cloud Console
 const SCOPES = 'https://www.googleapis.com/auth/drive.file';
 
 let tokenClient: any;
@@ -16,7 +16,7 @@ const STORAGE_KEY = 'google_drive_token';
 const STORAGE_EXPIRY_KEY = 'google_drive_token_expiry';
 
 /**
- * LocalStorage'dan token'ı yükle
+ * Load token from localStorage
  */
 const loadTokenFromStorage = (): boolean => {
   try {
@@ -27,57 +27,57 @@ const loadTokenFromStorage = (): boolean => {
       const expiryTime = parseInt(expiry, 10);
       const now = Date.now();
       
-      // Token hala geçerliyse
+      // If token is still valid
       if (now < expiryTime) {
         accessToken = token;
         return true;
       } else {
-        // Token süresi dolmuş, temizle
+        // Token expired, clear it
         clearTokenFromStorage();
         return false;
       }
     }
     return false;
   } catch (error) {
-    console.error('Token yükleme hatası:', error);
+    console.error('Token load error:', error);
     return false;
   }
 };
 
 /**
- * Token'ı localStorage'a kaydet
+ * Save token to localStorage
  */
 const saveTokenToStorage = (token: string, expiresIn: number = 3600): void => {
   try {
-    const expiryTime = Date.now() + (expiresIn * 1000); // saniyeyi milisaniyeye çevir
+    const expiryTime = Date.now() + (expiresIn * 1000); // convert seconds to milliseconds
     localStorage.setItem(STORAGE_KEY, token);
     localStorage.setItem(STORAGE_EXPIRY_KEY, expiryTime.toString());
   } catch (error) {
-    console.error('Token kaydetme hatası:', error);
+    console.error('Token save error:', error);
   }
 };
 
 /**
- * Token'ı localStorage'dan temizle
+ * Clear token from localStorage
  */
 const clearTokenFromStorage = (): void => {
   try {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_EXPIRY_KEY);
   } catch (error) {
-    console.error('Token temizleme hatası:', error);
+    console.error('Token clear error:', error);
   }
 };
 
 /**
- * Google API'yi yükle ve başlat
+ * Load and initialize Google API
  */
 export const initializeGoogleDrive = (): Promise<void> => {
   return new Promise((resolve, reject) => {
-    // Önce localStorage'dan token'ı yükle
+    // First load token from localStorage
     loadTokenFromStorage();
     
-    // Google API script'ini yükle
+    // Load Google API script
     const script = document.createElement('script');
     script.src = 'https://apis.google.com/js/api.js';
     script.onload = () => {
@@ -98,7 +98,7 @@ export const initializeGoogleDrive = (): Promise<void> => {
     script.onerror = reject;
     document.body.appendChild(script);
 
-    // Google Identity Services script'ini yükle
+    // Load Google Identity Services script
     const gisScript = document.createElement('script');
     gisScript.src = 'https://accounts.google.com/gsi/client';
     gisScript.onload = () => {
@@ -114,7 +114,7 @@ export const initializeGoogleDrive = (): Promise<void> => {
 };
 
 /**
- * Google hesabına giriş yap ve token al
+ * Sign in to Google account and get token
  */
 export const signInToGoogle = (): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -127,7 +127,7 @@ export const signInToGoogle = (): Promise<string> => {
         
         accessToken = response.access_token;
         
-        // Token'ı localStorage'a kaydet (expires_in varsa kullan, yoksa 3600 saniye default)
+        // Save token to localStorage (use expires_in if available, otherwise default to 3600 seconds)
         const expiresIn = response.expires_in || 3600;
         saveTokenToStorage(accessToken, expiresIn);
         
@@ -147,7 +147,7 @@ export const signInToGoogle = (): Promise<string> => {
 };
 
 /**
- * Google hesabından çıkış yap
+ * Sign out from Google account
  */
 export const signOutFromGoogle = () => {
   // @ts-ignore
@@ -159,13 +159,13 @@ export const signOutFromGoogle = () => {
     window.gapi.client.setToken('');
   }
   
-  // Token'ı temizle
+  // Clear token
   accessToken = null;
   clearTokenFromStorage();
 };
 
 /**
- * Dosyayı Google Drive'a yükle
+ * Upload file to Google Drive
  */
 export const uploadFileToGoogleDrive = async (
   file: File,
@@ -220,7 +220,7 @@ export const uploadFileToGoogleDrive = async (
 };
 
 /**
- * Dosyayı herkese açık yap
+ * Make file public
  */
 export const makeFilePublic = async (fileId: string): Promise<void> => {
   try {
@@ -242,7 +242,7 @@ export const makeFilePublic = async (fileId: string): Promise<void> => {
 };
 
 /**
- * Dosya bilgilerini al
+ * Get file information
  */
 export const getFileInfo = async (
   fileId: string
@@ -258,7 +258,7 @@ export const getFileInfo = async (
     );
 
     if (!response.ok) {
-      throw new Error('Dosya bilgileri alınamadı');
+      throw new Error('Failed to get file information');
     }
 
     return await response.json();
@@ -269,12 +269,12 @@ export const getFileInfo = async (
 };
 
 /**
- * Dosyayı Google Drive'dan sil
+ * Delete file from Google Drive
  */
 export const deleteFileFromGoogleDrive = async (fileId: string): Promise<void> => {
   try {
     if (!accessToken) {
-      throw new Error('Lütfen önce Google hesabınıza giriş yapın');
+      throw new Error('Please sign in to your Google account first');
     }
 
     const response = await fetch(`https://www.googleapis.com/drive/v3/files/${fileId}`, {
@@ -285,7 +285,7 @@ export const deleteFileFromGoogleDrive = async (fileId: string): Promise<void> =
     });
 
     if (!response.ok && response.status !== 204) {
-      throw new Error('Dosya silme başarısız');
+      throw new Error('File deletion failed');
     }
   } catch (error) {
     console.error('Delete error:', error);
@@ -294,7 +294,7 @@ export const deleteFileFromGoogleDrive = async (fileId: string): Promise<void> =
 };
 
 /**
- * Kullanıcının giriş durumunu kontrol et
+ * Check user's sign-in status
  */
 export const isSignedIn = (): boolean => {
   return accessToken !== null;

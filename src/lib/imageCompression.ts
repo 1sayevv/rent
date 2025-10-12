@@ -1,17 +1,17 @@
 /**
  * Image compression utility
- * Fotoğrafları Google Drive'a yüklemeden önce sıkıştırır
+ * Compresses images before uploading to Google Drive
  */
 
 interface CompressionOptions {
-  maxSizeKB?: number; // Maksimum dosya boyutu (KB)
-  quality?: number; // JPEG kalitesi (0-1)
-  maxWidth?: number; // Maksimum genişlik
-  maxHeight?: number; // Maksimum yükseklik
+  maxSizeKB?: number; // Maximum file size (KB)
+  quality?: number; // JPEG quality (0-1)
+  maxWidth?: number; // Maximum width
+  maxHeight?: number; // Maximum height
 }
 
 /**
- * Canvas kullanarak resmi sıkıştır
+ * Compress image using canvas
  */
 function compressImage(
   file: File,
@@ -31,7 +31,7 @@ function compressImage(
 
     img.onload = () => {
       try {
-        // Yeni boyutları hesapla (aspect ratio korunarak)
+        // Calculate new dimensions (maintaining aspect ratio)
         let { width, height } = img;
         
         if (width > maxWidth || height > maxHeight) {
@@ -40,14 +40,14 @@ function compressImage(
           height *= ratio;
         }
 
-        // Canvas boyutunu ayarla
+        // Set canvas dimensions
         canvas.width = width;
         canvas.height = height;
 
-        // Resmi çiz
+        // Draw the image
         ctx?.drawImage(img, 0, 0, width, height);
 
-        // Kalite ayarlarını dene
+        // Try quality settings
         let currentQuality = quality;
         const tryCompress = () => {
           canvas.toBlob(
@@ -60,9 +60,9 @@ function compressImage(
               const sizeKB = blob.size / 1024;
               console.log(`Compressed image: ${sizeKB.toFixed(2)}KB (quality: ${currentQuality})`);
 
-              // Boyut kontrolü
+              // Check size
               if (sizeKB <= maxSizeKB || currentQuality <= 0.1) {
-                // Dosya adını koru ama uzantıyı jpeg yap
+                // Keep filename but change extension to jpeg
                 const fileName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
                 const compressedFile = new File([blob], fileName, {
                   type: 'image/jpeg',
@@ -71,7 +71,7 @@ function compressImage(
                 
                 resolve(compressedFile);
               } else {
-                // Kaliteyi düşür ve tekrar dene
+                // Reduce quality and try again
                 currentQuality -= 0.1;
                 tryCompress();
               }
@@ -91,7 +91,7 @@ function compressImage(
       reject(new Error('Image load failed'));
     };
 
-    // Resmi yükle
+    // Load the image
     const reader = new FileReader();
     reader.onload = (e) => {
       img.src = e.target?.result as string;
@@ -104,7 +104,7 @@ function compressImage(
 }
 
 /**
- * Birden fazla resmi sıkıştır
+ * Compress multiple images
  */
 export async function compressImages(
   files: File[],
@@ -126,7 +126,7 @@ export async function compressImages(
       results.push(compressedFile);
     } catch (error) {
       console.error(`❌ Failed to compress ${file.name}:`, error);
-      // Sıkıştırma başarısız olursa orijinal dosyayı kullan
+      // Use original file if compression fails
       results.push(file);
     }
   }
@@ -135,7 +135,7 @@ export async function compressImages(
 }
 
 /**
- * Tek dosya sıkıştır
+ * Compress single file
  */
 export async function compressImageFile(
   file: File,

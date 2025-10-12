@@ -71,7 +71,7 @@ export default function CarDetails() {
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Загрузка автомобиля ID: {id}...</p>
+          <p className="text-muted-foreground">Loading car ID: {id}...</p>
         </div>
       </div>
     );
@@ -194,7 +194,7 @@ export default function CarDetails() {
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
                       <div className="text-center text-gray-500">
                         <Car className="h-12 w-12 mx-auto mb-2" />
-                        <p className="text-sm">Fotoğraf yok</p>
+                        <p className="text-sm">No image</p>
                       </div>
                     </div>
                   )}
@@ -292,15 +292,15 @@ export default function CarDetails() {
         {/* Debug Panel - Remove in production */}
         <Card className="shadow-card border-yellow-200 bg-yellow-50">
           <CardContent className="p-6">
-            <h3 className="text-lg font-semibold text-yellow-800 mb-4">🐛 Debug Bilgileri</h3>
+            <h3 className="text-lg font-semibold text-yellow-800 mb-4">🐛 Debug Information</h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
               <div>
-                <p className="font-medium text-yellow-800">Ana Fotoğraf:</p>
-                <p className="text-yellow-700 break-all">{car.image || "YOK"}</p>
+                <p className="font-medium text-yellow-800">Main Image:</p>
+                <p className="text-yellow-700 break-all">{car.image || "NONE"}</p>
               </div>
               <div>
-                <p className="font-medium text-yellow-800">Ek Fotoğraflar:</p>
-                <p className="text-yellow-700">{car.images ? car.images.length : 0} adet</p>
+                <p className="font-medium text-yellow-800">Additional Images:</p>
+                <p className="text-yellow-700">{car.images ? car.images.length : 0} items</p>
                 {car.images && car.images.map((img, i) => (
                   <p key={i} className="text-xs text-yellow-600 break-all">{i+1}: {img}</p>
                 ))}
@@ -323,7 +323,7 @@ export default function CarDetails() {
                         alt={`${car.name} - photo ${index + 1}`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
-                          // Fotoğraf yüklenemezse placeholder göster
+                          // Show placeholder if image fails to load
                           e.currentTarget.src = "/placeholder.svg";
                         }}
                       />
